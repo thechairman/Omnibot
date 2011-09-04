@@ -1,0 +1,4 @@
+
+#define RPL_MYINFO 004
+#define ERR_NICNNAMEINUSE 433
+
