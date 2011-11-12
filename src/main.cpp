@@ -3,6 +3,7 @@
 
 
 #include<poll.h>
+#include<unistd.h>
 
 int main()
 {
@@ -10,7 +11,9 @@ int main()
 	//drop the client in here
 	
 	irc.connect("madhax.net", 6667);
+//	sleep(2);
 	irc.registerUser("minibot", "minibot", "minibot");
+//	sleep(10);
 	irc.join("#alpha1");
 	
 	bool loop = true;

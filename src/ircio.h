@@ -15,6 +15,7 @@ class ircio{
 		virtual bool read(std::string&) = 0;
 		virtual bool write(std::string&) = 0 ;
 		virtual void registerCallBack(ircioCallBack*) = 0;
+		virtual unsigned int sleep(unsigned int) = 0;
 
 
 };

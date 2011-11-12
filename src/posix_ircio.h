@@ -12,6 +12,7 @@
 
 #include<vector>
 #include<string>
+#include<iostream>
 
 #include"ircio.h"
 
@@ -23,6 +24,7 @@ class posix_ircio : public ircio{
 		virtual bool read(std::string&);
 		virtual bool write(std::string&);
 		virtual void registerCallBack(ircioCallBack*);
+		virtual unsigned int sleep(unsigned int);
 
 	private:
 		static void* startListening(void* ptr);

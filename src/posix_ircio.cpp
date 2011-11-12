@@ -115,4 +115,11 @@ void* posix_ircio::startListening(void* ptr){
 
 	io->listen();
 
+	return NULL;
+
+}
+
+unsigned int posix_ircio::sleep(unsigned int seconds)
+{
+	return ::sleep(seconds);
 }

@@ -9,6 +9,7 @@ const std::string ircInterface::JOIN = "JOIN";
 const std::string ircInterface::PART = "PART";
 const std::string ircInterface::USER = "USER";
 
+
 ircInterface::ircInterface(){
 	
 }
@@ -20,20 +21,22 @@ int ircInterface::connect(std::string server, int port){
 
 	serverConnection.registerCallBack(this);
 	serverConnection.open(server, port);
+	serverConnection.sleep(SLEEP_INTRV);
 	return 0;
 }
 
 int ircInterface::registerUser(std::string nick, std::string uname, std::string rname){
 
-	std::string msg = NICK + " " + nick;
+	std::string msg = NICK + " " + nick+ "\r\n";
 	sendString(msg);
-	msg = "USER " + uname + " 0 * :" + rname;
+	msg = "USER " + uname + " 0 * :" + rname + "\r\n";
 	sendString(msg);
+	serverConnection.sleep(SLEEP_INTRV);
 	return 0;
 }
 
 int ircInterface::join(std::string channel){
-	std::string msg = JOIN + " :" + channel;
+	std::string msg = JOIN + " :" + channel + "\r\n";
 	sendString(msg);
 	return 0;
 }
@@ -98,7 +101,9 @@ void ircInterface::sendString(std::string str){
 
 void ircInterface::onMessage(std::string msg){
 	std::cout << msg << std::endl;
+	//msg = msg.substr(msg.find_first_of(' '));
 	std::string type = msg.substr(0, msg.find_first_of(' '));
+	//std::cout <<msg <<std::endl;
 
 	//check for ping
 	if(!type.compare(PING)){
@@ -129,6 +134,6 @@ void ircInterface::onMessage(std::string msg){
 }
 
 void ircInterface::sendPong(){
-	std::string temp = PONG;
-	serverConnection.write(temp);
+	std::string temp = PONG + " minibot\r\n";
+	sendString(temp);
 }

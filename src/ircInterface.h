@@ -43,6 +43,7 @@ class ircInterface : public ircioCallBack{
 	//some constants
 	static const int NUM_MSG_HDRS = 1;
 	static const int NUM_EVT_HDRS = 3;
+	static const int SLEEP_INTRV = 7;
 	//irc strings	
 	static const std::string PRIVMSG;	//message header
 	static const std::string QUIT;		//event header
