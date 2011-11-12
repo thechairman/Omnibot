@@ -9,8 +9,8 @@ int main()
 	ircInterface irc;
 	//drop the client in here
 	
-	irc.connect("madhax.net" 6667);
-	irc.registerNick("minibot", "minibot", "minibot");
+	irc.connect("madhax.net", 6667);
+	irc.registerUser("minibot", "minibot", "minibot");
 	irc.join("#alpha1");
 	
 	bool loop = true;
@@ -21,7 +21,7 @@ int main()
 	while(loop){
 
 		if(poll(cinfd, 1, 1000)){
-			cin >> pain;
+			std::cin >> pain;
 		}
 
 		if(pain[0] == 'q' || pain[0] == 'Q'){

@@ -1,6 +1,6 @@
 C = g++
 
-LIBS = -lpthread
+LIBS = -lpthread -lstdc++
 
 INCLUDES = -I ./
 

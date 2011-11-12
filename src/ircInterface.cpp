@@ -108,11 +108,11 @@ void ircInterface::onMessage(std::string msg){
 	
 	//check for message
 	if(!type.compare(PRIVMSG)){
-		ircMessage m;
+		//ircMessage m;
 
 		//build message here
 		
-		notifyMessage(m);
+		//notifyMessage(m);
 	}
 	
 	//check for action
@@ -120,11 +120,11 @@ void ircInterface::onMessage(std::string msg){
 			!type.compare(JOIN)||
 			!type.compare(PART))
 	{
-		ircEvent e;
+		//ircEvent e;
 
 		//build event here
 		
-		notifyEvent(e);
+		//notifyEvent(e);
 	}
 }
 

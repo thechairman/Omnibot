@@ -11,6 +11,7 @@
 #include<pthread.h>
 
 #include<vector>
+#include<string>
 
 #include"ircio.h"
 
@@ -24,7 +25,8 @@ class posix_ircio : public ircio{
 		virtual void registerCallBack(ircioCallBack*);
 
 	private:
-		virtual void listen(void* ptr);
+		static void* startListening(void* ptr);
+		virtual void listen();
 		virtual void onReceive(std::string);
 		int socket;
 		static const int BUFSIZE = 255;

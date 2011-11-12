@@ -1,33 +1,35 @@
+#include"posix_ircio.h"
 
-void posix_ircio::open(std::string server, int port)
+bool posix_ircio::open(std::string server, int port)
 {
 	//get a file descriptor
-	socket = socket(AF_INET, SOCK_STREAM, O);
+	socket = ::socket(AF_INET, SOCK_STREAM, 0);
 	if(socket < 0)
 	{
 		return false;
 	}
 
 	//look up the host
-	hostent serverhost = gethostbyname(server.c_str());
+	hostent* serverhost = gethostbyname(server.c_str());
 	if(serverhost == NULL)
 	{
 		return false;
 	}
 
 	//setup the sock address struct
-	sockaddr_in sockaddr;
-	bzero((char*) &sockaddr, sizeof(sockaddr));
+	sockaddr_in sockadder;
+	bzero((char*) &sockadder, sizeof(sockadder));
 
-	sockaddr.sin_family = AF_NET;
+	sockadder.sin_family = AF_INET;
 
 	bcopy((char*)serverhost->h_addr,
-			(char*)&sockaddr.sin_addr.s_addr, serverhost->h_length);
+			(char*)&sockadder.sin_addr.s_addr, serverhost->h_length);
 
-	sockaddr.sin_port = htons(port);
+	sockadder.sin_port = htons(port);
 
 	//open trhe socket
-	int result = connect(socket, &sockaddr, sizeof(sockaddr));
+	sockaddr* temp = (sockaddr*) &sockadder;
+	int result = connect(socket, temp, sizeof(sockadder));
 	if(result < 0){
 		return false;
 	}
@@ -35,7 +37,7 @@ void posix_ircio::open(std::string server, int port)
 	//start a p thread running listening on the socket
 	isOpen = true;
 
-	pthread_create(&listenerThread, NULL, (void*)listen, NULL);
+	pthread_create(&listenerThread, NULL, &posix_ircio::startListening, this);
 	return true;
 
 }
@@ -45,9 +47,9 @@ void posix_ircio::close()
 	isOpen = false;
 }
 
-void posix_ircio::write(std::string str)
+bool posix_ircio::write(std::string& str)
 {
-	int written =(int) write(socket, str.c_str(), str.size());
+	int written =(int) ::write(socket, str.c_str(), str.size());
 
 	if(written <0)
 	{
@@ -64,14 +66,14 @@ bool posix_ircio::read(std::string& temp)
 	char buf[BUFSIZE];
 	bzero(buf, BUFSIZE);
 	//read on the socket
-	int chars = (int)read(socket, buf, BUFSIZE);
+	int chars = (int)::read(socket, buf, BUFSIZE);
 	if(chars < 0)
 		return false;
 	 temp.assign(buf);
 	return true;
 }
 
-void posix_ircio::listen(void* ptr)
+void posix_ircio::listen()
 {
 	char buf[BUFSIZE];
 	while(isOpen)
@@ -79,7 +81,7 @@ void posix_ircio::listen(void* ptr)
 
 		bzero(buf, BUFSIZE);
 		//read on the socket
-		int chars = (int)read(socket, buf, BUFSIZE);	
+		int chars = (int)::read(socket, buf, BUFSIZE);	
 		if(chars < 0)
 			continue;
 
@@ -99,11 +101,18 @@ void posix_ircio::onReceive(std::string msg){
 	std::vector<ircioCallBack*>::iterator iter;
 	for(iter = callbacks.begin(); iter < callbacks.end(); iter++)
 	{
-		(*iter).onMessage(msg);
+		(*iter)->onMessage(msg);
 	}
 }
 
 void posix_ircio::registerCallBack(ircioCallBack* callback)
 {
 	callbacks.push_back(callback);	
+}
+
+void* posix_ircio::startListening(void* ptr){
+	posix_ircio* io = (posix_ircio*) ptr;
+
+	io->listen();
+
 }
