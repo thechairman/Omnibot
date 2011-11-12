@@ -1,7 +1,6 @@
 #ifndef _POSIX_IRCIO_
 #define _POSIX_IRCIO_
 
-#include"ircio.h"
 
 #include<unistd.h>
 #include<sys/types.h>
@@ -13,13 +12,15 @@
 
 #include<vector>
 
+#include"ircio.h"
+
 class posix_ircio : public ircio{
 
 	public:
 		virtual bool  open(std::string server, int port);
 		virtual void close();
 		virtual bool read(std::string&);
-		virtual bool write();
+		virtual bool write(std::string&);
 		virtual void registerCallBack(ircioCallBack*);
 
 	private:
@@ -31,7 +32,7 @@ class posix_ircio : public ircio{
 
 		//should probably add mutex for these
 		//at some point
-		bool isOpen
+		bool isOpen;
 		std::vector<ircioCallBack*> callbacks;
 
 

@@ -1,31 +1,31 @@
 #include "ircInterface.h"
+
+const std::string ircInterface::PRIVMSG = "PRIVMSG";
+const std::string ircInterface::QUIT = "QUIT";
+const std::string ircInterface::PING = "PING";
+const std::string ircInterface::PONG = "PONG";
+const std::string ircInterface::NICK = "NICK";
+const std::string ircInterface::JOIN = "JOIN";
+const std::string ircInterface::PART = "PART";
+const std::string ircInterface::USER = "USER";
+
 ircInterface::ircInterface(){
-	ios = new boost::asio::io_service;
-	sock = new boost::asio::ip::tcp::socket(*ios);
 	
 }
 
 ircInterface::~ircInterface(){
-	//should probably come up with a way to 
-	//make sure these ahve been closed and flushed first
-	delete ios;
-	delete sock;
 }
 
 int ircInterface::connect(std::string server, int port){
-	boost::asio::ip::tcp::resolver resolver(*ios);
-	boost::aso::ip::tcp::resolver::query query(&server, "irc");
-	tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-	boost::asio::connect(*sock, endpoint_iterator);
 
-	//should probably launch a thread to listen to the socket here
-	receiverThread = new boost::thread(&ircInterface::receiver, this);
+	serverConnection.registerCallBack(this);
+	serverConnection.open(server, port);
 	return 0;
 }
 
 int ircInterface::registerUser(std::string nick, std::string uname, std::string rname){
 
-	std::string msg = "NICK " + nick;
+	std::string msg = NICK + " " + nick;
 	sendString(msg);
 	msg = "USER " + uname + " 0 * :" + rname;
 	sendString(msg);
@@ -33,7 +33,7 @@ int ircInterface::registerUser(std::string nick, std::string uname, std::string 
 }
 
 int ircInterface::join(std::string channel){
-	std::string msg = "JOIN :"+channel;
+	std::string msg = JOIN + " :" + channel;
 	sendString(msg);
 	return 0;
 }
@@ -70,29 +70,65 @@ int ircInterface::quit(std::string reason){
 }
 
 int ircInterface::quit(){
-	std::string msg = "QUIT";
+	std::string msg = QUIT;
 	sendString(msg);
 	return 0;
 }
 
-void registerForNotify(ircInterfaceClient* client){
+void ircInterface::registerForNotify(ircInterfaceClient* client){
 	clients.push_back(client);
 }
 
 void ircInterface::notifyEvent(ircEvent e){
-	std::vector<ircInerfaceClient*>::iterator iter;
-	for(iter = clients.begin(); it < clients.end(); iter++){
+	std::vector<ircInterfaceClient*>::iterator iter;
+	for(iter = clients.begin(); iter < clients.end(); iter++){
 		(*iter)->alertEvent(e);
 	}
 }	
 void ircInterface::notifyMessage(ircMessage m){
-	std::vector<ircInerfaceClient*>::iterator iter;
-	for(iter = clients.begin(); it < clients.end(); iter++){
+	std::vector<ircInterfaceClient*>::iterator iter;
+	for(iter = clients.begin(); iter < clients.end(); iter++){
 		(*iter)->alertMessage(m);
 	}
 }	
 void ircInterface::sendString(std::string str){
+	serverConnection.write(str);
 	std::cout << str << std::endl;
 }
 
-void irc
+void ircInterface::onMessage(std::string msg){
+	std::cout << msg << std::endl;
+	std::string type = msg.substr(0, msg.find_first_of(' '));
+
+	//check for ping
+	if(!type.compare(PING)){
+		sendPong();
+		return;
+	}	
+	
+	//check for message
+	if(!type.compare(PRIVMSG)){
+		ircMessage m;
+
+		//build message here
+		
+		notifyMessage(m);
+	}
+	
+	//check for action
+	if(!type.compare(QUIT) ||
+			!type.compare(JOIN)||
+			!type.compare(PART))
+	{
+		ircEvent e;
+
+		//build event here
+		
+		notifyEvent(e);
+	}
+}
+
+void ircInterface::sendPong(){
+	std::string temp = PONG;
+	serverConnection.write(temp);
+}

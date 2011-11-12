@@ -2,14 +2,13 @@
 #include <vector>
 
 #include <iostream>
-#include <boost/asio.hpp>
-#include <boost/thread.hpp>
 
-#include "ircNotifyClasses.h"
+#include "posix_ircio.h"
+#include "ircInterfaceClient.h"
 
-class ircInterface{
+class ircInterface : public ircioCallBack{
 
-pubilc:
+	public:
 	ircInterface();
 	virtual ~ircInterface();
 	int connect(std::string server, int port);
@@ -17,13 +16,14 @@ pubilc:
 	int join(std::string channel);
 	int part(std::string channel, std::string reason);
 	int part(std::string channel);
-	int sendMessage(std::channel, std::string message);
+	int sendMessage(std::string channel, std::string message);
 	int sendPM(std::string nick, std::string message);
 	int quit(std::string reason);
-	int quit():
+	int quit();
 	void registerForNotify(ircInterfaceClient* client);
+	void onMessage(std::string);
 
-private:
+	private:
 	//hit registered callbacks
 	void notifyEvent(ircEvent e);
 	void notifyMessage(ircMessage m);
@@ -37,16 +37,19 @@ private:
 	//handles a message received from the socket
 	void handleString(std::string msg);
 
-	//this thread just loops over the socket reading messages
-	//and calling handleString when it gets one
-	void receiver();
-
-	//some kind of socket preferably boost 
-	//otherwise i could always just launch
-	//a thread to sit on it and handle
-	//messages
-	boost::asio::io_service* ios;
-	boost::asio::ip::tcp::socket* sock;
-	boost::thread receiverThread;
+	posix_ircio serverConnection;
 	std::vector<ircInterfaceClient*> clients;
-}
+
+	//some constants
+	static const int NUM_MSG_HDRS = 1;
+	static const int NUM_EVT_HDRS = 3;
+	//irc strings	
+	static const std::string PRIVMSG;	//message header
+	static const std::string QUIT;		//event header
+	static const std::string PING;
+	static const std::string PONG;
+	static const std::string NICK;
+	static const std::string JOIN;		//event header
+	static const std::string PART;		//event header
+	static const std::string USER;
+};
