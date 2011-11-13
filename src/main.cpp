@@ -1,14 +1,28 @@
 #include"ircInterface.h"
 #include"ircInterfaceClient.h"
 
+#include <iostream>
 
 #include<poll.h>
 #include<unistd.h>
+
+class testClass: public ircInterfaceClient{
+	public:
+		void alertEvent(ircEvent);
+		void alertMessage(ircMessage);
+};
+
+void testClass::alertEvent(ircEvent e){}
+void testClass::alertMessage(ircMessage m){
+	std::cout << "TestClass: " << m.user()->nick() << ": " << m.message() << std::endl;
+}
 
 int main()
 {
 	ircInterface irc;
 	//drop the client in here
+	testClass tester;
+	irc.registerForNotify(&tester);
 	
 	irc.connect("madhax.net", 6667);
 //	sleep(2);

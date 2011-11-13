@@ -152,7 +152,7 @@ void ircInterface::onMessage(std::string msg){
 
 		//should be setting the message to just contain the message
 		//TODO this should be streamlined if possible
-		msg = msg.substr(msg.find_first_of(':', msg.find_first_of(' ', msg.find_first_of(' ') + 1) + 1));
+		msg = msg.substr(msg.find_first_of(':', msg.find_first_of(' ', msg.find_first_of(' ') + 1) + 1) +1);
 		ircMessage m(temp, msg, channel);
 
 		
