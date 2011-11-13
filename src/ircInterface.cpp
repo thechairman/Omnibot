@@ -120,11 +120,43 @@ void ircInterface::onMessage(std::string msg){
 
 	//check for message
 	if(!type.compare(PRIVMSG)){
-		//ircMessage m;
+		//grab user data
+		std::string nick = prefix.substr(prefix.find_first_of(':') + 1, prefix.find_first_of('!') -1);
 
-		//build message here
+		//TODO this is just a temporary solution that could cause hella memory leaks if not fixed later
+		ircUser* temp = NULL;
 		
-		//notifyMessage(m);
+		std::map<std::string, ircUser*>::iterator it;
+
+		for(it = users.begin(); it != users.end(); it++){
+			if(!(*it).first.compare(nick)){
+				temp = (*it).second;
+				break;
+			}
+		}
+
+		if(temp == NULL){
+			temp = new ircUser(nick);
+			users[nick] = temp;
+		}
+
+		//TODO this should be streamlined if possible
+		std::string channel =  msg.substr(msg.find_first_of(' ') + 1, msg.find_first_of(' ', msg.find_first_of(' ') + 1) - msg.find_first_of(' '));
+
+		for(it = users.begin(); it != users.end(); it++){
+			if(!(*it).first.compare(channel)){
+				channel = "";
+				break;
+			}
+		}
+
+		//should be setting the message to just contain the message
+		//TODO this should be streamlined if possible
+		msg = msg.substr(msg.find_first_of(':', msg.find_first_of(' ', msg.find_first_of(' ') + 1) + 1));
+		ircMessage m(temp, msg, channel);
+
+		
+		notifyMessage(m);
 	}
 	
 	//check for action

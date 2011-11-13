@@ -12,7 +12,7 @@ public:
 		USER_NOT_REGISTERED = -1
 	};
 	ircUser();
-	ircUser(std::string nick_, int userId);
+	ircUser(std::string nick_, int userId = USER_NOT_REGISTERED);
 	ircUser(ircUser&);
 	std::string nick() const;
 	int userId() const;

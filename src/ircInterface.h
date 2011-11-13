@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <map>
 
 #include <iostream>
 
@@ -39,6 +40,9 @@ class ircInterface : public ircioCallBack{
 
 	posix_ircio serverConnection;
 	std::vector<ircInterfaceClient*> clients;
+
+	//map to hold nicks -> user structs
+	std::map<std::string, ircUser*> users;
 
 	//some constants
 	static const int NUM_MSG_HDRS = 1;
