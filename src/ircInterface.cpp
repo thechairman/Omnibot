@@ -101,16 +101,23 @@ void ircInterface::sendString(std::string str){
 
 void ircInterface::onMessage(std::string msg){
 	std::cout << msg << std::endl;
-	//msg = msg.substr(msg.find_first_of(' '));
 	std::string type = msg.substr(0, msg.find_first_of(' '));
 	//std::cout <<msg <<std::endl;
-
+	
+	//first check for messages that start with message names
 	//check for ping
 	if(!type.compare(PING)){
 		sendPong();
 		return;
 	}	
 	
+	//then ones that start with nicks
+	std::string prefix = type;
+	msg = msg.substr(msg.find_first_of(' ')+1);
+	type = msg.substr(0, msg.find_first_of(' '));
+	
+	//then other things
+
 	//check for message
 	if(!type.compare(PRIVMSG)){
 		//ircMessage m;

@@ -6,6 +6,7 @@ INCLUDES = -I ./
 
 OBJS = ircInterface.o\
        posix_ircio.o\
+       ircNotifyClasses.o\
        main.o
 
 all: MiniBot
