@@ -5,14 +5,15 @@
 
 class omnibot: public ircInterfaceClient{
 	public:
+		omnibot();
+		omnibot(ircInterface);
 		void alertEvent(ircEvent);
 		void alertMessage(ircMessage);
 
 	private:
 		ircInterface _irc;
+		PluginManger _manager(&_irc, NULL);
 		//nick manager
-		//plugin manager
-		//plugin utils
 		
 	//probably a ton of methods here about what to do
 	//with various things to do when certain messages 

@@ -5,12 +5,14 @@
 #include "PluginUtils.h"
 
 
-class OmniPluginInterface {
+class OmniPlugin {
 	public:
-		static void onMessage(void*);
+		static void onMessage(OmniPlugin*, ircMessage);
+		static void startThread(void*);
 		virtual void handleMessage(ircMessage*) = 0;
 		virtual bool init(PluginUtils*) = 0;
 		virtual void wrapUp() = 0;
+		virtual std::string name() = 0;
 
 
 };

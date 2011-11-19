@@ -6,7 +6,15 @@
 class PluginFactory{
 
 	Public:
+	static PluginFactory* instance();
 	OmniPluginInterface* load(std::string);
+	virtual ~PluginFactory();
+
+	protected:
+	PluginFactory();
+
+	private:
+	static PluginFactory* _instance = NULL;
 
 };
 
