@@ -26,9 +26,10 @@ int main()
 	
 	irc.connect("madhax.net", 6667);
 //	sleep(2);
-	irc.registerUser("minibot", "minibot", "minibot");
+	irc.registerUser("Omnibot", "Omnibot", "Omnibot");
 //	sleep(10);
 	irc.join("#alpha1");
+	irc.join("#main");
 	
 	bool loop = true;
 	pollfd cinfd[1];
