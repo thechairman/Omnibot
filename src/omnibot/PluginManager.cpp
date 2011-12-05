@@ -1,14 +1,20 @@
-#include "PluginManger.h"
+#include "PluginManager.h"
 
-PluginManager::PluginManager(ircInterface* irc, NickManager * nicks){
+PluginManager::PluginManager(ircInterface& irc, NickManager& nicks){
 
-	_utils = new PluginUtils(irc, this, nicks);
+	_utils = new PluginUtils(irc, *this, nicks);
 	_factory = PluginFactory::instance();
 
 }
 
 PluginManager::~PluginManager(){
 	delete _utils;
+
+	std::vector<OmniPlugin*>::iterator iter;
+	for(iter = _plugins.begin(); iter != _plugins.end(); iter++){
+		(*iter)->wrapUp();
+		delete (*iter);
+	}
 
 	//TODO not exactly sure what to do with that factory class...
 }
@@ -23,7 +29,7 @@ bool PluginManager::load(std::string pluginName){
 
 	//TODO look up permissions for this plugin and set them 
 	//in the this plugin utils struct
-	PluginUtils* utils= new PluginUtils(_utils);
+	PluginUtils* utils= new PluginUtils(*_utils);
 
 	newPlugin->init(utils);
 
@@ -40,7 +46,7 @@ bool PluginManager::unload(std::string pluginName){
 		if(!((*iter)->name().compare(pluginName)))
 		{
 			(*iter)->wrapUp();
-			delete (*iter)
+			delete (*iter);
 			_plugins.erase(iter);
 			break;
 		}
@@ -57,7 +63,7 @@ void PluginManager::pushMessage(ircMessage msg){
 	std::vector<OmniPlugin*>::iterator iter;
 	for(iter = _plugins.begin(); iter != _plugins.end(); iter++)
 	{
-		OmniPlugin::onMessage((*iter), msg);
+		OmniPlugin::passMessage((*iter), &msg);
 	}
 }
 

@@ -1,3 +1,5 @@
+#ifndef _IRC_INTERFACE_
+#define _IRC_INTERFACE_
 #include <string>
 #include <vector>
 #include <map>
@@ -58,3 +60,5 @@ class ircInterface : public ircioCallBack{
 	static const std::string PART;		//event header
 	static const std::string USER;
 };
+
+#endif

@@ -10,7 +10,13 @@ OBJS = ircInterface.o\
        ircNotifyClasses.o\
        omnibot.o\
        PluginFactory.o\
-       PluginManager.o
+       PluginManager.o\
+       LinuxPluginFactory.o\
+       PluginUtils.o\
+       OmniPluginInterface.o\
+       OmniThread.o\
+       main.o
+
 
 all: Omnibot
 

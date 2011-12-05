@@ -3,18 +3,28 @@
 
 #include "OmniPluginInterface.h"
 
+/* this class is designed to wrap system specific
+ * dynamic class loading up into a factory class
+ * so you it enhances code portabilty, it 
+ * should probably be an interface inherited by 
+ * specific implementations
+ */
+class PluginFactory;
+class OmniPlugin;
+
+
 class PluginFactory{
 
-	Public:
+	public:
 	static PluginFactory* instance();
-	OmniPluginInterface* load(std::string);
 	virtual ~PluginFactory();
+	virtual OmniPlugin* load(std::string) = 0;
 
 	protected:
 	PluginFactory();
 
 	private:
-	static PluginFactory* _instance = NULL;
+	static PluginFactory* _instance;
 
 };
 

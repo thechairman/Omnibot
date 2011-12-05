@@ -1,8 +1,14 @@
 
 #include "omnibot.h"
 
-omnibot::omnibot(){}
-omnibot::omnibot(ircInterface& irc_):_irc(irc_){}
+/*omnibot::omnibot(){
+	should create an irc instance here and connec
+	but i don't think this is possible... you would 
+	need a default server... maybe I should just take
+	the empty constructor out
+}*/
+omnibot::omnibot(ircInterface& irc_):_irc(irc_),_nicks(),_manager(_irc, _nicks){
+}
 
 void omnibot::alertMessage(ircMessage msg)
 {
@@ -17,15 +23,15 @@ void omnibot::alertMessage(ircMessage msg)
 		//before doing any of this...
 		if(!isOmniOp(msg.user())){
 			//tell them omnibot only list
-			_irc.sendMessage(msg.channel, msg.user()->nick() + ": I only listen to OmniOps :P");
+			_irc.sendMessage(msg.channel(), msg.user()->nick() + ": I only listen to OmniOps :P");
 		}
 
 		if (!toParse.substr(1, 4).compare("load")){
 			loadPlugin(toParse.substr(6));
 		}
-		else if(!toParse.subster(1, 4).compare("drop"))
+		else if(!toParse.substr(1, 4).compare("drop"))
 		{
-			dropPlugin(toParse.sugstr(6));
+			dropPlugin(toParse.substr(6));
 		}
 		else if(!toParse.substr(1,2).compare("op"))
 		{
