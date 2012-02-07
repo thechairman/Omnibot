@@ -1,6 +1,7 @@
 #include "PluginManager.h"
+#include <iostream>
 
-PluginManager::PluginManager(ircInterface& irc, NickManager& nicks){
+PluginManager::PluginManager(ircInterface* irc, NickManager& nicks){
 
 	_utils = new PluginUtils(irc, *this, nicks);
 	_factory = PluginFactory::instance();
@@ -20,6 +21,17 @@ PluginManager::~PluginManager(){
 }
 
 bool PluginManager::load(std::string pluginName){
+
+	std::vector<OmniPlugin*>::iterator iter;
+	for(iter = _plugins.begin(); iter != _plugins.end(); iter++)
+	{
+		if(!((*iter)->name().compare(pluginName)))
+		{
+			//TODO log that plugin was already loaded
+			return true;
+		}
+	}
+
 	OmniPlugin* newPlugin = _factory->load(pluginName);
 
 	if(newPlugin == NULL)
@@ -29,7 +41,7 @@ bool PluginManager::load(std::string pluginName){
 
 	//TODO look up permissions for this plugin and set them 
 	//in the this plugin utils struct
-	PluginUtils* utils= new PluginUtils(*_utils);
+	PluginUtils* utils= new PluginUtils(_utils, (PluginAttrs*) NULL );
 
 	newPlugin->init(utils);
 
@@ -59,11 +71,12 @@ bool PluginManager::unload(std::string pluginName){
 	return true;
 }
 
-void PluginManager::pushMessage(ircMessage msg){
+void PluginManager::pushMessage(ircMessage& msg){
 	std::vector<OmniPlugin*>::iterator iter;
 	for(iter = _plugins.begin(); iter != _plugins.end(); iter++)
 	{
-		OmniPlugin::passMessage((*iter), &msg);
+		std::cout <<"PluginManager: passing message to plugin: "<< (*iter)->name() << std::endl;
+		OmniPlugin::passMessage((*iter), msg);
 	}
 }
 

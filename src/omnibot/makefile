@@ -1,9 +1,9 @@
-VPATH = ../Minibot
+VPATH = ../Minibot:./plugins
 CC = g++
 
 LIBS = -lpthread -lstdc++
 
-INCLUDES = -I ./ -I ../Minibot/
+INCLUDES = -I ./ -I ../Minibot/ -I ./plugins
 
 OBJS = ircInterface.o\
        posix_ircio.o\
@@ -15,7 +15,8 @@ OBJS = ircInterface.o\
        PluginUtils.o\
        OmniPluginInterface.o\
        OmniThread.o\
-       main.o
+       main.o\
+       hurlbot.o
 
 
 all: Omnibot

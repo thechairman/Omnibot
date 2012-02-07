@@ -18,7 +18,7 @@ class OmniPluginThread: public OmniThread{
 
 class OmniPlugin {
 	public:
-		static void passMessage(OmniPlugin*, ircMessage*);
+		static void passMessage(OmniPlugin*, ircMessage&);
 		static void* startThread(void*);
 		virtual void onMessage(ircMessage&) = 0;
 		virtual bool init(PluginUtils*) = 0;

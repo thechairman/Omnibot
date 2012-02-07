@@ -1,5 +1,7 @@
 #include"posix_ircio.h"
+#include<errno.h>
 
+extern int errno;
 bool posix_ircio::open(std::string server, int port)
 {
 	//get a file descriptor
@@ -49,10 +51,13 @@ void posix_ircio::close()
 
 bool posix_ircio::write(std::string& str)
 {
+	std::cout << "ircio: using file discriptor: " << socket << std::endl;
+
 	int written =(int) ::write(socket, str.c_str(), str.size());
 
 	if(written <0)
 	{
+		std::cout << "ircio: errno is: " << errno << std::endl;
 		return false;
 	}
 	else

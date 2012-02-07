@@ -29,7 +29,7 @@ class ircInterface : public ircioCallBack{
 	private:
 	//hit registered callbacks
 	void notifyEvent(ircEvent e);
-	void notifyMessage(ircMessage m);
+	void notifyMessage(ircMessage& m);
 
 	//called from socket handler
 	void sendPong();
@@ -59,6 +59,7 @@ class ircInterface : public ircioCallBack{
 	static const std::string JOIN;		//event header
 	static const std::string PART;		//event header
 	static const std::string USER;
+	static const std::string ERROR;
 };
 
 #endif

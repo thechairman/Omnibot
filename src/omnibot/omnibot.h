@@ -9,12 +9,12 @@
 class omnibot: public ircInterfaceClient{
 	public:
 //		omnibot();
-		omnibot(ircInterface&);
-		void alertEvent(ircEvent);
-		void alertMessage(ircMessage);
+		omnibot(ircInterface*);
+		void alertEvent(ircEvent&);
+		void alertMessage(ircMessage&);
 
 	private:
-		ircInterface _irc;
+		ircInterface* _irc;
 		NickManager _nicks;
 		PluginManager _manager;
 		
@@ -23,7 +23,7 @@ class omnibot: public ircInterfaceClient{
 	//are recieved
 	void join(std::string);
 	void part(std::string);
-	void loadPlugin(std::string);
+	bool loadPlugin(std::string);
 	void dropPlugin(std::string);
 	bool isOmniOp(ircUser*);
 	bool isRegistered(ircUser*);

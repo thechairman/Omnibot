@@ -1,18 +1,25 @@
 
 #include "omnibot.h"
 
+
+#include <iostream>
 /*omnibot::omnibot(){
 	should create an irc instance here and connec
 	but i don't think this is possible... you would 
 	need a default server... maybe I should just take
 	the empty constructor out
 }*/
-omnibot::omnibot(ircInterface& irc_):_irc(irc_),_nicks(),_manager(_irc, _nicks){
+omnibot::omnibot(ircInterface* irc_):_irc(irc_),_nicks(),_manager(_irc, _nicks){
+	std::cout << std::hex << &irc_ << std::dec << std::endl;
+	_irc->registerForNotify(this);
 }
 
-void omnibot::alertMessage(ircMessage msg)
+void omnibot::alertMessage(ircMessage& msg)
 {
 	std::string toParse = msg.message();
+
+
+	std::cout << "Omnibot received string: " + toParse <<  std::endl;
 
 	//parse omnibot commands
 	//may just want to prefix omnibot
@@ -23,11 +30,19 @@ void omnibot::alertMessage(ircMessage msg)
 		//before doing any of this...
 		if(!isOmniOp(msg.user())){
 			//tell them omnibot only list
-			_irc.sendMessage(msg.channel(), msg.user()->nick() + ": I only listen to OmniOps :P");
+			_irc->sendMessage(msg.channel(), msg.user()->nick() + ": I only listen to OmniOps :P");
 		}
 
 		if (!toParse.substr(1, 4).compare("load")){
-			loadPlugin(toParse.substr(6));
+			if(loadPlugin(toParse.substr(6)))
+			{
+				_irc->sendMessage(msg.channel(), toParse.substr(6) + " loaded...");
+			}
+			else
+			{
+				_irc->sendMessage(msg.channel(), toParse.substr(6) + " failed to load :(");
+
+			}
 		}
 		else if(!toParse.substr(1, 4).compare("drop"))
 		{
@@ -52,6 +67,7 @@ void omnibot::alertMessage(ircMessage msg)
 		else
 		{
 			//pass string to plugins
+			std::cout << "Omnibot: sending message to plugin manager" << std::endl;
 			_manager.pushMessage(msg);
 		}
 
@@ -60,20 +76,21 @@ void omnibot::alertMessage(ircMessage msg)
 	else
 	{
 		//pass string to plugin Manager
+		std::cout << "Omnibot: sending message to plugin manager" << std::endl;
 		_manager.pushMessage(msg);
 	}
 }
 
-void omnibot::alertEvent(ircEvent e){}
+void omnibot::alertEvent(ircEvent& e){}
 void omnibot::join(std::string channel){
-	_irc.join(channel);
+	_irc->join(channel);
 }
 void omnibot::part(std::string channel){
-	_irc.part(channel);
+	_irc->part(channel);
 }
 
-void omnibot::loadPlugin(std::string pluginName){
-	_manager.load(pluginName);
+bool omnibot::loadPlugin(std::string pluginName){
+	return _manager.load(pluginName);
 }
 void omnibot::dropPlugin(std::string pluginName){
 	_manager.unload(pluginName);

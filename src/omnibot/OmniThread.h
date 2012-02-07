@@ -4,6 +4,8 @@
 class OmniThread{
 public:
 
+	OmniThread();
+
 	static const int SUCCESS = 0;
 	static const int THREAD_ALREADY_RUNNING = -1;
 	static const int SYS_THREAD_ERR = -2;

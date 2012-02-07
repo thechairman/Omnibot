@@ -1,5 +1,7 @@
 #include "ircInterface.h"
 
+
+#include <iostream>
 const std::string ircInterface::PRIVMSG = "PRIVMSG";
 const std::string ircInterface::QUIT = "QUIT";
 const std::string ircInterface::PING = "PING";
@@ -8,7 +10,7 @@ const std::string ircInterface::NICK = "NICK";
 const std::string ircInterface::JOIN = "JOIN";
 const std::string ircInterface::PART = "PART";
 const std::string ircInterface::USER = "USER";
-
+const std::string ircInterface::ERROR = "ERROR";
 
 ircInterface::ircInterface(){
 	
@@ -49,25 +51,27 @@ int ircInterface::part(std::string channel, std::string reason){
 
 
 int ircInterface::part(std::string channel){
-	std::string msg = "PART " + channel;
+	std::string msg = "PART " + channel + "\r\n";
 	sendString(msg);
 	return 0;
 }
 
 int ircInterface::sendMessage(std::string channel, std::string message){
-	std::string msg = "PRIVMSG " + channel + " :" + message;
+	std::cout << "Sending Message \""  << message <<"\" to channel \"" << channel <<"\"" << std::endl;
+
+	std::string msg = "PRIVMSG " + channel + " :" + message +"\r\n";
 	sendString(msg);
 	return 0;
 }
 
 int ircInterface::sendPM(std::string nick, std::string message){
-	std::string msg = "PRIVMSG " + nick + " :" + message;
+	std::string msg = "PRIVMSG " + nick + " :" + message + "\r\n";
 	sendString(msg);
 	return 0;
 }
 
 int ircInterface::quit(std::string reason){
-	std::string msg = "QUIT :" + reason;
+	std::string msg = "QUIT :" + reason + "\r\n";
 	sendString(msg);
 	return 0;
 }
@@ -80,6 +84,7 @@ int ircInterface::quit(){
 
 void ircInterface::registerForNotify(ircInterfaceClient* client){
 	clients.push_back(client);
+	std::cout << "IrcInterface: register client for notifications" << std::endl;
 }
 
 void ircInterface::notifyEvent(ircEvent e){
@@ -88,15 +93,21 @@ void ircInterface::notifyEvent(ircEvent e){
 		(*iter)->alertEvent(e);
 	}
 }	
-void ircInterface::notifyMessage(ircMessage m){
+void ircInterface::notifyMessage(ircMessage& m){
+
+	std::cout << "ircINterface: notifying clients of incoming messages" << std::endl;
+
 	std::vector<ircInterfaceClient*>::iterator iter;
 	for(iter = clients.begin(); iter < clients.end(); iter++){
 		(*iter)->alertMessage(m);
 	}
 }	
 void ircInterface::sendString(std::string str){
-	serverConnection.write(str);
-	std::cout << str << std::endl;
+	std::cout << "ircInterface: the address of this instance: " << this <<std::endl;
+	if(!serverConnection.write(str))
+		std::cout<<"oh no! string didn't send!" << std::endl;
+	else
+		std::cout<< "sent string to server:  "<< str << std::endl;
 }
 
 void ircInterface::onMessage(std::string msg){
@@ -108,6 +119,12 @@ void ircInterface::onMessage(std::string msg){
 	//check for ping
 	if(!type.compare(PING)){
 		sendPong();
+		return;
+	}
+
+	if(!type.compare(ERROR)){	
+		//need to figure out hwat to do here
+		//for now lets just try and not spam the other levels
 		return;
 	}	
 	
@@ -141,7 +158,11 @@ void ircInterface::onMessage(std::string msg){
 		}
 
 		//TODO this should be streamlined if possible
-		std::string channel =  msg.substr(msg.find_first_of(' ') + 1, msg.find_first_of(' ', msg.find_first_of(' ') + 1) - msg.find_first_of(' '));
+		std::string channel =  msg.substr(msg.find_first_of(' ') + 1, msg.find_first_of(' ', msg.find_first_of(' ') + 1) - msg.find_first_of(' ') -1);
+		std::remove(channel.begin(), channel.end(), ' ');
+		std::remove(channel.begin(), channel.end(), '\n');
+		std::remove(channel.begin(), channel.end(), '\r');
+		std::remove(channel.begin(), channel.end(), '\t');
 
 		for(it = users.begin(); it != users.end(); it++){
 			if(!(*it).first.compare(channel)){
@@ -153,6 +174,12 @@ void ircInterface::onMessage(std::string msg){
 		//should be setting the message to just contain the message
 		//TODO this should be streamlined if possible
 		msg = msg.substr(msg.find_first_of(':', msg.find_first_of(' ', msg.find_first_of(' ') + 1) + 1) +1);
+		if(msg.find("\r\n") != std::string::npos)
+			std::cout << "holy hell! its got newlines" <<std::endl;
+		msg = msg.substr(0, msg.find("\r\n"));
+		//std::remove(msg.begin(), msg.end(), '\n');
+		//std::remove(msg.begin(), msg.end(), '\r');
+		//std::remove(msg.begin(), msg.end(), '\t');
 		ircMessage m(temp, msg, channel);
 
 		

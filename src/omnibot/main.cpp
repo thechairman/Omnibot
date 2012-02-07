@@ -3,14 +3,19 @@
 
 #include<poll.h>
 #include<unistd.h>
+
+#include<iostream>
 int main(){
 	ircInterface irc;
-	omnibot omni(irc);
+	std::cout << std::hex << &irc << std::dec << std::endl;
+	omnibot omni(&irc);
+	//irc.registerForNotify(&omni);
 
 	irc.connect("madhax.net", 6667);
 	irc.registerUser("Omnibot", "Omnibot", "Omnibot");
 	irc.join("#alpha1");
 	irc.join("#main");
+	irc.join("#test2");
 
 
 	bool loop = true;

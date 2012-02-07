@@ -1,5 +1,8 @@
 #include<OmniThread.h>
 
+#include<iostream>
+OmniThread::OmniThread():threadStarted(false){}
+
 void OmniThread::callBack(void* (*function)(void*)){
 	_data._callback = function;
 }
@@ -14,10 +17,12 @@ void OmniThread::arg(void* arg_){
 } 
 
 int OmniThread::start(){
+	std::cout<< "OmniThread: starting thread" << std::endl;
 	if(threadStarted)
 		return THREAD_ALREADY_RUNNING;
 	_tasks.push(_data);
 
+	std::cout<< "OmniThread: creating pthread" << std::endl;
 	if(pthread_create(&_thread, NULL, OmniThreadCallback, (void*) this) !=0)
 		return SYS_THREAD_ERR;
 
@@ -43,6 +48,7 @@ void* OmniThread::OmniThreadCallback(void* thread_){
 
 		callBackData data = thread->_tasks.front();
 
+		std::cout<< "OmniThread: activating task calback" << std::endl;
 		switch(data._argc){
 			case 1:
 				data._callback(data._argv[0]);

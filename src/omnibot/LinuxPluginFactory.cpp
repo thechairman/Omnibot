@@ -1,7 +1,15 @@
 #include <linuxPluginFactory.h>
 
+#include"hurlbot.h"
+
 OmniPlugin* LinuxPluginFactory::load(std::string pluginName){
-	return NULL;
+	
+	OmniPlugin* plugin = NULL;
+	if(!pluginName.compare("hurlbot")){
+		plugin = dynamic_cast<OmniPlugin*>  (new hURLbot());
+	}
+
+	return plugin;
 }
 
 LinuxPluginFactory::~LinuxPluginFactory(){}

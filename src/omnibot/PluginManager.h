@@ -16,12 +16,12 @@ class PluginFactory;
 
 class PluginManager{
 	public:
-		PluginManager(ircInterface&, NickManager&);
+		PluginManager(ircInterface*, NickManager&);
 		virtual ~PluginManager();
 		bool load(std::string);
 		bool unload(std::string);
 		
-		void pushMessage(ircMessage);
+		void pushMessage(ircMessage& );
 
 	private:
 		PluginUtils* _utils;

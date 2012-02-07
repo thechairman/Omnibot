@@ -4,8 +4,11 @@
 #include<string>
 
 class ircUser{
+
+	friend class NickManager;
 private:
 	std::string _nick;
+	bool _isAuthenticated;
 	int _userId;
 public:	
 	enum userCodes{
@@ -16,6 +19,7 @@ public:
 	ircUser(ircUser&);
 	std::string nick() const;
 	int userId() const;
+	bool isAuthenticated() const;
 };
 class ircMessage{
 private:
@@ -25,7 +29,7 @@ private:
 public:
 	ircMessage();
 	ircMessage(ircUser* user_, std::string Message, std::string channel_ = "");
-	ircMessage(ircMessage&);
+	ircMessage(const ircMessage&);
 	std::string message() const;
 	std::string channel() const;
 	bool isPrivateMsg() const;
