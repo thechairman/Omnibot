@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "posix_ircio.h"
-#include "ircInterfaceClient.h"
+#include "ircInterfaceClient.h" //this includes the event, message and user classes
 
 class ircInterface : public ircioCallBack{
 
@@ -33,6 +33,13 @@ class ircInterface : public ircioCallBack{
 
 	//called from socket handler
 	void sendPong();
+
+	//these handle each type of message found by
+	//on message
+	ircMessage handle_privmsg(std::string);
+	ircEvent handle_quit(std::string);
+	ircEvent handle_join(std::string);
+	ircEvent handle_part(std::string);
 
 	//sends a string across the socket
 	void sendString(std::string str);

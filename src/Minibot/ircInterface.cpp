@@ -109,9 +109,13 @@ void ircInterface::sendString(std::string str){
 	else
 		std::cout<< "sent string to server:  "<< str << std::endl;
 }
-
+//TODO break out how to handle each message type into 
+//its own function handle_X  and turn this into a simple multi plexor function
+//break it out before it gets two monsterous.
 void ircInterface::onMessage(std::string msg){
 	std::cout << msg << std::endl;
+	msg = msg.substr(0, msg.rfind("\r\n") + 2);
+	std::cout << "truncated message: " << msg << std::endl;
 	std::string type = msg.substr(0, msg.find_first_of(' '));
 	//std::cout <<msg <<std::endl;
 	
@@ -184,6 +188,9 @@ void ircInterface::onMessage(std::string msg){
 
 		
 		notifyMessage(m);
+		msg = msg.substr(2);
+		if(msg.find("\r\n") != std::string::npos)
+			onMessage(msg);
 	}
 	
 	//check for action
@@ -197,6 +204,7 @@ void ircInterface::onMessage(std::string msg){
 		
 		//notifyEvent(e);
 	}
+
 }
 
 void ircInterface::sendPong(){

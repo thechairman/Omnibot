@@ -58,3 +58,106 @@ bool ircMessage::isPrivateMsg() const{
 ircUser* ircMessage::user(){
 	return _user;
 }
+
+ircEvent::EventType ircEvent::type(){
+	return _type;
+}
+
+std::string ircEvent::channel(){
+	if(_type != ET_CHANNEL_JOIN && _type != ET_CHANNEL_PART)
+		return "INVALID";
+	else 
+		return _arg1;
+}
+
+std::string ircEvent::nick(){
+	if(_type != ET_CHANNEL_JOIN && _type != ET_CHANNEL_PART &&_type != ET_NICK_CHANGE && _type != ET_QUIT && _type != ET_KICK && _type != ET_KILL )
+		return "INVALID";
+	else 
+		return _arg2;
+}
+
+std::string ircEvent::newNick(){
+	if(_type != ET_NICK_CHANGE)
+		return "INVALID";
+	else
+		return _arg3;
+}
+
+std::string ircEvent::doer(){
+	if( _type != ET_KICK && _type != ET_KILL )
+		return "INVALID";
+	else 
+		return _arg4;
+}
+
+std::string ircEvent::description(){
+	if(_type != ET_CHANNEL_PART && _type != ET_ERROR && _type != ET_QUIT && _type != ET_KICK && _type != ET_KILL )	
+		return "INVALID";
+	else 
+		return _arg3;
+
+}
+
+
+//static functions for creating events
+ircEvent ircEvent::error(std::string description){
+	ircEvent e;
+	e._type = ET_ERROR;
+	e._arg3 = description;
+	return e;
+}
+
+ircEvent ircEvent::join(std::string channel, std::string nick){
+	ircEvent e;
+	e._type = ET_CHANNEL_JOIN;
+	e._arg1 = channel;
+	e._arg2 = nick;
+	return e;
+}
+
+ircEvent ircEvent::part(std::string channel, std::string nick, std::string reason){
+	ircEvent e;
+	e._type = ET_CHANNEL_PART;
+	e._arg1 = channel;
+	e._arg2 = nick;
+	e._arg3 = reason;
+	return e;
+
+}
+
+ircEvent ircEvent::nickChange(std::string nick, std::string newNick){
+	ircEvent e;
+	e._type = ET_NICK_CHANGE;
+	e._arg2 = nick;
+	e._arg3 = newNick;
+	return e;
+
+}
+
+ircEvent ircEvent::quit(std::string nick, std::string reason){
+	ircEvent e;
+	e._type = ET_QUIT;
+	e._arg2 = nick;
+	e._arg3 = reason;
+	return e;
+}
+
+ircEvent ircEvent::kill(std::string nick, std::string doer, std::string reason){
+	ircEvent e;
+	e._type = ET_KILL;
+	e._arg2 = nick;
+	e._arg3 = reason;
+	e._arg4 = doer;
+	return e;
+
+}
+ircEvent ircEvent::kick(std::string nick, std::string doer, std::string reason){
+	ircEvent e;
+	e._type = ET_KICK;
+	e._arg2 = nick;
+	e._arg3 = reason;
+	e._arg4 = doer;
+	return e;
+
+}
