@@ -1,4 +1,4 @@
-VPATH = ../Minibot:./plugins
+VPATH = ../Minibot:./plugins:./Threads
 CC = g++
 
 LIBS = -lpthread -lstdc++
@@ -14,9 +14,12 @@ OBJS = ircInterface.o\
        LinuxPluginFactory.o\
        PluginUtils.o\
        OmniPluginInterface.o\
-       OmniThread.o\
        main.o\
-       hurlbot.o
+       hurlbot.o\
+       OmniThreadPool.o\
+       pthread_ThreadPool.o\
+       pthread_PooledThread.o\
+       pthread_Thread.o
 
 
 all: Omnibot
@@ -31,7 +34,7 @@ Omnibot: ${OBJS}
 %.o : ./%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ ${INCLUDES} -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	g++ ${INCLUDES} -g -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

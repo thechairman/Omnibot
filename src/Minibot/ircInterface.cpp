@@ -112,7 +112,7 @@ void ircInterface::sendString(std::string str){
 //TODO break out how to handle each message type into 
 //its own function handle_X  and turn this into a simple multi plexor function
 //break it out before it gets two monsterous.
-void ircInterface::onMessage(std::string msg){
+/*void ircInterface::onMessage(std::string msg){
 	std::cout << msg << std::endl;
 	msg = msg.substr(0, msg.rfind("\r\n") + 2);
 	std::cout << "truncated message: " << msg << std::endl;
@@ -180,6 +180,7 @@ void ircInterface::onMessage(std::string msg){
 		msg = msg.substr(msg.find_first_of(':', msg.find_first_of(' ', msg.find_first_of(' ') + 1) + 1) +1);
 		if(msg.find("\r\n") != std::string::npos)
 			std::cout << "holy hell! its got newlines" <<std::endl;
+		:w
 		msg = msg.substr(0, msg.find("\r\n"));
 		//std::remove(msg.begin(), msg.end(), '\n');
 		//std::remove(msg.begin(), msg.end(), '\r');
@@ -188,9 +189,12 @@ void ircInterface::onMessage(std::string msg){
 
 		
 		notifyMessage(m);
-		msg = msg.substr(2);
-		if(msg.find("\r\n") != std::string::npos)
-			onMessage(msg);
+		if (msg.size() > 2)
+		{
+			msg = msg.substr(2);
+			if(msg.find("\r\n") != std::string::npos)
+				onMessage(msg);
+		}
 	}
 	
 	//check for action
@@ -205,6 +209,117 @@ void ircInterface::onMessage(std::string msg){
 		//notifyEvent(e);
 	}
 
+}*/
+
+void ircInterface::onMessage(std::string pkge){
+	while(pkge.find("\r\n") != std::string::npos){
+		std::string msg = pkge.substr(0, pkge.find("\r\n"));
+		pkge = pkge.substr(pkge.find("\r\n") + 2);
+
+		//alot of the control strings will start with  the type sperated from the 
+		//contents of the message with a space
+		std::string type = msg.substr(0, msg.find_first_of(' '));
+
+			
+		//first check for messages that start with message names
+		//check for ping
+		if(!type.compare(PING))
+		{
+			sendPong();
+			return;
+		}
+
+		else if(!type.compare(ERROR))
+		{	
+			//need to figure out hwat to do here
+			//for now lets just try and not spam the other levels
+			return;
+		}
+
+		//now check for messages that start with nicks
+		else 
+		{	
+			//type is actually a prefix containing the host mask etc
+			std::string prefix = type;
+			// the actual message past the prefix
+			msg = msg.substr(msg.find_first_of(' ')+1);
+			//the first part of that message should be the type
+			type = msg.substr(0, msg.find_first_of(' '));
+
+			//check first to see if it is a private message
+			//most irc messaages are private messages
+			if(!type.compare(PRIVMSG))
+			{
+				handle_privmsg(msg, prefix);
+			}
+			else if(!type.compare(QUIT))
+			{
+			}
+			else if(!type.compare(JOIN))
+			{
+			}
+			else if(!type.compare(PART))
+			{
+			}
+
+		}
+
+
+	}
+}
+
+void ircInterface::handle_privmsg(std::string msg, std::string prefix){
+
+	//grab user data
+	std::string nick = prefix.substr(prefix.find_first_of(':') + 1, 
+					 prefix.find_first_of('!') -1);
+
+	//TODO this is a  temp solution that could cause hella memory leaks if not fixed later
+	ircUser* temp = NULL;
+	
+	std::map<std::string, ircUser*>::iterator it;
+
+	for(it = users.begin(); it != users.end(); it++){
+		if(!(*it).first.compare(nick)){
+			temp = (*it).second;
+			break;
+		}
+	}
+
+	if(temp == NULL){
+		temp = new ircUser(nick);
+		users[nick] = temp;
+	}
+
+	//TODO this should be streamlined if possible
+	std::string channel =  msg.substr(msg.find_first_of(' ') + 1,
+		msg.find_first_of(' ', msg.find_first_of(' ') + 1) - msg.find_first_of(' ') -1);
+
+	//strip white space characters
+	std::remove(channel.begin(), channel.end(), ' ');
+	std::remove(channel.begin(), channel.end(), '\n');
+	std::remove(channel.begin(), channel.end(), '\r');
+	std::remove(channel.begin(), channel.end(), '\t');
+
+	//see if its somebody or a channel
+	//TODO an organized
+	for(it = users.begin(); it != users.end(); it++){
+		if(!(*it).first.compare(channel)){
+			channel = "";
+			break;
+		}
+	}
+
+	//should be setting the message to just contain the message
+	//TODO this should be streamlined if possible
+	msg = msg.substr(msg.find_first_of(':', 
+				msg.find_first_of(' ', msg.find_first_of(' ') + 1) + 1) +1);
+	if(msg.find("\r\n") != std::string::npos)
+	msg = msg.substr(0, msg.find("\r\n"));
+	ircMessage m(temp, msg, channel);
+
+	
+	notifyMessage(m);
 }
 
 void ircInterface::sendPong(){

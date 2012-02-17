@@ -36,7 +36,7 @@ class ircInterface : public ircioCallBack{
 
 	//these handle each type of message found by
 	//on message
-	ircMessage handle_privmsg(std::string);
+	void handle_privmsg(std::string, std::string);
 	ircEvent handle_quit(std::string);
 	ircEvent handle_join(std::string);
 	ircEvent handle_part(std::string);
