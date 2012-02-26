@@ -8,12 +8,12 @@
 
 class testClass: public ircInterfaceClient{
 	public:
-		void alertEvent(ircEvent);
-		void alertMessage(ircMessage);
+		void alertEvent(ircEvent&);
+		void alertMessage(ircMessage&);
 };
 
-void testClass::alertEvent(ircEvent e){}
-void testClass::alertMessage(ircMessage m){
+void testClass::alertEvent(ircEvent& e){}
+void testClass::alertMessage(ircMessage& m){
 	std::cout << "TestClass: " << m.user()->nick() << ": " << m.message() << std::endl;
 }
 
