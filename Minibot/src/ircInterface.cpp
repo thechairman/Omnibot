@@ -21,7 +21,9 @@ const std::string ircInterface::JOIN = "JOIN";
 const std::string ircInterface::PART = "PART";
 const std::string ircInterface::USER = "USER";
 const std::string ircInterface::ERROR = "ERROR";
-const std::string ircInterface::INSPIRCDVARS = "005";	//this value may be standard for all irc severs, but my experiance is only with inspircd; joe
+const std::string ircInterface::INSPIRCDVARS = "005";
+const std::string ircInterface::NICKLIST = "353"; 
+//this value may be standard for all irc severs, but my experiance is only with inspircd; joe
 
 ircInterface::ircInterface(){
 	_userDB = new ircUserDB();
@@ -148,12 +150,8 @@ void ircInterface::onMessage(std::string pkge){
 			//for now lets just try and not spam the other levels
 			return;
 		}
-		else if(!type.compare(INSPIRCDVARS))
-		{
-			//Grab the value of things like symbols for nick modes etc
-		}
 
-		//now check for messages that start with nicks
+		//now check for messages that start with nicks or server titles
 		else 
 		{	
 			//type is actually a prefix containing the host mask etc
@@ -186,12 +184,24 @@ void ircInterface::onMessage(std::string pkge){
 				notifyEvent(e);
 			}
 
+			else if(!type.compare(INSPIRCDVARS))
+			{
+				handle_vars(msg);
+			}
+
+			else if(!type.compare(NICKLIST))
+			{
+				//add function to parse the nicklist
+				handle_nicklist(msg);
+			}
 		}
-
-
 	}
 }
 
+void ircInterface::handle_nicklist(std::string nicks)
+{
+
+}
 //again this entire function could be inspircd specific
 void ircInterface::handle_vars(std::string varList)
 {

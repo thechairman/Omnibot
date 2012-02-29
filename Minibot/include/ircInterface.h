@@ -42,6 +42,7 @@ class ircInterface : public ircioCallBack{
 	//these handle each type of message found by
 	//on message
 	void handle_vars(std::string);
+	void handle_nicklist(std::string);
 	void handle_privmsg(std::string, std::string);
 	ircEvent handle_quit(std::string, std::string);
 	ircEvent handle_join(std::string, std::string);
@@ -77,7 +78,9 @@ class ircInterface : public ircioCallBack{
 	static const std::string USER;
 	static const std::string ERROR;
 
+	//this could be inspirc specific
 	static const std::string INSPIRCDVARS;
+	static const std::string NICKLIST;
 };
 
 #endif
