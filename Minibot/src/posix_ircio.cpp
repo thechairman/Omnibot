@@ -1,4 +1,5 @@
 #include"posix_ircio.h"
+#include <strings.h>
 #include<errno.h>
 
 extern int errno;
@@ -68,8 +69,7 @@ bool posix_ircio::write(std::string& str)
 
 bool posix_ircio::read(std::string& temp)
 {
-	char buf[BUFSIZE];
-	bzero(buf, BUFSIZE);
+	char buf[BUFSIZE] = {0};
 	//read on the socket
 	int chars = (int)::read(socket, buf, BUFSIZE);
 	if(chars < 0)
@@ -80,11 +80,10 @@ bool posix_ircio::read(std::string& temp)
 
 void posix_ircio::listen()
 {
-	char buf[BUFSIZE];
+	char buf[BUFSIZE] = {0};
 	while(isOpen)
 	{
 
-		bzero(buf, BUFSIZE);
 		//read on the socket
 		int chars = (int)::read(socket, buf, BUFSIZE);	
 		if(chars < 0)
