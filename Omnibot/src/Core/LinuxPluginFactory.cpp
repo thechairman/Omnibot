@@ -1,4 +1,4 @@
-#include <linuxPluginFactory.h>
+#include <LinuxPluginFactory.h>
 
 #include"hurlbot.h"
 
