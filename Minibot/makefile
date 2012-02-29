@@ -13,7 +13,9 @@ EXECUTABLE = ${BUILD_DIR}Minibot
 #All objects not specifically related to executables go here
 LIB_OBJS = ${BUILD_DIR}ircInterface.o\
 	   ${BUILD_DIR}posix_ircio.o\
-	   ${BUILD_DIR}ircNotifyClasses.o
+	   ${BUILD_DIR}ircNotifyClasses.o\
+	   ${BUILD_DIR}ircUserAuth.o\
+	   ${BUILD_DIR}ircUserDB.o
 
 #all objects related only to the executable
 EXE_OBJS = ${LIB_OBJS}\

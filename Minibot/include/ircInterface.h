@@ -8,6 +8,11 @@
 
 #include "posix_ircio.h"
 #include "ircInterfaceClient.h" //this includes the event, message and user classes
+#include "ircUserDB.h"
+#include "ircUserAuth.h"
+
+//Frakking circular dependencies
+class ircUserAuth;
 
 class ircInterface : public ircioCallBack{
 
@@ -28,7 +33,7 @@ class ircInterface : public ircioCallBack{
 
 	private:
 	//hit registered callbacks
-	void notifyEvent(ircEvent e);
+	void notifyEvent(ircEvent& e);
 	void notifyMessage(ircMessage& m);
 
 	//called from socket handler
@@ -36,10 +41,11 @@ class ircInterface : public ircioCallBack{
 
 	//these handle each type of message found by
 	//on message
+	void handle_vars(std::string);
 	void handle_privmsg(std::string, std::string);
-	ircEvent handle_quit(std::string);
-	ircEvent handle_join(std::string);
-	ircEvent handle_part(std::string);
+	ircEvent handle_quit(std::string, std::string);
+	ircEvent handle_join(std::string, std::string);
+	ircEvent handle_part(std::string, std::string );
 
 	//sends a string across the socket
 	void sendString(std::string str);
@@ -47,11 +53,14 @@ class ircInterface : public ircioCallBack{
 	//handles a message received from the socket
 	void handleString(std::string msg);
 
+	//TODO find a way to get this to just ircio
 	posix_ircio serverConnection;
 	std::vector<ircInterfaceClient*> clients;
 
 	//map to hold nicks -> user structs
 	std::map<std::string, ircUser*> users;
+	ircUserDB* _userDB;
+	ircUserAuth* _userAuth;
 
 	//some constants
 	static const int NUM_MSG_HDRS = 1;
@@ -67,6 +76,8 @@ class ircInterface : public ircioCallBack{
 	static const std::string PART;		//event header
 	static const std::string USER;
 	static const std::string ERROR;
+
+	static const std::string INSPIRCDVARS;
 };
 
 #endif

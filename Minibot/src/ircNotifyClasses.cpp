@@ -16,8 +16,12 @@ std::string ircUser::nick() const{
 	return temp;
 }
 
-int ircUser::userId() const {
+unsigned int ircUser::userId() const {
 	return _userId;
+}
+bool ircUser::isAuthenticated() const
+{
+	return _isAuthenticated;
 }
 
 ircMessage::ircMessage(): _message(""), _user(NULL), _channel(""){}

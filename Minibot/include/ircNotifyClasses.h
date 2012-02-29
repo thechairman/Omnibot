@@ -7,10 +7,11 @@ class ircUser{
 
 	friend class NickManager;
 	friend class ircInterface;
+	friend class ircUserDB;
 private:
 	std::string _nick;
 	bool _isAuthenticated;
-	int _userId;
+	unsigned int _userId;
 public:	
 	enum userCodes{
 		USER_NOT_REGISTERED = -1
@@ -19,7 +20,7 @@ public:
 	ircUser(std::string nick_, int userId = USER_NOT_REGISTERED);
 	ircUser(ircUser&);
 	std::string nick() const;
-	int userId() const;
+	unsigned int userId() const;
 	bool isAuthenticated() const;
 };
 class ircMessage{
