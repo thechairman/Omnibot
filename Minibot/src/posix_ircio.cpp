@@ -80,9 +80,11 @@ bool posix_ircio::read(std::string& temp)
 
 void posix_ircio::listen()
 {
-	char buf[BUFSIZE] = {0};
+	std::string leftovers = "";
 	while(isOpen)
 	{
+
+		char buf[BUFSIZE] = {0};
 
 		//read on the socket
 		int chars = (int)::read(socket, buf, BUFSIZE);	
@@ -93,7 +95,21 @@ void posix_ircio::listen()
 		//the buffer is zeroed
 		//buf[chars] = '\0';
 		
-		std::string temp(buf);
+		std::string buffer(buf);
+		std::string temp = leftovers + buffer;
+		size_t split = temp.find_last_of("\r\n") + 2;
+		std::cout<< "ircio: temp size: " << temp.size() << " split: " << split << std::endl;
+
+		if(split > temp.size())
+		{
+			leftovers = "";
+		}
+		else
+		{
+			leftovers = temp.substr(split);
+			temp = temp.substr(0, split);
+		}
+
 		//call on receive
 		onReceive(temp);
 

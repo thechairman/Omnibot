@@ -1,5 +1,7 @@
 #include "ircUserDB.h"
 
+#include <iostream>
+
 ircUserDB::ircUserDB()
 {
 	srand(time(NULL));
@@ -101,7 +103,14 @@ void ircUserDB::removeUser(std::string nick)
 	}
 
 	ircUser* user = (*user_i).second;
-	
+
+	if(user == NULL)
+	{
+		std::cout << "this user is broken" << std::endl;
+	}
+	else
+		std::cout << "retrieved user was fine" << std::endl;
+
 	//remove it forom channels;
 	channels_it channels;
 	for(channels = _usersByChannel.begin(); channels != _usersByChannel.end(); channels++)
@@ -117,6 +126,9 @@ void ircUserDB::removeUser(std::string nick)
 	}
 	
 	//remove from usersbyid
+	
+	std::cout << "just removing it from the arrays now" << std::endl;
+
 	_usersByID.erase(_usersByID.find(user->userId()));
 	
 	//remove from users by nick
@@ -244,6 +256,9 @@ void ircUserDB::loadData()
 {
 	std::ifstream dbfile;
 	dbfile.open("users.db");
+
+	if(!dbfile.good())
+		return;
 
 	size_t mapsize;
 	dbfile >> mapsize;

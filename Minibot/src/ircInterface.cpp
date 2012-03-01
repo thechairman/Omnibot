@@ -26,7 +26,10 @@ const std::string ircInterface::NICKLIST = "353";
 //this value may be standard for all irc severs, but my experiance is only with inspircd; joe
 
 ircInterface::ircInterface(){
+	std::cout << "ircInterface: initializing user database..." << std::endl;
 	_userDB = new ircUserDB();
+
+	std::cout << "ircINterface: initializing user authentication" << std::endl;
 	_userAuth = new ircUserAuth(this, _userDB);
 }
 
@@ -131,6 +134,8 @@ void ircInterface::onMessage(std::string pkge){
 		std::string msg = pkge.substr(0, pkge.find("\r\n"));
 		pkge = pkge.substr(pkge.find("\r\n") + 2);
 
+		std::cout << "ircInterface: raw message is : "<<msg<<std::endl;
+		
 		//alot of the control strings will start with  the type sperated from the 
 		//contents of the message with a space
 		std::string type = msg.substr(0, msg.find_first_of(' '));
@@ -198,21 +203,43 @@ void ircInterface::onMessage(std::string pkge){
 	}
 }
 
-void ircInterface::handle_nicklist(std::string nicks)
-{
+void ircInterface::handle_nicklist(std::string nickMsg)
+{	
+	std::string channel = nickMsg.substr(nickMsg.find_first_of('=') + 2);
+	channel = channel.substr(0, channel.find_first_of(' '));
+	std::string nick = nickMsg.substr(nickMsg.find_first_of(':'));
+	
+	std::cout << "ircInterface: List of nicks: " << nick << std::endl;
+
+	std::stringstream nicks(nick);
+
+	while(getline(nicks, nick, ' '))
+	{
+		_userAuth->addUser(nick);
+		_userDB->addUserToChannel(nick, channel);
+
+		std::cout << "ircInterface: added nick: " << nick << " to channel: " << channel << std::endl;
+	}
 
 }
 //again this entire function could be inspircd specific
 void ircInterface::handle_vars(std::string varList)
 {
 	std::stringstream vars(varList);
-	std::string var;
+	std::string assign;
 
-	while(getline(vars, var, ' '))
+	while(getline(vars, assign, ' '))
 	{
-		if(!var.substr(0,var.find_first_of('=')).compare("STATUSMSG"))
-		{
+		if(assign.find_first_of('=') == std::string::npos)
+			continue;
 
+		std::string var = assign.substr(0, assign.find_first_of('='));
+		std::string val = assign.substr(assign.find_first_of('='));
+
+		if(!var.compare("STATUSMSG"))
+		{
+			_userAuth->nickPrefixes(val);
+			std::cout << "ircInterface: nick Prefixes are: " << val << std::endl;
 		}
 	}
 }
@@ -281,18 +308,6 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 	ircUser* temp = NULL;
 	
 	std::map<std::string, ircUser*>::iterator it;
-//
-//	for(it = users.begin(); it != users.end(); it++){
-//		if(!(*it).first.compare(nick)){
-//			temp = (*it).second;
-//			break;
-//		}
-//	}
-//
-//	if(temp == NULL){
-//		temp = new ircUser(nick);
-//		users[nick] = temp;
-//	}
 
 	_userDB->getUser(nick);
 

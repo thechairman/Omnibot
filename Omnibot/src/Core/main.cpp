@@ -5,12 +5,15 @@
 #include<unistd.h>
 
 #include<iostream>
-int main(){
+int main(){	
+	std::cout << "initilizing the irc interface..." << std::endl;
 	ircInterface irc;
-	std::cout << std::hex << &irc << std::dec << std::endl;
+	//std::cout << std::hex << &irc << std::dec << std::endl;
+	std::cout << "firing up the omnibot..." <<std::endl;
 	omnibot omni(&irc);
 	//irc.registerForNotify(&omni);
 
+	std::cout << "connecting to server..." << std::endl;
 	irc.connect("madhax.net", 6667);
 	irc.registerUser("Omnibot", "Omnibot", "Omnibot");
 	irc.join("#alpha1");

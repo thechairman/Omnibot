@@ -1,6 +1,6 @@
 #include "ircUserAuth.h"
 
-ircUserAuth::ircUserAuth(ircInterface* irc, ircUserDB* db):_userDB(db),_irc(irc){}
+ircUserAuth::ircUserAuth(ircInterface* irc, ircUserDB* db):_userDB(db),_irc(irc),_nickModePrefixes("~&@%+-"){}
 ircUserAuth::~ircUserAuth(){}
 
 void ircUserAuth::nickServInfo(std::string str)
