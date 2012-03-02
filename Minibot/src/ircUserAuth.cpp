@@ -48,8 +48,11 @@ void ircUserAuth::addUser(std::string nick)
 	
 	if(_authMethod == AUTH_NICKSERV)
 	{
+		std::cout << "ircUserAuth: calling ircUserDB::addUser()" << std::endl;
 		_userDB->addUser(nick, false, false);
-		
+
+
+		std::cout << "ircUserAuth: pinging nickserve" << std::endl;
 		//if it doesn't exist or isn't authenticated run a status on nickserve
 		_irc->sendPM("Nickserv", "status " + nick);
 

@@ -6,7 +6,6 @@ ircUserDB::ircUserDB()
 {
 	srand(time(NULL));
 	loadData();
-
 }
 
 ircUserDB::~ircUserDB()
@@ -29,9 +28,7 @@ void ircUserDB::setRegistered(std::string nick,bool registered)
 		saveData();
 	}
 	
-	//else it should have defaulted to false, but lets make sure
-	
-	
+	//else it should have defaulted to false, but lets make sure	
 }
 void ircUserDB::setAuthenticated(std::string nick, bool authenticated)
 {
@@ -65,30 +62,45 @@ void ircUserDB::setAuthenticated(unsigned int id, bool authenticated)
 void ircUserDB::addUser(std::string nick, bool registered = false, bool authenticated = false)
 {
 	usersByNick_it iter = _usersByNick.find(nick);
-	if(iter == _usersByNick.end())
+	if(iter == _usersByNick.end() || (*iter).second == NULL)
 	{
+		std::cout << "ircUserDB: the user wasn't found in the database." << std::endl;
 		//create new user object
 		ircUser* temp = new ircUser();
 		temp->_nick= nick;
 
+		std::cout << "ircUserDB: the new nick object is at: " << std::hex << temp << std::dec << std::endl;
+
 		registeredId_it idIter = _registeredNicksToIDs.find(nick);
 		if(registered || idIter != _registeredNicksToIDs.end())
 		{
+			std::cout << "ircUserDB: in if" << std::endl;
 			temp->_userId = (*idIter).second;
 		}
 		else
 		{
+			std::cout << "ircUserDB: in else" << std::endl;
 			//generate a new id
 			temp->_userId = getNextAvailableID();
 		}
 			temp->_isAuthenticated = authenticated;
 
-		
+		std::cout << "ircUserDB: user object created, adding to database..." << std::endl;
+
 		//add it to both maps
 		_usersByNick[nick] = temp;
 		_usersByID[temp->userId()] = temp;
+
+		{
+			ircUser* ohai = _usersByNick[nick];
+
+			std::cout << "ircUserDB: the new nick object in usersbynick: " << std::hex << ohai << std::dec << std::endl;
+		}
 	}
+	else
+		std::cout << "ircUserDB: find didn't return map::end >.>" << std::endl;
 	//else its already here so whe shouldn't need to add it
+	
 }
 
 //TODO this should be redone with channels by nick
@@ -117,6 +129,9 @@ void ircUserDB::removeUser(std::string nick)
 	{
 		nicklist_it nicks;
 		for (nicks = (*channels).second.begin(); nicks != (*channels).second.end(); nicks++){
+
+			std::cout << "Given user id is: " << user->userId() << std::endl;
+			std::cout << "DB user id is: " << (*nicks)->userId() << std::endl;
 			if((*nicks)->userId() == user->userId())
 			{
 				(*channels).second.erase(nicks);
@@ -179,8 +194,6 @@ void ircUserDB::removeUserFromChannel(std::string nick, std::string channel)
 	
 	//remove from users by nick
 	_usersByNick.erase(nick);
-
-
 }
 
 ircUser* ircUserDB::getUser(std::string nick)
@@ -207,11 +220,11 @@ unsigned int ircUserDB::getNextAvailableID()
 
 	//XXX when this was a MACRO it was came back 0 >.>
 //#define RAND_INV_RANGE(r) ((unsigned int) ((RAND_MAX + 1) / (r)))
-	unsigned int rand_inv_range = (unsigned int) ((RAND_MAX + 1) / RANGE);
-	do {
+	//unsigned int rand_inv_range = (unsigned int) ((RAND_MAX + 1) / RANGE);
+	//do {
 	    posId = (unsigned int) rand();
-	} while (posId >= RANGE * rand_inv_range);
-	posId /= rand_inv_range;
+	//} while (posId >= RANGE * rand_inv_range);
+	//posId /= rand_inv_range;
 
 //#undef RAND_INV_RANGE
 

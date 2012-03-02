@@ -87,6 +87,7 @@ void posix_ircio::listen()
 		char buf[BUFSIZE] = {0};
 
 		//read on the socket
+		std::cout << "gonna hang on the socket again" << std::endl;
 		int chars = (int)::read(socket, buf, BUFSIZE);	
 		if(chars < 0)
 			continue;
@@ -108,6 +109,8 @@ void posix_ircio::listen()
 		{
 			leftovers = temp.substr(split);
 			temp = temp.substr(0, split);
+
+			std::cout << "Leftovers: " << leftovers << std::endl << "temp: " << temp << std::endl;
 		}
 
 		//call on receive

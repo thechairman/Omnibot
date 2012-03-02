@@ -6,6 +6,9 @@ void hURLbot::onMessage(ircMessage& msg){
 		std::cout << "hURLbot: gonna hURL" << std::endl;
 		ircUser* user = msg.user();
 
+		if(user == NULL)
+			std::cout << "this fraking thing is null too" << std::endl;
+
 		utils->sendPM(user->nick(), "Here ya go:");
 
 		std::deque<std::string>::iterator iter;

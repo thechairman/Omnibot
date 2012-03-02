@@ -31,6 +31,8 @@ ircInterface::ircInterface(){
 
 	std::cout << "ircINterface: initializing user authentication" << std::endl;
 	_userAuth = new ircUserAuth(this, _userDB);
+
+	_userAuth->authMethod(ircUserAuth::AUTH_NICKSERV);
 }
 
 ircInterface::~ircInterface(){
@@ -309,7 +311,7 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 	
 	std::map<std::string, ircUser*>::iterator it;
 
-	_userDB->getUser(nick);
+	temp = _userDB->getUser(nick);
 
 	//TODO this should be streamlined if possible
 	std::string channel =  msg.substr(msg.find_first_of(' ') + 1,

@@ -12,6 +12,7 @@ ircUser::ircUser(ircUser& user){
 }
 
 std::string ircUser::nick() const{
+	std::cout << "nick length is: " << _nick.size() << " nick string " << _nick << std::endl;
 	std::string temp(_nick);
 	return temp;
 }

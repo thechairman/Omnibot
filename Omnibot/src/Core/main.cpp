@@ -17,7 +17,7 @@ int main(){
 	irc.connect("madhax.net", 6667);
 	irc.registerUser("Omnibot", "Omnibot", "Omnibot");
 	irc.join("#alpha1");
-	irc.join("#main");
+//	irc.join("#main");
 	irc.join("#test2");
 
 
@@ -33,10 +33,10 @@ int main(){
 		}
 
 		if(pain[0] == 'q' || pain[0] == 'Q'){
-			loop = false;	
+		//	loop = false;	
 		}
 	}
-
+	std::cout << "exit while loop in main" << std::endl;
 	irc.quit();
 }
 
