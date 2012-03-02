@@ -209,7 +209,7 @@ void ircInterface::handle_nicklist(std::string nickMsg)
 {	
 	std::string channel = nickMsg.substr(nickMsg.find_first_of('=') + 2);
 	channel = channel.substr(0, channel.find_first_of(' '));
-	std::string nick = nickMsg.substr(nickMsg.find_first_of(':'));
+	std::string nick = nickMsg.substr(nickMsg.find_first_of(':') + 1);
 	
 	std::cout << "ircInterface: List of nicks: " << nick << std::endl;
 
@@ -236,11 +236,11 @@ void ircInterface::handle_vars(std::string varList)
 			continue;
 
 		std::string var = assign.substr(0, assign.find_first_of('='));
-		std::string val = assign.substr(assign.find_first_of('='));
+		std::string val = assign.substr(assign.find_first_of('=') + 1);
 
 		if(!var.compare("STATUSMSG"))
 		{
-			_userAuth->nickPrefixes(val.substr(val.find_first_of(':') + 1));
+			_userAuth->nickPrefixes(val);
 			std::cout << "ircInterface: nick Prefixes are: " << val << std::endl;
 		}
 	}
