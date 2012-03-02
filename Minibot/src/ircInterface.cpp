@@ -240,7 +240,7 @@ void ircInterface::handle_vars(std::string varList)
 
 		if(!var.compare("STATUSMSG"))
 		{
-			_userAuth->nickPrefixes(val);
+			_userAuth->nickPrefixes(val.substr(val.find_first_of(':') + 1));
 			std::cout << "ircInterface: nick Prefixes are: " << val << std::endl;
 		}
 	}
@@ -312,6 +312,11 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 	std::map<std::string, ircUser*>::iterator it;
 
 	temp = _userDB->getUser(nick);
+
+	if(!temp)
+	{
+		std::cout << "ircInterface: uh-oh, this nick returned null... brace yourself for impact!" << std::endl;
+	}
 
 	//TODO this should be streamlined if possible
 	std::string channel =  msg.substr(msg.find_first_of(' ') + 1,
