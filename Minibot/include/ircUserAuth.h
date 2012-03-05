@@ -11,7 +11,8 @@ class ircUserAuth
 {
 	public:
 		enum AuthType
-		{
+		{	
+			AUTH_NONE,
 			AUTH_LOCAL,
 			AUTH_NICKSERV
 		};
