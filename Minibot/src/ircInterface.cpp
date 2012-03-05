@@ -44,6 +44,8 @@ void printUser(ircUser* user)
 }
 
 ircInterface::ircInterface(){
+	_serverConnection = ircio::create();
+
 	std::cout << "ircInterface: initializing user database..." << std::endl;
 	_userDB = new ircUserDB();
 
@@ -56,13 +58,14 @@ ircInterface::ircInterface(){
 ircInterface::~ircInterface(){
 	delete _userAuth;
 	delete _userDB;
+	delete _serverConnection;
 }
 
 int ircInterface::connect(std::string server, int port){
 
-	serverConnection.registerCallBack(this);
-	serverConnection.open(server, port);
-	serverConnection.sleep(SLEEP_INTRV);
+	_serverConnection->registerCallBack(this);
+	_serverConnection->open(server, port);
+	_serverConnection->sleep(SLEEP_INTRV);
 	return 0;
 }
 
@@ -72,7 +75,7 @@ int ircInterface::registerUser(std::string nick, std::string uname, std::string 
 	sendString(msg);
 	msg = "USER " + uname + " 0 * :" + rname + "\r\n";
 	sendString(msg);
-	serverConnection.sleep(SLEEP_INTRV);
+	_serverConnection->sleep(SLEEP_INTRV);
 	return 0;
 }
 
@@ -143,7 +146,7 @@ void ircInterface::notifyMessage(ircMessage& m){
 }	
 void ircInterface::sendString(std::string str){
 	std::cout << "ircInterface: the address of this instance: " << this <<std::endl;
-	if(!serverConnection.write(str))
+	if(!_serverConnection->write(str))
 		std::cout<<"oh no! string didn't send!" << std::endl;
 	else
 		std::cout<< "sent string to server:  "<< str << std::endl;

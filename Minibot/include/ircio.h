@@ -1,6 +1,8 @@
 #ifndef _IRCIO_
 #define _IRCIO_
 
+#include <string>
+
 class ircioCallBack{
 	
 public:
@@ -10,6 +12,7 @@ public:
 class ircio{
 
 	public:
+		static ircio* create();
 		virtual bool open(std::string, int) = 0;
 		virtual void close() = 0;
 		virtual bool read(std::string&) = 0;

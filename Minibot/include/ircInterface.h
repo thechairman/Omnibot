@@ -6,7 +6,9 @@
 
 #include <iostream>
 
-#include "posix_ircio.h"
+//#include "posix_ircio.h"
+#include "ircio.h"
+
 #include "ircInterfaceClient.h" //this includes the event, message and user classes
 #include "ircUserDB.h"
 #include "ircUserAuth.h"
@@ -56,7 +58,7 @@ class ircInterface : public ircioCallBack{
 	void handleString(std::string msg);
 
 	//TODO find a way to get this to just ircio
-	posix_ircio serverConnection;
+	ircio* _serverConnection;
 	std::vector<ircInterfaceClient*> clients;
 
 	//map to hold nicks -> user structs
