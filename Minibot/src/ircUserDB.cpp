@@ -130,6 +130,9 @@ void ircUserDB::removeUser(std::string nick)
 		nicklist_it nicks;
 		for (nicks = (*channels).second.begin(); nicks != (*channels).second.end(); nicks++){
 
+			//TODO figure out why this is necessary >.>
+			if((*nicks) == NULL)
+				continue;
 			std::cout << "Given user id is: " << user->userId() << std::endl;
 			std::cout << "DB user id is: " << (*nicks)->userId() << std::endl;
 			if((*nicks)->userId() == user->userId())
