@@ -253,7 +253,7 @@ unsigned int ircUserDB::getNextAvailableID()
 
 void ircUserDB::saveData()
 {
-
+	std::cout << "ircUserDB: saving data..." << std::endl;
 	std::ofstream dbfile;
 	dbfile.open("users.db");
 	

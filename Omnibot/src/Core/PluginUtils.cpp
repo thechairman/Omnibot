@@ -13,3 +13,4 @@ PluginUtils::PluginUtils(ircInterface* irc_, PluginManager& manager_, NickManage
 void PluginUtils::sendPM(std::string nick, std::string message){
 	_irc->sendPM(nick, message);
 }
+

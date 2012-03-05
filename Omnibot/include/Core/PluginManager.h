@@ -23,6 +23,8 @@ class PluginManager{
 		
 		void pushMessage(ircMessage& );
 
+		std::string listLoadedPlugins();
+
 	private:
 		PluginUtils* _utils;
 		std::vector<OmniPlugin*> _plugins;

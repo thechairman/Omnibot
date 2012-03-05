@@ -44,6 +44,7 @@ class ircInterface : public ircioCallBack{
 	void handle_vars(std::string);
 	void handle_nicklist(std::string);
 	void handle_privmsg(std::string, std::string);
+	void handle_notice(std::string, std::string);
 	ircEvent handle_quit(std::string, std::string);
 	ircEvent handle_join(std::string, std::string);
 	ircEvent handle_part(std::string, std::string );
@@ -64,11 +65,12 @@ class ircInterface : public ircioCallBack{
 	ircUserAuth* _userAuth;
 
 	//some constants
-	static const int NUM_MSG_HDRS = 1;
+	static const int NUM_MSG_HDRS = 2;
 	static const int NUM_EVT_HDRS = 3;
 	static const int SLEEP_INTRV = 7;
 	//irc strings	
 	static const std::string PRIVMSG;	//message header
+	static const std::string NOTICE;	//message header
 	static const std::string QUIT;		//event header
 	static const std::string PING;
 	static const std::string PONG;

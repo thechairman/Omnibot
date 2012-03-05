@@ -13,6 +13,7 @@
 //add timer to reconnecet if we disconnect
 
 const std::string ircInterface::PRIVMSG = "PRIVMSG";
+const std::string ircInterface::NOTICE = "NOTICE";
 const std::string ircInterface::QUIT = "QUIT";
 const std::string ircInterface::PING = "PING";
 const std::string ircInterface::PONG = "PONG";
@@ -24,6 +25,23 @@ const std::string ircInterface::ERROR = "ERROR";
 const std::string ircInterface::INSPIRCDVARS = "005";
 const std::string ircInterface::NICKLIST = "353"; 
 //this value may be standard for all irc severs, but my experiance is only with inspircd; joe
+
+
+//helper function to print user datas
+void printUser(ircUser* user)
+{
+	std::stringstream userdata;
+	userdata << "ircInterface: User data: ";
+	userdata << user->nick() << "\t";
+	userdata << user->userId() << "\t";
+	if(user->isAuthenticated())
+		userdata <<"true";
+	else
+		userdata << "false";
+
+	std::cout << userdata.str() << std::endl;
+
+}
 
 ircInterface::ircInterface(){
 	std::cout << "ircInterface: initializing user database..." << std::endl;
@@ -174,6 +192,10 @@ void ircInterface::onMessage(std::string pkge){
 			{
 				handle_privmsg(msg, prefix);
 			}
+			else if(!type.compare(NOTICE))
+			{
+				handle_notice(msg, prefix);
+			}
 			else if(!type.compare(QUIT))
 
 			{
@@ -284,7 +306,7 @@ ircEvent ircInterface::handle_part(std::string msg, std::string prefix)
 	return ircEvent::part(channel, nick, "");
 }
 
-void ircInterface::handle_privmsg(std::string msg, std::string prefix){
+void ircInterface::handle_notice(std::string msg, std::string prefix){
 
 	//grab user data
 	std::string nick = prefix.substr(prefix.find_first_of(':') + 1, 
@@ -306,17 +328,31 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 		return;
 	}
 
+	//XXX this may not be the best way to handle this...
+	//so it turns out this would be a really poor way to handle this
+	//apparently most of the sources of this message type would return null users :/ 
+	//handle_privmsg(msg, prefix);
+}
+
+void ircInterface::handle_privmsg(std::string msg, std::string prefix){
+
+	//grab user data
+	std::string nick = prefix.substr(prefix.find_first_of(':') + 1, 
+					 prefix.find_first_of('!') -1);
+
+
 	//TODO this is a  temp solution that could cause hella memory leaks if not fixed later
 	ircUser* temp = NULL;
 	
 	std::map<std::string, ircUser*>::iterator it;
 
 	temp = _userDB->getUser(nick);
-
 	if(!temp)
 	{
 		std::cout << "ircInterface: uh-oh, this nick returned null... brace yourself for impact!" << std::endl;
 	}
+	
+	printUser(temp);
 
 	//TODO this should be streamlined if possible
 	std::string channel =  msg.substr(msg.find_first_of(' ') + 1,

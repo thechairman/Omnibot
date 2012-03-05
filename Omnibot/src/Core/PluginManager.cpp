@@ -1,4 +1,5 @@
 #include "PluginManager.h"
+#include <sstream>
 #include <iostream>
 
 PluginManager::PluginManager(ircInterface* irc, NickManager& nicks){
@@ -80,3 +81,16 @@ void PluginManager::pushMessage(ircMessage& msg){
 	}
 }
 
+std::string PluginManager::listLoadedPlugins()
+{
+	std::vector<OmniPlugin*>::iterator iter;
+	std::stringstream list;
+	for(iter = _plugins.begin(); iter != _plugins.end(); iter++)
+	{	
+		list << (*iter)->name() << " ";
+	//	std::cout <<"PluginManager: passing message to plugin: "<< (*iter)->name() << std::endl;
+	//	OmniPlugin::passMessage((*iter), msg);
+	}
+
+	return list.str();
+}

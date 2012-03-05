@@ -64,6 +64,10 @@ void omnibot::alertMessage(ircMessage& msg)
 		{
 			part(toParse.substr(6));
 		}
+		else if(!toParse.substr(1,4).compare("list"))
+		{
+			_irc->sendMessage(msg.channel(), "Loaded Plugins: " + _manager.listLoadedPlugins());
+		}
 		else
 		{
 			//pass string to plugins
