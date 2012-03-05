@@ -108,3 +108,11 @@ ${BUILD_CORE}/%.o:${SRC_CORE}/%.cpp
 .PHONY: clean
 clean:
 	${RM} ${BUILD_THREADS}/*.d ${BUILD_THREADS}/*.o ${BUILD_CORE}/*.d ${BUILD_CORE}/*.o ${THREAD_LIB} ${EXECUTABLE}
+
+.PHONY: cleanall
+
+cleanall: clean
+	${MAKE} -C ${MINIBOT_PATH} clean
+	${MAKE} -C ${PLUGIN_DIR} clean
+
+

@@ -20,5 +20,8 @@ all: ${PLUGINS}
 	@echo ' '
 
 
+.PHONY:clean
 
+clean:
+	${RM} *.o *.d
 
