@@ -23,7 +23,9 @@ const std::string ircInterface::PART = "PART";
 const std::string ircInterface::USER = "USER";
 const std::string ircInterface::ERROR = "ERROR";
 const std::string ircInterface::INSPIRCDVARS = "005";
-const std::string ircInterface::NICKLIST = "353"; 
+const std::string ircInterface::NICKLIST = "353";
+
+char ircInterface::CMD_DELIM = '@';
 //this value may be standard for all irc severs, but my experiance is only with inspircd; joe
 
 
@@ -382,11 +384,23 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 				msg.find_first_of(' ', msg.find_first_of(' ') + 1) + 1) +1);
 	if(msg.find("\r\n") != std::string::npos)
 	msg = msg.substr(0, msg.find("\r\n"));
+	
+	if(msg[0] == CMD_DELIM)
+	{	
+		if(msg.substr(1, msg.find_first_of(' ')).compare("auth"))
+		{
+			_userAuth->verifyAuth(temp, msg.substr(msg.find_first_of(' ')+1 ));
+			return;
+		}
+
+	}
+
 	ircMessage m(temp, msg, channel);
 
 	
 	notifyMessage(m);
 }
+
 
 void ircInterface::sendPong(){
 	std::string temp = PONG + " minibot\r\n";

@@ -51,6 +51,8 @@ class ircInterface : public ircioCallBack{
 	ircEvent handle_join(std::string, std::string);
 	ircEvent handle_part(std::string, std::string );
 
+	void handle_cmd_auth(ircUser*);
+
 	//sends a string across the socket
 	void sendString(std::string str);
 
@@ -85,6 +87,8 @@ class ircInterface : public ircioCallBack{
 	//this could be inspirc specific
 	static const std::string INSPIRCDVARS;
 	static const std::string NICKLIST;
+
+	static char CMD_DELIM;
 };
 
 #endif

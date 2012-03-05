@@ -73,3 +73,13 @@ void ircUserAuth::nickPrefixes(std::string prefixes)
 {
 	_nickModePrefixes = prefixes;
 }
+
+void ircUserAuth::verifyAuth(ircUser* user, std::string credentials)
+{
+	if(_authMethod == AUTH_NICKSERV)
+	{
+		std::cout << "ircUserAuth: pinging nickserve" << std::endl;
+		//if it doesn't exist or isn't authenticated run a status on nickserve
+		_irc->sendPM("Nickserv", "status " + user->nick());
+	}
+}

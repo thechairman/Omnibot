@@ -24,6 +24,7 @@ class ircUserAuth
 		virtual ircUserAuth::AuthType authMethod();
 		void authMethod(AuthType);
 		void nickPrefixes(std::string);
+		void verifyAuth(ircUser*, std::string);
 
 
 	protected:

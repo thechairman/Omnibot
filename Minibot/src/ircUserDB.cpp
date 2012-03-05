@@ -4,7 +4,11 @@
 
 ircUserDB::ircUserDB()
 {
+	std::cout << "ircUserDB: initializing rand..." << std::endl;
 	srand(time(NULL));
+
+	std::cout << "ircUserDB: loading data..." << std::endl;
+
 	loadData();
 }
 
@@ -273,11 +277,14 @@ void ircUserDB::loadData()
 	std::ifstream dbfile;
 	dbfile.open("users.db");
 
+	std::cout <<"ircUserDB: opening database file..." << std::endl;
 	if(!dbfile.good())
 		return;
 
 	size_t mapsize;
 	dbfile >> mapsize;
+
+	std::cout <<"ircUserDB: there are "<< mapsize << " registered nicks" << std::endl;
 
 	for (size_t i = 0; i < mapsize; ++i)
 	{
@@ -286,6 +293,8 @@ void ircUserDB::loadData()
 		unsigned int id;
 		dbfile >> id;
 		_registeredNicksToIDs[nick] = id;
+
+//		std::cout << "ircUserDB: loaded nick: " << nick << " id: " << id << std::endl;
 
 	}
 }
