@@ -23,13 +23,13 @@ void ircUserAuth::nickServInfo(std::string str)
 		{
 			//_userDB->addUser(nick, true, false);
 			_userDB->setRegistered(nick, true);
-			_userDB->setAuthenticated(nick, true);
+			_userDB->setAuthenticated(nick, false);
 		}
 		else if(!status.compare("0"))
 		{
 			//_userDB->addUser(nick, false, false);
-			_userDB->setRegistered(nick, true);
-			_userDB->setAuthenticated(nick, true);
+			_userDB->setRegistered(nick, false);
+			_userDB->setAuthenticated(nick, false);
 		}
 
 	}
