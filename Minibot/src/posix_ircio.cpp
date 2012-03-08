@@ -90,7 +90,28 @@ void posix_ircio::listen()
 		std::cout << "gonna hang on the socket again" << std::endl;
 		int chars = (int)::read(socket, buf, BUFSIZE);	
 		if(chars < 0)
+		{	std::cout << "ircio: errno is: " << errno << std::endl;
+
+			switch(errno)
+			{
+				case EINTR:
+				case EAGAIN:
+					continue;
+					break;
+				case EBADF:
+				case EINVAL:
+				case EFAULT:
+				case EIO:
+				case EISDIR:
+					//should brobably break responsibly here 
+					//and lt the uper levles know what happened;
+					onReceive("ERROR  Connection brokent \r\n");
+					return;
+				
+			}
+
 			continue;
+		}
 
 		//this shouldn't be needed if
 		//the buffer is zeroed
@@ -98,7 +119,15 @@ void posix_ircio::listen()
 		
 		std::string buffer(buf);
 		std::string temp = leftovers + buffer;
-		size_t split = temp.find_last_of("\r\n") + 2;
+		size_t split = temp.find_last_of("\r\n");
+		if(split == std::string::npos)
+		{
+			split = 0;
+		}
+		else
+		{
+			split += 2;
+		}
 		std::cout<< "ircio: temp size: " << temp.size() << " split: " << split << std::endl;
 
 		if(split > temp.size())

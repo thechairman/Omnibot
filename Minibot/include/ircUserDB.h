@@ -24,6 +24,8 @@ class ircUserDB {
 		ircUser* getUser(unsigned int);
 		std::vector<ircUser*> getChannelCurrentUsers(std::string);
 
+		void printAllUsers();
+
 	private:
 		//methods for ircINterface use
 		void setRegistered(std::string,bool);

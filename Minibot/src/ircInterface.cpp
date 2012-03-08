@@ -351,6 +351,8 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 	
 	std::map<std::string, ircUser*>::iterator it;
 
+	std::cout << "ircInterface: the nick were looking for is: " << nick << std::endl;
+
 	temp = _userDB->getUser(nick);
 	if(!temp)
 	{
@@ -385,13 +387,22 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 	if(msg.find("\r\n") != std::string::npos)
 	msg = msg.substr(0, msg.find("\r\n"));
 	
+	std::cout << "is this a command? " << msg.substr(0, msg.find_first_of(' ')) << std::endl;
 	if(msg[0] == CMD_DELIM)
-	{	
-		if(msg.substr(1, msg.find_first_of(' ')).compare("auth"))
+	{
+
+		std::cout << "looking at minibot commands..." << std::endl;	
+		if(!msg.substr(1, msg.find_first_of(' ')).compare("auth"))
 		{
 			_userAuth->verifyAuth(temp, msg.substr(msg.find_first_of(' ')+1 ));
 			return;
 		}
+		else if(!msg.substr(1, msg.find_first_of(' ')).compare("users"))
+		{
+			_userDB->printAllUsers();
+			return;
+		}
+
 
 	}
 

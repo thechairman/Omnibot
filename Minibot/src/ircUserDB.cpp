@@ -1,7 +1,7 @@
 #include "ircUserDB.h"
 
 #include <iostream>
-
+#include <sstream>
 ircUserDB::ircUserDB()
 {
 	std::cout << "ircUserDB: initializing rand..." << std::endl;
@@ -20,6 +20,13 @@ ircUserDB::~ircUserDB()
 void ircUserDB::setRegistered(std::string nick,bool registered)
 {
 	ircUser* user = getUser(nick);
+	
+	if(user == NULL)
+	{
+		std::cout << "setRegistered" << std::endl;
+		printAllUsers();
+	}
+
 	registeredId_it idIter = _registeredNicksToIDs.find(nick);
 	if(registered && idIter != _registeredNicksToIDs.end())
 	{
@@ -37,6 +44,12 @@ void ircUserDB::setRegistered(std::string nick,bool registered)
 void ircUserDB::setAuthenticated(std::string nick, bool authenticated)
 {
 	ircUser* user = getUser(nick);
+
+	if(user == NULL)
+	{
+		std::cout << "setAauthenticated" << std::endl;
+		printAllUsers();
+	}
 	user->_isAuthenticated = authenticated;
 }
 
@@ -122,10 +135,9 @@ void ircUserDB::removeUser(std::string nick)
 
 	if(user == NULL)
 	{
-		std::cout << "this user is broken" << std::endl;
+		std::cout << "removeUser" << std::endl;
+		printAllUsers();
 	}
-	else
-		std::cout << "retrieved user was fine" << std::endl;
 
 	//remove it forom channels;
 	channels_it channels;
@@ -136,7 +148,11 @@ void ircUserDB::removeUser(std::string nick)
 
 			//TODO figure out why this is necessary >.>
 			if((*nicks) == NULL)
+			{
+				std::cout << "removeUser(inner loop)" << std::endl;
+				printAllUsers();
 				continue;
+			}
 			std::cout << "Given user id is: " << user->userId() << std::endl;
 			std::cout << "DB user id is: " << (*nicks)->userId() << std::endl;
 			if((*nicks)->userId() == user->userId())
@@ -175,6 +191,11 @@ void ircUserDB::removeUserFromChannel(std::string nick, std::string channel)
 	std::vector<ircUser*>::iterator channelUser;
 	for(channelUser = users.begin(); channelUser != users.end(); channelUser++)
 	{
+		if((*channelUser) == NULL)
+		{
+			std::cout << "RemoveUserFromChannel" << std::endl;
+			printAllUsers();
+		}
 		if((*channelUser)->userId() == userId)
 		{
 			users.erase(channelUser);
@@ -205,12 +226,39 @@ void ircUserDB::removeUserFromChannel(std::string nick, std::string channel)
 
 ircUser* ircUserDB::getUser(std::string nick)
 {
-	return _usersByNick[nick];
+
+	ircUser* user = NULL;
+	usersByNick_it iter = _usersByNick.find(nick);
+	if(iter != _usersByNick.end())
+	{
+		user = (*iter).second;
+	}
+
+	if(user == NULL)
+	{
+		std::cout << "getUser nick" << std::endl;
+		printAllUsers();
+	}
+	return user;
 }
 
 ircUser* ircUserDB::getUser(unsigned int ID)
 {
-	return _usersByID[ID];
+	
+
+	ircUser* user = NULL;
+	usersByID_it iter = _usersByID.find(ID);
+	if(iter != _usersByID.end())
+	{
+		user = (*iter).second;
+	}
+
+	if(user == NULL)
+	{
+		std::cout << "getUser id" << std::endl;
+		printAllUsers();
+	}
+	return user;
 }
 
 std::vector<ircUser*> ircUserDB::getChannelCurrentUsers(std::string channel)
@@ -297,4 +345,68 @@ void ircUserDB::loadData()
 //		std::cout << "ircUserDB: loaded nick: " << nick << " id: " << id << std::endl;
 
 	}
+}
+
+
+
+
+void ircUserDB::printAllUsers()
+{
+	std::stringstream users;
+
+	users << std::endl << "-----DATABURRS DUMP-----" << std::endl;
+
+	usersByNick_it nicks;
+
+	for(nicks = _usersByNick.begin(); nicks!=_usersByNick.end(); nicks++)
+	{
+		users << (*nicks).first << "\t";
+
+		if((*nicks).second == NULL)
+		{
+			users << "NULL\tNULL" << std::endl;
+		}
+		else
+		{
+			ircUser* temp =  (*nicks).second;
+			users << temp->userId() << "\t";
+			if(temp->isAuthenticated())
+			{
+				users << "true" << std::endl;
+			}
+			else
+			{
+				users << "false" <<std::endl;
+			}
+		}
+	}
+
+
+	users << std::endl << std::endl;
+	usersByID_it ids;
+
+	for(ids = _usersByID.begin(); ids!=_usersByID.end(); ids++)
+	{
+		users << (*ids).first << "\t";
+
+		if((*ids).second == NULL)
+		{
+			users << "NULL\tNULL" << std::endl;
+		}
+		else
+		{
+			ircUser* temp =  (*ids).second;
+			users << temp->nick() << "\t";
+			if(temp->isAuthenticated())
+			{
+				users << "true" << std::endl;
+			}
+			else
+			{
+				users << "false" <<std::endl;
+			}
+		}
+	}
+
+	std::cout << users.str();
 }
