@@ -20,7 +20,7 @@ class ircUserAuth
 		ircUserAuth(ircInterface*, ircUserDB*);
 		virtual ~ircUserAuth();
 		virtual void nickServInfo(std::string);
-		virtual void addUser(std::string);
+		virtual std::string addUser(std::string);
 		virtual ircUserAuth::AuthType authMethod();
 		void authMethod(AuthType);
 		void nickPrefixes(std::string);

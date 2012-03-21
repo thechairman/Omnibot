@@ -20,11 +20,13 @@ class ircUserDB {
 		void removeUser(std::string);
 		void addUserToChannel(std::string, std::string);
 		void removeUserFromChannel(std::string, std::string);
+		void nickChange(std::string, std::string);
 		ircUser* getUser(std::string);
 		ircUser* getUser(unsigned int);
 		std::vector<ircUser*> getChannelCurrentUsers(std::string);
 
 		void printAllUsers();
+		void printChannelUsers(std::string);
 
 	private:
 		//methods for ircINterface use

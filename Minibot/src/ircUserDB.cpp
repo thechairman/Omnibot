@@ -177,25 +177,65 @@ void ircUserDB::removeUser(std::string nick)
 
 void ircUserDB::addUserToChannel(std::string nick, std::string channel)
 {
+	std::cout << "ircUserDB: adding user: " << nick << std::endl;
+	std::cout << "before: " << std::endl;
+	printChannelUsers(channel);
 	usersByNick_it user = _usersByNick.find(nick);
 
 	_usersByChannel[channel].push_back((*user).second);
+
+	std::cout << "after:" << std::endl;
+	printChannelUsers(channel);
 }
 
 void ircUserDB::removeUserFromChannel(std::string nick, std::string channel)
 {
-	std::vector<ircUser*> users =  _usersByChannel[channel];
+	//look up the channel we want
+	channels_it iter = _usersByChannel.find(channel);
+	
+	//make sure it existes
+	if(iter == _usersByChannel.end())
+	{
+		std::cout << "ircUserDB::removeUserFromChannel(): no such channel" << std::endl;
+		return;
+	}
 
-	unsigned int userId = (*(_usersByNick.find(nick))).second->userId();
+	//get the vector of users
+	std::vector<ircUser*> users =  (*iter).second;
+	
+	//find the user we want to remove from the channel in the 
+	//list of nicks
+	usersByNick_it temp = _usersByNick.find(nick);
+
+
+	//make sure that user actually esits
+	if(temp == _usersByNick.end())
+	{
+		std::cout << "ircUserDB::removeUserFromChannel(): no such nick exists" << std::endl;
+		return;
+	}
+
+	//save off that users id
+	unsigned int userId = (*temp).second->userId();
+
 
 	std::vector<ircUser*>::iterator channelUser;
+
+	printChannelUsers(channel);
+
+	//look through the vector for a pointer to a nick with the same user id.
 	for(channelUser = users.begin(); channelUser != users.end(); channelUser++)
 	{
+		//there have been nulls in the list before 
+		//handle them if we find any
 		if((*channelUser) == NULL)
 		{
 			std::cout << "RemoveUserFromChannel" << std::endl;
 			printAllUsers();
+			continue;
 		}
+
+		//
 		if((*channelUser)->userId() == userId)
 		{
 			users.erase(channelUser);
@@ -215,7 +255,7 @@ void ircUserDB::removeUserFromChannel(std::string nick, std::string channel)
 		}
 	}
 
-	//if its not then the user is gon and we need to clean up
+	//if its not then the user is gone and we need to clean up
 
 	//remove from usersbyid
 	_usersByID.erase(_usersByID.find(userId));
@@ -266,6 +306,19 @@ std::vector<ircUser*> ircUserDB::getChannelCurrentUsers(std::string channel)
 	return _usersByChannel[channel];
 }
 
+void ircUserDB::nickChange(std::string nick, std::string newNick)
+{
+	usersByNick_it it = _usersByNick.find(nick);
+	ircUser* user = (*it).second;
+
+
+	user->_nick = newNick;
+
+	_usersByNick.erase(it);
+	_usersByNick[newNick] = user;
+
+}
+
 unsigned int ircUserDB::getNextAvailableID()
 {
 
@@ -313,10 +366,14 @@ void ircUserDB::saveData()
 	dbfile.open("users.db");
 	
 	dbfile << _registeredNicksToIDs.size();
+	std::cout << "-----Saved Data------" << std::endl;
+	std::cout << "number of registered nicks: " << _registeredNicksToIDs.size() << std::endl;
 	for(registeredId_it iter = _registeredNicksToIDs.begin(); iter != _registeredNicksToIDs.end(); iter++)
 	{
 		dbfile << iter->first;
+		std::cout << "nick: " << iter->first << std::endl;
 		dbfile << iter->second;
+		std::cout << "id: " << iter->second << std::endl << std::endl;
 	}
 }
 
@@ -409,4 +466,21 @@ void ircUserDB::printAllUsers()
 	}
 
 	std::cout << users.str();
+}
+
+void ircUserDB::printChannelUsers(std::string channel)
+{
+	std::vector<ircUser*> users =  _usersByChannel[channel];
+
+
+	std::vector<ircUser*>::iterator channelUser;
+
+	std::cout << "-----Users in channel " << channel << "-----" << std::endl;
+	for(channelUser = users.begin(); channelUser != users.end(); channelUser++)
+	{
+		if((*channelUser) != NULL)
+			std::cout << (*channelUser)->nick() << std::endl;
+		else 
+			std::cout << "NULL" << std::endl;
+	}
 }

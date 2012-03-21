@@ -91,7 +91,7 @@ ${BUILD_THREADS}/%.o:${SRC_THREAD}/%.cpp
 	@mkdir -p ${BUILD_THREADS}
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ ${INCLUDES} -g -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	g++ ${INCLUDES} -D_GLIBCXX_DEBUG -g -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -100,7 +100,7 @@ ${BUILD_CORE}/%.o:${SRC_CORE}/%.cpp
 	@mkdir -p ${BUILD_CORE}
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ ${INCLUDES} -g -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	g++ ${INCLUDES} -D_GLIBCXX_DEBUG -g -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

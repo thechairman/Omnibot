@@ -50,6 +50,7 @@ class ircInterface : public ircioCallBack{
 	ircEvent handle_quit(std::string, std::string);
 	ircEvent handle_join(std::string, std::string);
 	ircEvent handle_part(std::string, std::string );
+	ircEvent handle_nick(std::string, std::string);
 
 	void handle_cmd_auth(ircUser*);
 

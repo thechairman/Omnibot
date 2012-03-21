@@ -218,6 +218,12 @@ void ircInterface::onMessage(std::string pkge){
 				notifyEvent(e);
 			}
 
+			else if(!type.compare(NICK))
+			{
+				ircEvent e = handle_nick(msg, prefix);
+				notifyEvent(e);
+			}
+
 			else if(!type.compare(INSPIRCDVARS))
 			{
 				handle_vars(msg);
@@ -244,10 +250,11 @@ void ircInterface::handle_nicklist(std::string nickMsg)
 
 	while(getline(nicks, nick, ' '))
 	{
-		_userAuth->addUser(nick);
-		_userDB->addUserToChannel(nick, channel);
+		std::string temp;
+		temp = _userAuth->addUser(nick);
+		_userDB->addUserToChannel(temp, channel);
 
-		std::cout << "ircInterface: added nick: " << nick << " to channel: " << channel << std::endl;
+		std::cout << "ircInterface: added nick: " << temp << " to channel: " << channel << std::endl;
 	}
 
 }
@@ -309,6 +316,22 @@ ircEvent ircInterface::handle_part(std::string msg, std::string prefix)
 
 	//TODO handle part reasons for now it's an empty string
 	return ircEvent::part(channel, nick, "");
+}
+
+ircEvent ircInterface::handle_nick(std::string msg, std::string prefix)
+{
+	
+	std::string nick = prefix.substr(prefix.find_first_of(':') + 1, 
+					 prefix.find_first_of('!') -1);
+
+	std::string newNick = msg.substr(msg.find_first_of(' ') + 1);
+	
+	std::cout << "ircInterface: nick changed: " << nick << "->" << newNick << std::endl;
+
+
+	_userDB->nickChange(nick, newNick);
+
+	return ircEvent::nickChange(nick, newNick);
 }
 
 void ircInterface::handle_notice(std::string msg, std::string prefix){

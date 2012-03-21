@@ -12,7 +12,7 @@ ircUser::ircUser(ircUser& user){
 }
 
 std::string ircUser::nick() const{
-	std::cout << "nick length is: " << _nick.size() << " nick string " << _nick << std::endl;
+	//std::cout << "nick length is: " << _nick.size() << " nick string " << _nick << std::endl;
 	std::string temp(_nick);
 	return temp;
 }
@@ -28,9 +28,9 @@ bool ircUser::isAuthenticated() const
 ircMessage::ircMessage(): _message(""), _user(NULL), _channel(""){}
 
 ircMessage::ircMessage(const ircMessage& msg): _message(msg._message), _user(msg._user),_channel(msg._channel){
-	std::cout << "ircMessage: copied message size: " <<  _message.size() << std::endl;
-	if(_message.size() < 500) 
-		std::cout  << "ircMessage: copied message is: " << _message << std::endl;
+	//std::cout << "ircMessage: copied message size: " <<  _message.size() << std::endl;
+	//if(_message.size() < 500) 
+	//	std::cout  << "ircMessage: copied message is: " << _message << std::endl;
 }
 
 ircMessage::ircMessage(ircUser* user_, std::string Message, std::string channel_){
@@ -41,7 +41,7 @@ ircMessage::ircMessage(ircUser* user_, std::string Message, std::string channel_
 
 
 std::string ircMessage::message() const{
-	std::cout << "ircMessage: the length of the message is " << _message.size() << std::endl;
+	//std::cout << "ircMessage: the length of the message is " << _message.size() << std::endl;
 	//std::cout << "ircMessage trying to return message: " << _message << std::endl;
 	std::string temp(_message);
 	return temp;

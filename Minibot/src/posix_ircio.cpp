@@ -87,7 +87,7 @@ void posix_ircio::listen()
 		char buf[BUFSIZE] = {0};
 
 		//read on the socket
-		std::cout << "gonna hang on the socket again" << std::endl;
+		//std::cout << "gonna hang on the socket again" << std::endl;
 		int chars = (int)::read(socket, buf, BUFSIZE);	
 		if(chars < 0)
 		{	std::cout << "ircio: errno is: " << errno << std::endl;

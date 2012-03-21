@@ -35,7 +35,7 @@ void ircUserAuth::nickServInfo(std::string str)
 	}
 }
 
-void ircUserAuth::addUser(std::string nick)
+std::string ircUserAuth::addUser(std::string nick)
 {
 	//need to strip leading symbols if any...
 	if(_nickModePrefixes.find(nick[0]) != std::string::npos)
@@ -44,7 +44,7 @@ void ircUserAuth::addUser(std::string nick)
 	//check to see if this user exists and is authenticated
 	ircUser* usr = _userDB->getUser(nick);
 	if(usr != NULL && usr->isAuthenticated())
-		return;
+		return nick;
 	
 	if(_authMethod == AUTH_NICKSERV)
 	{
@@ -57,6 +57,8 @@ void ircUserAuth::addUser(std::string nick)
 		_irc->sendPM("Nickserv", "status " + nick);
 
 	}
+
+	return nick;
 	
 }
 void ircUserAuth::authMethod(ircUserAuth::AuthType type)
