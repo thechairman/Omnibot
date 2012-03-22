@@ -49,7 +49,7 @@ ircInterface::ircInterface(){
 	_serverConnection = ircio::create();
 
 	std::cout << "ircInterface: initializing user database..." << std::endl;
-	_userDB = new ircUserDB();
+	_userDB = ircUserDB::create();
 
 	std::cout << "ircINterface: initializing user authentication" << std::endl;
 	_userAuth = new ircUserAuth(this, _userDB);

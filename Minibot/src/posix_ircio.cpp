@@ -119,7 +119,7 @@ void posix_ircio::listen()
 		
 		std::string buffer(buf);
 		std::string temp = leftovers + buffer;
-		size_t split = temp.find_last_of("\r\n");
+		size_t split = temp.rfind("\r\n");
 		if(split == std::string::npos)
 		{
 			split = 0;

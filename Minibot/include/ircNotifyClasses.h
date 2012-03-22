@@ -8,6 +8,7 @@ class ircUser{
 	friend class NickManager;
 	friend class ircInterface;
 	friend class ircUserDB;
+	friend class posix_ircUserDB;
 private:
 	std::string _nick;
 	bool _isAuthenticated;
