@@ -265,6 +265,19 @@ void posix_ircUserDB::removeUserFromChannel(std::string nick, std::string channe
 	_usersByNick.erase(nick);
 }
 
+void posix_ircUserDB::nickChange(std::string nick, std::string newNick)
+{
+	usersByNick_it it = _usersByNick.find(nick);
+	ircUser* user = (*it).second;
+
+
+	user->_nick = newNick;
+
+	_usersByNick.erase(it);
+	_usersByNick[newNick] = user;
+
+}
+
 ircUser* posix_ircUserDB::getUser(std::string nick)
 {
 
@@ -307,17 +320,49 @@ std::vector<ircUser*> posix_ircUserDB::getChannelCurrentUsers(std::string channe
 	return _usersByChannel[channel];
 }
 
-void posix_ircUserDB::nickChange(std::string nick, std::string newNick)
+std::vector<ircUser*> posix_ircUserDB::allUsers()
 {
-	usersByNick_it it = _usersByNick.find(nick);
-	ircUser* user = (*it).second;
+	usersByID_it iter;
+	std::vector<ircUser*> users;
+	for(iter = _usersByID.begin(); iter != _usersByID.end(); iter++)
+	{
+		users.push_back((*iter).second);
+	}
 
+	return users;
+}
+std::vector<ircUser*> posix_ircUserDB::onlineRegisteredUsers()
+{
+	registeredId_it iter;
+	std::vector<ircUser*> users;
+	for(iter = _registeredNicksToIDs.begin(); iter != _registeredNicksToIDs.end(); iter++)
+	{
+		usersByNick_it user = _usersByNick.find((*iter).first);
+		if(user != _usersByNick.end())
+		{
+			users.push_back((*user).second);
+		}
+	}
 
-	user->_nick = newNick;
+	return users;
 
-	_usersByNick.erase(it);
-	_usersByNick[newNick] = user;
+}
+std::vector<ircUser*> posix_ircUserDB::allRegisteredUsers()
+{
+}
+std::vector<ircUser*> posix_ircUserDB::authenticatedUsers()
+{
+	usersByID_it iter;
+	std::vector<ircUser*> users;
+	for(iter = _usersByID.begin(); iter != _usersByID.end(); iter++)
+	{
+		if((*iter).second->isAuthenticated())
+		{
+			users.push_back((*iter).second);
+		}
+	}
 
+	return users;
 }
 
 unsigned int posix_ircUserDB::getNextAvailableID()

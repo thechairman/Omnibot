@@ -26,6 +26,11 @@ class posix_ircUserDB: public ircUserDB {
 		ircUser* getUser(unsigned int);
 		std::vector<ircUser*> getChannelCurrentUsers(std::string);
 
+		std::vector<ircUser*> allUsers();
+		std::vector<ircUser*> onlineRegisteredUsers();
+		std::vector<ircUser*> allRegisteredUsers();
+		std::vector<ircUser*> authenticatedUsers();
+
 		void printAllUsers();
 		void printChannelUsers(std::string);
 

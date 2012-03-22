@@ -19,7 +19,11 @@ class ircUserDB {
 		virtual ircUser* getUser(std::string) = 0;
 		virtual ircUser* getUser(unsigned int) = 0;
 		virtual std::vector<ircUser*> getChannelCurrentUsers(std::string) = 0;
-
+		virtual std::vector<ircUser*> allUsers() = 0;
+		virtual std::vector<ircUser*> onlineRegisteredUsers() = 0;
+		virtual std::vector<ircUser*> allRegisteredUsers() = 0;
+		virtual std::vector<ircUser*> authenticatedUsers() = 0;
+	
 		virtual void printAllUsers() = 0;
 		virtual void printChannelUsers(std::string) = 0;
 
