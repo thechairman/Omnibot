@@ -55,9 +55,12 @@ ircInterface::ircInterface(){
 	_userAuth = new ircUserAuth(this, _userDB);
 
 	_userAuth->authMethod(ircUserAuth::AUTH_NICKSERV);
+
+	_usersInterface = new ircUsersInterface(_userDB);
 }
 
 ircInterface::~ircInterface(){
+	delete _usersInterface;
 	delete _userAuth;
 	delete _userDB;
 	delete _serverConnection;
@@ -80,6 +83,8 @@ int ircInterface::registerUser(std::string nick, std::string uname, std::string 
 	_serverConnection->sleep(SLEEP_INTRV);
 	return 0;
 }
+
+
 
 int ircInterface::join(std::string channel){
 	std::string msg = JOIN + " :" + channel + "\r\n";
@@ -129,6 +134,11 @@ int ircInterface::quit(){
 void ircInterface::registerForNotify(ircInterfaceClient* client){
 	clients.push_back(client);
 	std::cout << "IrcInterface: register client for notifications" << std::endl;
+}
+
+ircUsersInterface* ircInterface::usersInterface()
+{
+	return _usersInterface;
 }
 
 void ircInterface::notifyEvent(ircEvent& e){
@@ -440,3 +450,4 @@ void ircInterface::sendPong(){
 	std::string temp = PONG + " minibot\r\n";
 	sendString(temp);
 }
+

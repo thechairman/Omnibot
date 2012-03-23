@@ -4,7 +4,8 @@ AR = ar
 
 #location of the minibot project and product library
 MINIBOT_PATH = ../Minibot
-MINIBOT_LIB = ${MINIBOT_PATH}/build/libMinibot.a
+MINIBOT_BUILD = ${MINIBOT_PATH}/build/
+MINIBOT_LIB = ${MINIBOT_BUILD}/build/libMinibot.a
 
 #location of the omnibot plugins
 PLUGIN_DIR = ./plugins
@@ -64,6 +65,8 @@ all: ${PRODUCTS}
 
 -include ${PLUGIN_DIR}*.d
 
+-include ${MINIBOT_BUILD}*.d
+
 #build the actual executable.
 ${EXECUTABLE}: ${THREAD_LIB} ${CORE_OBJS} ${PLUGINS} ${MINIBOT}
 	@echo "Building: $@"
@@ -119,4 +122,7 @@ cleanall: clean
 	${MAKE} -C ${MINIBOT_PATH} clean
 	${MAKE} -C ${PLUGIN_DIR} clean
 
+.PHONY: rebuild
+
+rebuild: cleanall all
 

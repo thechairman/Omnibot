@@ -12,6 +12,7 @@
 #include "ircInterfaceClient.h" //this includes the event, message and user classes
 #include "ircUserDB.h"
 #include "ircUserAuth.h"
+#include "ircUsersInterface.h"
 
 //Frakking circular dependencies
 class ircUserAuth;
@@ -32,6 +33,9 @@ class ircInterface : public ircioCallBack{
 	int quit();
 	void registerForNotify(ircInterfaceClient* client);
 	void onMessage(std::string);
+
+	ircUsersInterface* usersInterface();
+	
 
 	private:
 	//hit registered callbacks
@@ -68,6 +72,7 @@ class ircInterface : public ircioCallBack{
 	std::map<std::string, ircUser*> users;
 	ircUserDB* _userDB;
 	ircUserAuth* _userAuth;
+	ircUsersInterface* _usersInterface;
 
 	//some constants
 	static const int NUM_MSG_HDRS = 2;
