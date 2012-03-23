@@ -3,6 +3,8 @@
 #include "ircNotifyClasses.h"
 #include "ircUserDB.h"
 
+#include <pthread.h>
+
 #include <map>
 #include <vector>
 #include <string>
@@ -40,6 +42,10 @@ class posix_ircUserDB: public ircUserDB {
 		void setAuthenticated(std::string, bool);
 		void setRegistered(unsigned int, bool);
 		void setAuthenticated(unsigned int, bool);
+
+		//mutexes
+		pthread_mutex_t theBigLock;
+		pthread_mutex_t userLock;
 
 		static const unsigned int RANGE = UINT_MAX;
 		std::map<std::string, unsigned int> _registeredNicksToIDs;

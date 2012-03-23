@@ -7,6 +7,10 @@ posix_ircUserDB::posix_ircUserDB()
 	std::cout << "posix_ircUserDB: initializing rand..." << std::endl;
 	srand(time(NULL));
 
+	std::cout <<"posix_ircUserDB: initializing mutexs..." << std::endl;
+	pthread_mutex_init(&theBigLock, NULL);
+	pthread_mutex_init(&userLock, NULL);
+
 	std::cout << "posix_ircUserDB: loading data..." << std::endl;
 
 	loadData();
@@ -15,6 +19,9 @@ posix_ircUserDB::posix_ircUserDB()
 posix_ircUserDB::~posix_ircUserDB()
 {
 	saveData();
+
+	pthread_mutex_destroy(&theBigLock);
+	pthread_mutex_destroy(&userLock);
 }
 
 void posix_ircUserDB::setRegistered(std::string nick,bool registered)
