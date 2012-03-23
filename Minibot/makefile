@@ -17,7 +17,8 @@ LIB_OBJS = ${BUILD_DIR}ircInterface.o\
 	   ${BUILD_DIR}ircUserAuth.o\
 	   ${BUILD_DIR}ircUserDB.o \
 	   ${BUILD_DIR}posix_ircUserDB.o\
-	   ${BUILD_DIR}ircio.o
+	   ${BUILD_DIR}ircio.o\
+	   ${BUILD_DIR}ircUsersInterface.o
 
 #all objects related only to the executable
 EXE_OBJS = ${LIB_OBJS}\
@@ -28,7 +29,7 @@ PRODUCTS = ${EXECUTABLE}\
 
 all: ${PRODUCTS}
 
--include *.d
+-include ${BUILD_DIR}*.d
 
 ${LIBRARY}: ${LIB_OBJS}
 	@mkdir -p ${BUILD_DIR}

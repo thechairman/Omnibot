@@ -1,6 +1,7 @@
 #ifndef _IRC_NOTIFY_
 #define _IRC_NOTIFY_
 
+
 #include<string>
 
 class ircUser{
@@ -19,7 +20,7 @@ public:
 	};
 	ircUser();
 	ircUser(std::string nick_, int userId = USER_NOT_REGISTERED);
-	ircUser(ircUser&);
+	ircUser(const ircUser&);
 	std::string nick() const;
 	unsigned int userId() const;
 	bool isAuthenticated() const;

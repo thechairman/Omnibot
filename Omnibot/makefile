@@ -58,7 +58,11 @@ PRODUCTS = ${PLUGINS}\
 
 all: ${PRODUCTS}
 
--include *.d
+-include ${BUILD_CORE}*.d
+
+-include ${BUILD_THREADS}*.d
+
+-include ${PLUGIN_DIR}*.d
 
 #build the actual executable.
 ${EXECUTABLE}: ${THREAD_LIB} ${CORE_OBJS} ${PLUGINS} ${MINIBOT}

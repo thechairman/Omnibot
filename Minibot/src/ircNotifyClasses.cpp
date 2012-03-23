@@ -6,7 +6,7 @@ ircUser::ircUser(){
 }
 ircUser::ircUser(std::string nick_, int userId):_nick(nick_), _userId(userId){}
 
-ircUser::ircUser(ircUser& user){
+ircUser::ircUser(const ircUser& user){
 	_nick = user._nick;
 	_userId = user._userId;
 }
