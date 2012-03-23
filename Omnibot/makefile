@@ -39,6 +39,7 @@ THREAD_OBJS =${BUILD_THREADS}/OmniThreadPool.o\
 CORE_OBJS = ${BUILD_CORE}/omnibot.o\
 	    ${BUILD_CORE}/PluginFactory.o\
 	    ${BUILD_CORE}/PluginManager.o\
+	    ${BUILD_CORE}/NickManager.o\
 	    ${BUILD_CORE}/LinuxPluginFactory.o\
 	    ${BUILD_CORE}/PluginUtils.o\
 	    ${BUILD_CORE}/OmniPluginInterface.o\

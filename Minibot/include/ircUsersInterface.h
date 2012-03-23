@@ -1,3 +1,5 @@
+#ifndef _IRC_USERS_INTERFACE_
+#define _IRC_USERS_INTERFACE_
 #include "ircUserDB.h"
 #include "ircNotifyClasses.h"
 
@@ -18,3 +20,5 @@ class ircUsersInterface{
 		ircUserDB* _DB;
 		std::vector<ircUser> pointersToCopies(std::vector<ircUser*>);
 };
+
+#endif

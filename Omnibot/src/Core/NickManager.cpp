@@ -1,50 +1,35 @@
 #include "NickManager.h"
 
-void NickManager::channelnicks(std::string channel_ std::vector<std::string> vect){
-	std::vector<std::string>::iterator itr;
-	for(itr = vect.begin(), itr != vect.end(), vect++){
+NickManager::NickManager(ircUsersInterface* ui):_UI(ui){}
+NickManager::~NickManager(){}
 
-		//check to see if its allready in users
-		
-		//if not create a new user
-		
-	}
+std::vector<ircUser> NickManager::getChannelUsers(std::string channel)
+{
+	return _UI->getChannelUsers(channel);
+}
+ircUser NickManager::getUser(std::string nick)
+{
+	return _UI->getUser(nick);
+}
+ircUser NickManager::getUser(unsigned int id)
+{
+	return _UI->getUser(id);
 }
 
-void NickManager::changeNick(std::string oldNick, std::string newNick){
-	//find nick  in users
-	
-	//change nick value in user
+std::vector<ircUser> NickManager::getAllUsers()
+{
+	return _UI->getAllUsers();
+}
+std::vector<ircUser> NickManager::getOnlineRegisteredUsers()
+{
+	return _UI->getOnlineRegisteredUsers();
+}
+std::vector<ircUser> NickManager::getAllRegisteredUsers()
+{
+	return _UI->getAllRegisteredUsers();
+}
+std::vector<ircUser> NickManager::getAuthenticatedUsers()
+{
+	return _UI->getAllRegisteredUsers();
 }
 
-void NickManager::joinChannel(std::string channel, std::string nick){
-	//find out if nick exists
-	//
-	//if not, create one;
-	//
-	//put it in the appropritate chanel
-}
-
-void NickManager::leaveChannel(std::string channel, std::string nick){
-//get nick from vector and delete it
-
-}
-
-void NickManager::quit(std::string nick){
-	//get nick from vector and delete it
-}
-
-void verifyUserStatus(ircUser* user_){
-
-}
-
-std::vector<ircUser*>::iterator NickManager::getUserByNick(std::string nick){
-	std::vector<ircUser*>::iterator iter;
-	for(iter = users.begin(); iter!= users.end(); iter++){
-		if(!nick.compare((*iter)->nick())){
-			break;
-		}
-	}
-
-	return iter;
-}
