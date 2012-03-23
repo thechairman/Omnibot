@@ -33,6 +33,9 @@ class posix_ircUserDB: public ircUserDB {
 		std::vector<ircUser*> allRegisteredUsers();
 		std::vector<ircUser*> authenticatedUsers();
 
+		void lockUsers();
+		void releaseUsers();
+
 		void printAllUsers();
 		void printChannelUsers(std::string);
 
@@ -46,6 +49,8 @@ class posix_ircUserDB: public ircUserDB {
 		//mutexes
 		pthread_mutex_t theBigLock;
 		pthread_mutex_t userLock;
+		void lockDB();
+		void unlockDB();
 
 		static const unsigned int RANGE = UINT_MAX;
 		std::map<std::string, unsigned int> _registeredNicksToIDs;

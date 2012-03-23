@@ -24,65 +24,6 @@ posix_ircUserDB::~posix_ircUserDB()
 	pthread_mutex_destroy(&userLock);
 }
 
-void posix_ircUserDB::setRegistered(std::string nick,bool registered)
-{
-	ircUser* user = getUser(nick);
-	
-	if(user == NULL)
-	{
-		std::cout << "setRegistered" << std::endl;
-		printAllUsers();
-	}
-
-	registeredId_it idIter = _registeredNicksToIDs.find(nick);
-	if(registered && idIter != _registeredNicksToIDs.end())
-	{
-		user->_userId = (*idIter).second;
-	}
-	else if(registered)
-	{
-		//temp->_userId = getNextAvailableID();
-		_registeredNicksToIDs[nick] = user->_userId;
-		saveData();
-	}
-	
-	//else it should have defaulted to false, but lets make sure	
-}
-void posix_ircUserDB::setAuthenticated(std::string nick, bool authenticated)
-{
-	ircUser* user = getUser(nick);
-
-	if(user == NULL)
-	{
-		std::cout << "setAauthenticated" << std::endl;
-		printAllUsers();
-	}
-	user->_isAuthenticated = authenticated;
-}
-
-//*************************************************************
-//	not sure this function makes a whole lot of sense
-//*************************************************************
-void posix_ircUserDB::setRegistered(unsigned int id, bool registered)
-{
-	ircUser* user = getUser(id);
-	registeredId_it idIter = _registeredNicksToIDs.find(user->nick());
-	if(registered && idIter != _registeredNicksToIDs.end())
-	{
-		user->_userId = (*idIter).second;
-	}
-	else if(registered)
-	{
-		//temp->_userId = getNextAvailableID();
-		_registeredNicksToIDs[user->nick()] = user->_userId;
-		saveData();
-	}
-}
-void posix_ircUserDB::setAuthenticated(unsigned int id, bool authenticated)
-{
-	ircUser* user = getUser(id);
-	user->_isAuthenticated = authenticated;
-}
 void posix_ircUserDB::addUser(std::string nick, bool registered = false, bool authenticated = false)
 {
 	usersByNick_it iter = _usersByNick.find(nick);
@@ -372,6 +313,84 @@ std::vector<ircUser*> posix_ircUserDB::authenticatedUsers()
 	return users;
 }
 
+void posix_ircUserDB::lockUsers()
+{
+	pthread_mutex_lock(&userLock);
+}
+void posix_ircUserDB::releaseUsers()
+{
+	pthread_mutex_unlock(&userLock);
+}
+
+void posix_ircUserDB::setRegistered(std::string nick,bool registered)
+{
+	ircUser* user = getUser(nick);
+	
+	if(user == NULL)
+	{
+		std::cout << "setRegistered" << std::endl;
+		printAllUsers();
+	}
+
+	registeredId_it idIter = _registeredNicksToIDs.find(nick);
+	if(registered && idIter != _registeredNicksToIDs.end())
+	{
+		user->_userId = (*idIter).second;
+	}
+	else if(registered)
+	{
+		//temp->_userId = getNextAvailableID();
+		_registeredNicksToIDs[nick] = user->_userId;
+		saveData();
+	}
+	
+	//else it should have defaulted to false, but lets make sure	
+}
+void posix_ircUserDB::setAuthenticated(std::string nick, bool authenticated)
+{
+	ircUser* user = getUser(nick);
+
+	if(user == NULL)
+	{
+		std::cout << "setAauthenticated" << std::endl;
+		printAllUsers();
+	}
+	user->_isAuthenticated = authenticated;
+}
+
+//*************************************************************
+//	not sure this function makes a whole lot of sense
+//*************************************************************
+void posix_ircUserDB::setRegistered(unsigned int id, bool registered)
+{
+	ircUser* user = getUser(id);
+	registeredId_it idIter = _registeredNicksToIDs.find(user->nick());
+	if(registered && idIter != _registeredNicksToIDs.end())
+	{
+		user->_userId = (*idIter).second;
+	}
+	else if(registered)
+	{
+		//temp->_userId = getNextAvailableID();
+		_registeredNicksToIDs[user->nick()] = user->_userId;
+		saveData();
+	}
+}
+void posix_ircUserDB::setAuthenticated(unsigned int id, bool authenticated)
+{
+	ircUser* user = getUser(id);
+	user->_isAuthenticated = authenticated;
+}
+
+void posix_ircUserDB::lockDB()
+{
+	pthread_mutex_lock(&theBigLock);
+}
+
+void posix_ircUserDB::unlockDB()
+{
+	pthread_mutex_unlock(&theBigLock);
+}
 unsigned int posix_ircUserDB::getNextAvailableID()
 {
 
