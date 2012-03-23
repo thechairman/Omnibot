@@ -20,11 +20,20 @@ class PluginUtils {
 		PluginUtils(ircInterface*, PluginManager&, NickManager&);
 		void sendMessage(std::string channel, std::string message);
 		void sendPM(std::string nick, std::string message);
+		
+		ircUser getUser(std::string);
+		ircUser getUser(unsigned int);
+
+		std::vector<ircUser> getChannelUsers(std::string);
+		std::vector<ircUser> getAllUsers();
+		std::vector<ircUser> getOnlineRegisteredUsers();
+		std::vector<ircUser> getAllRegisteredUsers();
+		std::vector<ircUser> getAuthenticatedUsers();
 
 	private:
 		ircInterface *_irc;
 		PluginManager *_manager;
-		NickManager _nicks;
+		NickManager *_nicks;
 		PluginAttrs* _attrs;
 };
 

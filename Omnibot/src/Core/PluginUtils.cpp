@@ -7,10 +7,40 @@ PluginUtils::PluginUtils(PluginUtils* utils, PluginAttrs* attrs)
 	_nicks = utils->_nicks;
 	_attrs = attrs;
 }
-PluginUtils::PluginUtils(ircInterface* irc_, PluginManager& manager_, NickManager& nicks_): _irc(irc_),_manager(&manager_),_nicks(nicks_){}
+PluginUtils::PluginUtils(ircInterface* irc_, PluginManager& manager_, NickManager& nicks_): _irc(irc_),_manager(&manager_),_nicks(&nicks_){}
 
 
 void PluginUtils::sendPM(std::string nick, std::string message){
 	_irc->sendPM(nick, message);
 }
 
+
+
+ircUser PluginUtils::getUser(std::string nick)
+{
+	return _nicks->getUser(nick);
+}
+ircUser PluginUtils::getUser(unsigned int id)
+{
+	return _nicks->getUser(id);
+}
+
+std::vector<ircUser> PluginUtils::getChannelUsers(std::string channel)
+{
+	return _nicks->getChannelUsers(channel);
+}
+std::vector<ircUser> PluginUtils::getAllUsers()
+{
+	return _nicks->getAllUsers();
+}
+std::vector<ircUser> PluginUtils::getOnlineRegisteredUsers()
+{
+	return _nicks->getOnlineRegisteredUsers();
+}
+std::vector<ircUser> PluginUtils::getAllRegisteredUsers()
+{
+	return _nicks->getAllRegisteredUsers();
+}
+std::vector<ircUser> PluginUtils::getAuthenticatedUsers()
+{
+}
