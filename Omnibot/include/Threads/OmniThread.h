@@ -2,6 +2,8 @@
 #define _H_OMNITHREAD_
 #include "OmniThreadedClass.h"
 
+
+
 class OmniThread
 {
 	public:
@@ -24,6 +26,7 @@ class OmniThread
 		virtual void join() = 0;
 		virtual void setMode(OmniThread::Mode) = 0;
 		virtual void addTask(OmniThreadedClass*, OmniThreadedClass::Mode) = 0;
+
 
 };
 #endif

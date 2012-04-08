@@ -4,7 +4,7 @@
 #include "OmniThread.h"
 #include "pthread_PooledThread.h"
 
-class pthread_Thread: OmniThread
+class pthread_Thread: public OmniThread
 {
 	public:
 		~pthread_Thread();

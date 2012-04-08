@@ -8,6 +8,8 @@
 #include "OmniPooledThread.h"
 #include "OmniThread.h"
 
+class OmniThread;
+
 class pthread_PooledThread: public OmniPooledThread
 {
 	public:

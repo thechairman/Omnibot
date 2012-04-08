@@ -15,7 +15,9 @@ void PluginUtils::sendPM(std::string nick, std::string message){
 }
 
 
-
+void PluginUtils::sendMessage(std::string channel, std::string message){
+	_irc->sendMessage(channel, message);
+}
 ircUser PluginUtils::getUser(std::string nick)
 {
 	return _nicks->getUser(nick);

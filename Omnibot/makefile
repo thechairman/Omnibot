@@ -11,7 +11,7 @@ MINIBOT_LIB = ${MINIBOT_BUILD}/build/libMinibot.a
 PLUGIN_DIR = ./plugins
 
 LIBPATH = -L ../Minibot/build -L ./build/Threads
-LIBS = -lOmniThread -lpthread -lMinibot 
+LIBS = -lOmniThread -lpthread -lMinibot -lcurl 
 INCLUDES = -I ./include -I ./include/Core -I ./include/Threads -I ../Minibot/include -I ./plugins
 
 #source code directories in the Omnibot project
@@ -48,7 +48,8 @@ CORE_OBJS = ${BUILD_CORE}/omnibot.o\
 #################################################################################
 #		These are only needed until dynamic loading is implement
 #################################################################################
-PLUGIN_OBJS = ${PLUGIN_DIR}/hurlbot.o
+PLUGIN_OBJS = ${PLUGIN_DIR}/hurlbot.o\
+	      ${PLUGIN_DIR}/bashbot.o
 
 #################################################################################
 

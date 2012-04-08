@@ -4,6 +4,8 @@
 #include "OmniThreadedClass.h"
 #include "OmniThread.h"
 
+class OmniThread;
+
 class OmniPooledThread
 {
  	public:
