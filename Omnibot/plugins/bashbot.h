@@ -32,20 +32,20 @@ class bashbot:public OmniPlugin
 
 		bool refreshCache();
 		std::string search(std::string);
-		bashQuote nextBash();
-		bashQuote bashNum(std::string);
+		bashQuote* nextBash();
+		bashQuote* bashNum(std::string);
 		bashBuffer* webget(std::string);
 		
 
-		void printQuote(bashQuote, std::string);
+		void printQuote(bashQuote*, std::string);
 
 
 
 
-		std::deque<bashQuote> cache;
+		std::deque<bashQuote*> cache;
 
 		//parsing subfucntions
-		bashQuote parseQuote(std::stringstream&);
+		bashQuote* parseQuote(std::stringstream*);
 		std::string getNum(std::string);
 		std::string getInitialLine(std::string);
 		std::vector<std::string> getBashNums(std::stringstream&);
@@ -54,7 +54,7 @@ class bashbot:public OmniPlugin
 
 
 		static const std::string baseURL;
-		static const int GLBUFFERSIZE = 255;
+		static const int GLBUFFERSIZE = 512;
 		static const size_t CACHE_MIN = 5;
 		static const unsigned int SPAM_INTV = 500000;
 

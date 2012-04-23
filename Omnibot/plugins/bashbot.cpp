@@ -3,6 +3,7 @@
 #include<curl/easy.h>
 
 #include<cstdlib>
+#include<cstring>
 
 #include "bashbot.h"
 #include "Threads/pthread_Thread.h"
@@ -12,14 +13,17 @@ void bashbot::onMessage(ircMessage& msg)
 {
 	std::string text = msg.message();
 
+	std::cout << "bashbot: message is: " << text << std::endl;
+
 	if(!text.compare("!bash") || !text.compare("!Bash") || !text.compare("!BASH"))
 	{
 		if(text.size() == 5)
 		{
-			bashbot::bashQuote q = nextBash();
+			bashbot::bashQuote* q = nextBash();
 			if(!msg.isPrivateMsg())
 			{
 				printQuote(q, msg.channel());
+				delete q;
 			}
 		}
 		else
@@ -35,10 +39,11 @@ void bashbot::onMessage(ircMessage& msg)
 			}
 			else
 			{
-				bashbot::bashQuote q = bashNum(arg);
+				bashbot::bashQuote* q = bashNum(arg);
 				if(!msg.isPrivateMsg())
 				{
 					printQuote(q, msg.channel());
+					delete q;
 				}
 			}	
 		}
@@ -47,12 +52,16 @@ void bashbot::onMessage(ircMessage& msg)
 
 bool bashbot::init(PluginUtils* u)
 {
+
 	utils = u;
 	cacheThread = dynamic_cast<OmniThread*> (new pthread_Thread()); 
 	cacheThread->init();
 	initHtmlMap();
 	curl_global_init( CURL_GLOBAL_ALL );
 	cachebuilder* cb = new cachebuilder(this);
+	std::cout << "bashbot: size of cache in init: " << cache.size() << std::endl;
+	cache.clear();
+	std::cout << "bashbot: size of cache in init after clear: " << cache.size() << std::endl;
 	cacheThread->addTask(cb, OmniThreadedClass::MODE_A);
 
 	return true;
@@ -61,6 +70,7 @@ bool bashbot::init(PluginUtils* u)
 void bashbot::wrapUp()
 {
 	delete cacheThread;
+
 }
 
 std::string bashbot::name()
@@ -119,6 +129,8 @@ void bashbot::initHtmlMap()
 
 bool bashbot::refreshCache()
 {
+
+	std::cout << "bashbot: refreshing cache" << std::endl;
 	bashBuffer* buffer = webget(baseURL + "/?random");
 
 	//dump html doc into string
@@ -127,12 +139,20 @@ bool bashbot::refreshCache()
 	//dump string into string stream;
 	std::stringstream html(stuff);
 
+//	std::cout << "this is teh massive html: " << html.str();
+
 	delete buffer; 
+
+	std::cout << "bashbot: parsing quotes" << std::endl;
 	
 	while(!html.eof())
 	{
-		cache.push_back(parseQuote(html));
+		std::cout << "bashbot: parsed bash "<< cache.size() << std::endl;
+		cache.push_back(parseQuote(&html));
 	}
+
+	std::cout << "bashbot: cache refreshed" << std::endl;
+	std::cout << "bashbot: cache size now " << cache.size() << std::endl;
 
 	return true;
 }
@@ -151,6 +171,12 @@ std::string bashbot::search(std::string searchString)
 
 	std::string line = "| BASH |: "; 
 	for(unsigned int i = 0; i < nums.size(); ++i )
+	// this should never happen
+	// this should never happen
+	// this should never happen
+	// this should never happen
+	// this should never happen
+	// this should never happen
 	{
 		line += nums[i] + " ";
 	}
@@ -159,9 +185,9 @@ std::string bashbot::search(std::string searchString)
 
 	return line;
 }
-bashbot::bashQuote bashbot::nextBash()
+bashbot::bashQuote* bashbot::nextBash()
 {
-	bashbot::bashQuote q = cache.front();
+	bashbot::bashQuote* q = cache.front();
 	cache.pop_front();
 	
 	if(cache.size() < CACHE_MIN)
@@ -172,7 +198,7 @@ bashbot::bashQuote bashbot::nextBash()
 
 	return q;
 }
-bashbot::bashQuote bashbot::bashNum(std::string number)
+bashbot::bashQuote* bashbot::bashNum(std::string number)
 {
 	bashBuffer* buffer = webget(baseURL + "/?quote=" + number);
 
@@ -181,7 +207,7 @@ bashbot::bashQuote bashbot::bashNum(std::string number)
 	//dump string into string stream;
 	std::stringstream html(stuff);
 
-	bashbot::bashQuote quote = parseQuote(html);
+	bashbot::bashQuote* quote = parseQuote(&html);
 
 	delete buffer;
 
@@ -205,54 +231,95 @@ bashbot::bashBuffer* bashbot::webget(std::string url)
 	return buffer;
 
 }
-void bashbot::printQuote(bashbot::bashQuote quote, std::string channel) 
+void bashbot::printQuote(bashbot::bashQuote* quote, std::string channel) 
 {
-	std::string prefix = "| BASH " + quote.num + " |: ";
+	std::string prefix = "| BASH " + quote->num + " |: ";
 
-	for(size_t i = 0; i < quote.lines.size(); ++i)
+	for(size_t i = 0; i < quote->lines.size(); ++i)
 	{
-		std::string line = prefix + quote.lines[i];
+		std::string line = prefix + quote->lines[i];
 		utils->sendMessage(channel, line);
 		::usleep(SPAM_INTV);
 	}
 }
-bashbot::bashQuote bashbot::parseQuote(std::stringstream& src)
+bashbot::bashQuote* bashbot::parseQuote(std::stringstream* src)
 {
-	while(!src.eof())
+	//std::cout << src->str() << std::endl << "there it was again" << std::endl;
+///	std::cout << "bashbot: allocating quote" << std::endl;
+	bashbot::bashQuote* quote = new bashbot::bashQuote();
+	while(!src->eof())
 	{
+	//	std::cout << "bashbot: allocating buffer" << std::endl;
+	//	std::cout << "bashbot: streamsize is " << src->str().size() << std::endl;
 		char* buf = new char[GLBUFFERSIZE];
-		src.getline(buf, GLBUFFERSIZE);
+		memset(buf, 0, GLBUFFERSIZE);
 
-		if(src.bad()){};
+		int sptr = src->tellg();
+		if(sptr < 0)
+		{
+			std::cerr << "bashbot: stream pointer was less than zero" << std::endl;
+		}
+		int end = src->str().find("\n",sptr);
+
+		end = end - sptr;
+		if(end < GLBUFFERSIZE -1){
+			src->read(buf, (std::streamsize) end);
+		}
+
+		src->seekg(end + sptr + 1);
+		if(src->eof())
+		{
+			delete buf;
+			return quote;
+		}
+
+		int othersptr = src->tellg();	
+//		std::cout << "bashbot: pointer before: " << sptr << " after: " << othersptr << std::endl;
+
+		if(src->bad()){};
 			//try to fail gracefully
 
 		std::string line(buf);
+	//	std::cout << "bashbot: deleteing buffer" << std::endl;
+		//std::cout << "bashbot: buf contents is: " << buf << std::endl;
+//		std::cout << "bashbot: line is: " << line << std::endl;
 		delete buf;
 
-		bashbot::bashQuote quote;
 
 		if(line.find("p class=\"qt\"") != std::string::npos)
 		{
-			quote.num = getNum(line);
-			quote.lines.push_back(getInitialLine(line));
+//			std::cout << "bashbot: bashline: " <<line << std::endl;
+			quote->num = getNum(line);
+			quote->lines.push_back(getInitialLine(line));
+			
+			if(line.find("</p>") != std::string::npos)
+			{
+				return quote;
+			}
 		}
-		else if(quote.lines.size() > 0)
+		else if(quote->lines.size() > 0)
 		{
 			if(line.find("</p>") != std::string::npos)
 			{
 
-				quote.lines.push_back(trimBodyLine(line));
+				quote->lines.push_back(trimBodyLine(line));
+//				std::cout << "bashbot: last bashline: " <<line << std::endl;
 				return quote;
 			}
-			quote.lines.push_back(trimBodyLine(line));
+			quote->lines.push_back(trimBodyLine(line));
+//			std::cout << "bashbot: bashline: " <<line << std::endl;
 		}
+
 
 
 	}
 
-	// this should never happen
-	bashbot::bashQuote q;
-	return q; 
+	if(quote->lines.size() < 1){
+		delete quote;
+		quote = NULL;
+	}
+	return quote;
+
 }
 
 std::string bashbot::getNum(std::string line)
@@ -273,8 +340,7 @@ std::string bashbot::getInitialLine(std::string line)
 	loc += 13;
 
 	std::string retval = line.substr(loc);
-	retval = retval.substr(retval.find("<br />"));
-	return unescapehtml(retval, 0);
+	return trimBodyLine(retval);
 }
 
 std::vector<std::string> bashbot::getBashNums(std::stringstream& src)
@@ -306,12 +372,12 @@ std::string bashbot::trimBodyLine(std::string line)
 	std::string retval;
 	if(line.find("<br />") != std::string::npos)
 	{
-		retval = retval.substr(line.find("<br />"));
+		retval = retval.substr(0, line.find("<br />"));
 	}
 
 	else if(line.find("</p>") != std::string::npos)
 	{
-		retval = retval.substr(line.find("</p>"));
+		retval = retval.substr(0, line.find("</p>"));
 	}
 	return unescapehtml(retval, 0);
 
@@ -343,6 +409,8 @@ std::string bashbot::unescapehtml(std::string line, int start)
 
 size_t bashbot::writeMemCallback(void *ptr, size_t size, size_t nmemb, void *data)
 {
+
+	std::cout << "bashbot: got some from cURL" << std::endl;
 	size_t realsize = size * nmemb;
 
 	bashBuffer* buffer = (bashBuffer*) data;
