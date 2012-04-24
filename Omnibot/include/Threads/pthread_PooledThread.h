@@ -6,9 +6,7 @@
 #include <deque>
 
 #include "OmniPooledThread.h"
-#include "OmniThread.h"
-
-class OmniThread;
+#include "OmniThreadTypes.h"
 
 class pthread_PooledThread: public OmniPooledThread
 {
@@ -21,12 +19,12 @@ class pthread_PooledThread: public OmniPooledThread
 		int addTask(OmniThreadedClass*, OmniThreadedClass::Mode);
 		bool isHeld();
 		int id();
-		OmniThread::ThreadStatus status();
+		OmniThreadStatus status();
 	private:
 		void* workFucntion(void*);
 
 		static const unsigned int POLL_INTERVAL = 5000;
-		OmniThread::Mode _mode;
+		OmniThreadMode _mode;
 		bool _started;
 		bool _running;
 		bool _idle;

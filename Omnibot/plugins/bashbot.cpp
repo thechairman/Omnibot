@@ -59,18 +59,19 @@ bool bashbot::init(PluginUtils* u)
 	initHtmlMap();
 	curl_global_init( CURL_GLOBAL_ALL );
 	cachebuilder* cb = new cachebuilder(this);
-	std::cout << "bashbot: size of cache in init: " << cache.size() << std::endl;
-	cache.clear();
-	std::cout << "bashbot: size of cache in init after clear: " << cache.size() << std::endl;
+	cache = new std::deque<bashQuote*>();
+	std::cout << "bashbot: size of cache in init: " << cache->size() << std::endl;
+	cache->clear();
+	std::cout << "bashbot: size of cache in init after clear: " << cache->size() << std::endl;
 	cacheThread->addTask(cb, OmniThreadedClass::MODE_A);
+	cacheThread->start();
 
 	return true;
 }
 
 void bashbot::wrapUp()
-{
+{	
 	delete cacheThread;
-
 }
 
 std::string bashbot::name()
@@ -147,12 +148,12 @@ bool bashbot::refreshCache()
 	
 	while(!html.eof())
 	{
-		std::cout << "bashbot: parsed bash "<< cache.size() << std::endl;
-		cache.push_back(parseQuote(&html));
+		std::cout << "bashbot: parsed bash "<< cache->size() << std::endl;
+		cache->push_back(parseQuote(&html));
 	}
 
 	std::cout << "bashbot: cache refreshed" << std::endl;
-	std::cout << "bashbot: cache size now " << cache.size() << std::endl;
+	std::cout << "bashbot: cache size now " << cache->size() << std::endl;
 
 	return true;
 }
@@ -187,10 +188,10 @@ std::string bashbot::search(std::string searchString)
 }
 bashbot::bashQuote* bashbot::nextBash()
 {
-	bashbot::bashQuote* q = cache.front();
-	cache.pop_front();
+	bashbot::bashQuote* q = cache->front();
+	cache->pop_front();
 	
-	if(cache.size() < CACHE_MIN)
+	if(cache->size() < CACHE_MIN)
 	{	
 		cachebuilder* cb = new cachebuilder(this);
 		cacheThread->addTask(cb, OmniThreadedClass::MODE_A);
@@ -233,6 +234,7 @@ bashbot::bashBuffer* bashbot::webget(std::string url)
 }
 void bashbot::printQuote(bashbot::bashQuote* quote, std::string channel) 
 {
+	std::cout << "bashbot: printqoute quote length is: " << quote->lines.size() << std::endl;
 	std::string prefix = "| BASH " + quote->num + " |: ";
 
 	for(size_t i = 0; i < quote->lines.size(); ++i)
@@ -288,12 +290,17 @@ bashbot::bashQuote* bashbot::parseQuote(std::stringstream* src)
 
 		if(line.find("p class=\"qt\"") != std::string::npos)
 		{
-//			std::cout << "bashbot: bashline: " <<line << std::endl;
+			std::cout << "bashbot: bashline: " <<line << std::endl;
+
+			quote->lines.push_back("BEGIN BASH");
 			quote->num = getNum(line);
-			quote->lines.push_back(getInitialLine(line));
+			std::string tmp = getInitialLine(line);
+			std::cout << "bashbot: trimed line is: " << tmp << std::endl;
+			quote->lines.push_back(tmp);
 			
-			if(line.find("</p>") != std::string::npos)
+			if(line.find("</p>", line.size() - 4) != std::string::npos)
 			{
+				std::cout << "bashbot: number of lines: " << quote->lines.size() << std::endl;
 				return quote;
 			}
 		}
@@ -302,11 +309,17 @@ bashbot::bashQuote* bashbot::parseQuote(std::stringstream* src)
 			if(line.find("</p>") != std::string::npos)
 			{
 
-				quote->lines.push_back(trimBodyLine(line));
-//				std::cout << "bashbot: last bashline: " <<line << std::endl;
+				std::string tmp = trimBodyLine(line);
+				std::cout << "bashbot: trimed line is: " << tmp << std::endl;
+				quote->lines.push_back(tmp);
+				std::cout << "bashbot: number of lines: " << quote->lines.size() << std::endl;
+				std::cout << "bashbot: last bashline: " <<line << std::endl;
 				return quote;
 			}
-			quote->lines.push_back(trimBodyLine(line));
+			//quote->lines.push_back(trimBodyLine(line));
+			std::string tmp = trimBodyLine(line);
+			std::cout << "bashbot: trimed line is: " << tmp << std::endl;
+			quote->lines.push_back(tmp);
 //			std::cout << "bashbot: bashline: " <<line << std::endl;
 		}
 
@@ -327,7 +340,7 @@ std::string bashbot::getNum(std::string line)
 	size_t loc = line.find("<b>#");
 	loc += 4;
 	std::string retval = line.substr(loc);
-	loc = retval.find("<\\b>");
+	loc = retval.find("</b>");
 	retval = retval.substr(0, loc);
 	
 	return retval;
@@ -340,6 +353,8 @@ std::string bashbot::getInitialLine(std::string line)
 	loc += 13;
 
 	std::string retval = line.substr(loc);
+	std::cout << "bashbot: the initial line is : " << retval << std::endl;
+
 	return trimBodyLine(retval);
 }
 
@@ -369,16 +384,24 @@ std::vector<std::string> bashbot::getBashNums(std::stringstream& src)
 
 std::string bashbot::trimBodyLine(std::string line)
 {
+	std::cout << "bashbot: line to trim: " << line << std::endl;
+
 	std::string retval;
 	if(line.find("<br />") != std::string::npos)
 	{
-		retval = retval.substr(0, line.find("<br />"));
+		retval = line.substr(0, line.find("<br />"));
 	}
 
 	else if(line.find("</p>") != std::string::npos)
 	{
-		retval = retval.substr(0, line.find("</p>"));
+		retval = line.substr(0, line.find("</p>"));
 	}
+	else
+	{
+		retval = "whoops... lost it";
+	}
+
+	std::cout << "bashbot: trimmed line is: " << retval << std::endl;
 	return unescapehtml(retval, 0);
 
 }

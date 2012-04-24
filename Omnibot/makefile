@@ -31,9 +31,12 @@ THREAD_LIB = ${BUILD_THREADS}/libOmniThread.a
 
 #These are the objects that the OmniThread library is built from
 THREAD_OBJS =${BUILD_THREADS}/OmniThreadPool.o\
+	     ${BUILD_THREADS}/OmniThread.o\
+	     ${BUILD_THREADS}/OmniMutex.o\
 	      ${BUILD_THREADS}/pthread_ThreadPool.o\
 	      ${BUILD_THREADS}/pthread_PooledThread.o\
-	      ${BUILD_THREADS}/pthread_Thread.o
+	      ${BUILD_THREADS}/pthread_Thread.o\
+	      ${BUILD_THREADS}/pthread_Mutex.o
 
 #These are the core objs that the application is built from
 CORE_OBJS = ${BUILD_CORE}/omnibot.o\

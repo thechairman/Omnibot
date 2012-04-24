@@ -1,7 +1,7 @@
 #include "pthread_PooledThread.h"
 #include <utility>
 #include <iostream>
-pthread_PooledThread::pthread_PooledThread()
+pthread_PooledThread::pthread_PooledThread():_started(false),_running(false),_idle(false),_held(false),_id(0)
 {
 	sem_init(&_taskSem, 0, 0);
 }
@@ -14,13 +14,16 @@ pthread_PooledThread::~pthread_PooledThread()
 int pthread_PooledThread::start()
 {
 	_started = true;
+	return 0;
 }
 int pthread_PooledThread::stop()
 {
 	_started = false;
+	return 0;
 }
 int pthread_PooledThread::join()
 {
+	return 0;
 }
 int pthread_PooledThread::addTask(OmniThreadedClass* task, OmniThreadedClass::Mode mode)
 {
@@ -29,7 +32,9 @@ int pthread_PooledThread::addTask(OmniThreadedClass* task, OmniThreadedClass::Mo
 		new std::pair<OmniThreadedClass*, OmniThreadedClass::Mode>(task, mode);
 	
 	_tasks.push_back(tmp);
+	std::cout << "pooledThread: task queue has " << _tasks.size() << "tasks" << std::endl;
 	sem_post(&_taskSem);
+	return 0;
 
 }
 bool pthread_PooledThread::isHeld()
@@ -40,9 +45,8 @@ int pthread_PooledThread::id()
 {
 	return _id;
 }
-OmniThread::ThreadStatus pthread_PooledThread::status()
+OmniThreadStatus pthread_PooledThread::status()
 {
-
 }
 void* pthread_PooledThread::workFunction(void* thread_)
 {
@@ -54,6 +58,7 @@ void* pthread_PooledThread::workFunction(void* thread_)
 		{
 			sem_wait(&(thread->_taskSem));
 
+			std::cout << "PooledThread: executing next task" << std::endl;
 			std::pair<OmniThreadedClass*, OmniThreadedClass::Mode>* task;
 			task = thread->_tasks.front();
 			thread->_tasks.pop_front();

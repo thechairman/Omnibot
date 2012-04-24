@@ -29,7 +29,7 @@ void pthread_Thread::join()
 {
 
 }
-void pthread_Thread::setMode(OmniThread::Mode mode)
+void pthread_Thread::setMode(OmniThreadMode mode)
 {
 }
 void pthread_Thread::addTask(OmniThreadedClass* task, OmniThreadedClass::Mode mode)

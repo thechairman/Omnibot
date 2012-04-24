@@ -12,7 +12,7 @@ class pthread_Thread: public OmniThread
 		int start();
 		int stop();
 		void join();
-		void setMode(OmniThread::Mode);
+		void setMode(OmniThreadMode);
 		void addTask(OmniThreadedClass*, OmniThreadedClass::Mode);
 		int clean();
 		bool isAlive();

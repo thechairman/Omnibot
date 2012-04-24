@@ -42,7 +42,7 @@ class bashbot:public OmniPlugin
 
 
 
-		std::deque<bashQuote*> cache;
+		std::deque<bashQuote*>* cache;
 
 		//parsing subfucntions
 		bashQuote* parseQuote(std::stringstream*);
