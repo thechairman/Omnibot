@@ -1,13 +1,15 @@
 #ifndef _BASHBOT_
 #define _BASHBOT_
 
-#include "OmniPluginInterface.h"
 #include <vector>
 #include <deque>
 #include <map>
-#include<sstream>
+#include <sstream>
+
+#include "OmniPluginInterface.h"
 #include "Threads/OmniThreadedClass.h"
 #include "Threads/OmniThread.h"
+#include "Threads/OmniMutex.h"
 
 class bashbot:public OmniPlugin
 {
@@ -41,7 +43,7 @@ class bashbot:public OmniPlugin
 
 
 
-
+		OmniMutex* cacheMutex;
 		std::deque<bashQuote*>* cache;
 
 		//parsing subfucntions

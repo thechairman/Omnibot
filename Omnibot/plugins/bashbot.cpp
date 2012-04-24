@@ -53,16 +53,26 @@ void bashbot::onMessage(ircMessage& msg)
 bool bashbot::init(PluginUtils* u)
 {
 
+	//assign utils
 	utils = u;
-	cacheThread = dynamic_cast<OmniThread*> (new pthread_Thread()); 
-	cacheThread->init();
+
+	//init html escape map
 	initHtmlMap();
+
+	//init curl
 	curl_global_init( CURL_GLOBAL_ALL );
-	cachebuilder* cb = new cachebuilder(this);
+
+	//set up cache
 	cache = new std::deque<bashQuote*>();
 	std::cout << "bashbot: size of cache in init: " << cache->size() << std::endl;
 	cache->clear();
 	std::cout << "bashbot: size of cache in init after clear: " << cache->size() << std::endl;
+	cacheMutex = OmniMutex::create();
+
+	//setup cache thread
+	cachebuilder* cb = new cachebuilder(this);
+	cacheThread = dynamic_cast<OmniThread*> (new pthread_Thread()); 
+	cacheThread->init();
 	cacheThread->addTask(cb, OmniThreadedClass::MODE_A);
 	cacheThread->start();
 
@@ -149,7 +159,9 @@ bool bashbot::refreshCache()
 	while(!html.eof())
 	{
 		std::cout << "bashbot: parsed bash "<< cache->size() << std::endl;
+		cacheMutex->lock();
 		cache->push_back(parseQuote(&html));
+		cacheMutex->unlock();
 	}
 
 	std::cout << "bashbot: cache refreshed" << std::endl;
@@ -188,8 +200,10 @@ std::string bashbot::search(std::string searchString)
 }
 bashbot::bashQuote* bashbot::nextBash()
 {
+	cacheMutex->lock();
 	bashbot::bashQuote* q = cache->front();
 	cache->pop_front();
+	cacheMutex->unlock();
 	
 	if(cache->size() < CACHE_MIN)
 	{	
