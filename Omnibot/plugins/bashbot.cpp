@@ -15,7 +15,9 @@ void bashbot::onMessage(ircMessage& msg)
 
 	std::cout << "bashbot: message is: " << text << std::endl;
 
-	if(!text.compare("!bash") || !text.compare("!Bash") || !text.compare("!BASH"))
+	std::string cmd = text.substr(0,5);
+
+	if(!cmd.compare("!bash") || !cmd.compare("!Bash") || !cmd.compare("!BASH"))
 	{
 		if(text.size() == 5)
 		{
@@ -30,11 +32,12 @@ void bashbot::onMessage(ircMessage& msg)
 		{
 			std::string arg = text.substr(6);
 			int i  = ::atoi(arg.c_str());
+			std::cout << "bashbot: the bash arg was: " << arg << " i = " << i << std::endl;
 			if(i == 0)
 			{
 				if(!msg.isPrivateMsg())
 				{
-					utils->sendMessage(search(arg), msg.channel());
+					utils->sendMessage(msg.channel(), search(arg));
 				}
 			}
 			else
@@ -172,6 +175,7 @@ bool bashbot::refreshCache()
 
 std::string bashbot::search(std::string searchString)
 {
+	std::cout << "bashbot: serch url: " << baseURL << "/?search=" << searchString << "&sort=0&show=25" << std::endl;
 	bashBuffer* buffer = webget(baseURL + "/?search=" 
 			+ searchString + "&sort=0&show=25");
 
@@ -184,12 +188,6 @@ std::string bashbot::search(std::string searchString)
 
 	std::string line = "| BASH |: "; 
 	for(unsigned int i = 0; i < nums.size(); ++i )
-	// this should never happen
-	// this should never happen
-	// this should never happen
-	// this should never happen
-	// this should never happen
-	// this should never happen
 	{
 		line += nums[i] + " ";
 	}
@@ -215,13 +213,16 @@ bashbot::bashQuote* bashbot::nextBash()
 }
 bashbot::bashQuote* bashbot::bashNum(std::string number)
 {
+	std::cout << "bashbot: bashnum url: " << baseURL << "/?quote=" << number << std::endl;
+
 	bashBuffer* buffer = webget(baseURL + "/?quote=" + number);
 
 	std::string stuff(buffer->begin(), buffer->end());
 
 	//dump string into string stream;
 	std::stringstream html(stuff);
-
+	
+	std::cout << "bashbot: bashnum is parsing the quote" << std::endl;
 	bashbot::bashQuote* quote = parseQuote(&html);
 
 	delete buffer;
@@ -290,7 +291,7 @@ bashbot::bashQuote* bashbot::parseQuote(std::stringstream* src)
 		}
 
 		int othersptr = src->tellg();	
-//		std::cout << "bashbot: pointer before: " << sptr << " after: " << othersptr << std::endl;
+		//std::cout << "bashbot: pointer before: " << sptr << " after: " << othersptr << std::endl;
 
 		if(src->bad()){};
 			//try to fail gracefully
@@ -298,7 +299,7 @@ bashbot::bashQuote* bashbot::parseQuote(std::stringstream* src)
 		std::string line(buf);
 	//	std::cout << "bashbot: deleteing buffer" << std::endl;
 		//std::cout << "bashbot: buf contents is: " << buf << std::endl;
-//		std::cout << "bashbot: line is: " << line << std::endl;
+		//std::cout << "bashbot: line is: " << line << std::endl;
 		delete buf;
 
 
@@ -306,7 +307,6 @@ bashbot::bashQuote* bashbot::parseQuote(std::stringstream* src)
 		{
 			std::cout << "bashbot: bashline: " <<line << std::endl;
 
-			quote->lines.push_back("BEGIN BASH");
 			quote->num = getNum(line);
 			std::string tmp = getInitialLine(line);
 			std::cout << "bashbot: trimed line is: " << tmp << std::endl;
@@ -431,12 +431,23 @@ std::string bashbot::unescapehtml(std::string line, int start)
 		if(j != std::string::npos && j > i)
 		{
 			std::map<std::string, std::string>::iterator iter;
-			iter =  entities.find(line.substr(i, j + 1));
+
+			std::string posEntity = line.substr(i, j + 1 - i);
+
+			std::cout << "bashbot: found possible entity: " << posEntity << std::endl;
+
+			iter =  entities.find(posEntity);
 			if(iter != entities.end())
 			{
 				std::string entity = (*iter).second;
 				line = line.substr(0,i) + entity + line.substr(j+1);
+
+				std::cout << "bashbot: found the and replaced the entitty." <<std ::endl;
 				return unescapehtml(line, start + 1);
+			}
+			else
+			{
+				std::cout << "bashbot: couldn't find a match in the table" << std::endl;
 			}
 		}
 

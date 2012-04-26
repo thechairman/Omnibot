@@ -56,7 +56,7 @@ class bashbot:public OmniPlugin
 
 
 		static const std::string baseURL;
-		static const int GLBUFFERSIZE = 512;
+		static const int GLBUFFERSIZE = 600;
 		static const size_t CACHE_MIN = 5;
 		static const unsigned int SPAM_INTV = 500000;
 
