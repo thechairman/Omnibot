@@ -4,68 +4,79 @@
 #include <sstream>
 posix_ircUserDB::posix_ircUserDB()
 {
-	std::cout << "posix_ircUserDB: initializing rand..." << std::endl;
+	//initialize the random number generator
 	srand(time(NULL));
 
-	std::cout <<"posix_ircUserDB: initializing mutexs..." << std::endl;
+	//initilize the mutexes
 	pthread_mutex_init(&theBigLock, NULL);
 	pthread_mutex_init(&userLock, NULL);
 
-	std::cout << "posix_ircUserDB: loading data..." << std::endl;
-
+	//load data on persistant nicks
 	loadData();
 }
 
 posix_ircUserDB::~posix_ircUserDB()
 {
+	//save current state of registered users
 	saveData();
 
+	//clean up mutexes
 	pthread_mutex_destroy(&theBigLock);
 	pthread_mutex_destroy(&userLock);
 }
 
 void posix_ircUserDB::addUser(std::string nick, bool registered = false, bool authenticated = false)
 {
+	//look for nick in all users 
 	usersByNick_it iter = _usersByNick.find(nick);
+
+	//check to see if the nick wasn't in the database or it had no associated ircUser Object
 	if(iter == _usersByNick.end() || (*iter).second == NULL)
 	{
-		std::cout << "posix_ircUserDB: the user wasn't found in the database." << std::endl;
+		std::cout << "posix_ircUserDB::addUser the user wasn't found in the database." << std::endl;
+
 		//create new user object
 		ircUser* temp = new ircUser();
 		temp->_nick= nick;
 
-		std::cout << "posix_ircUserDB: the new nick object is at: " << std::hex << temp << std::dec << std::endl;
-
+		//check to see if the nick is in the registered users table
 		registeredId_it idIter = _registeredNicksToIDs.find(nick);
+
+		//if we already no from the args or if it was in the table 
+		//then we want to use the existing id for that user
 		if(registered || idIter != _registeredNicksToIDs.end())
 		{
-			std::cout << "posix_ircUserDB: in if" << std::endl;
 			temp->_userId = (*idIter).second;
 		}
+		//if there is no evidence that the nick is registered
+		//we need to assign a new id number
 		else
 		{
-			std::cout << "posix_ircUserDB: in else" << std::endl;
 			//generate a new id
 			temp->_userId = getNextAvailableID();
 		}
-			temp->_isAuthenticated = authenticated;
 
-		std::cout << "posix_ircUserDB: user object created, adding to database..." << std::endl;
+		//apparently for now everyone is authenticated
+		temp->_isAuthenticated = authenticated;
+
+		std::cout << "posix_ircUserDB::addUser: user object created, adding to database..." << std::endl;
 
 		//add it to both maps
 		_usersByNick[nick] = temp;
 		_usersByID[temp->userId()] = temp;
 
-		{
+		/*{
 			ircUser* ohai = _usersByNick[nick];
 
 			std::cout << "posix_ircUserDB: the new nick object in usersbynick: " << std::hex << ohai << std::dec << std::endl;
-		}
+		}*/
 	}
+
+	//if the nick is in the database we don't need to do anything
 	else
-		std::cout << "posix_ircUserDB: find didn't return map::end >.>" << std::endl;
-	//else its already here so whe shouldn't need to add it
-	
+	{
+		std::cout << "posix_ircUserDB::addUser: use was already in the DB" << std::endl;
+	}
 }
 
 //TODO this should be redone with channels by nick
@@ -79,47 +90,67 @@ void posix_ircUserDB::removeUser(std::string nick)
 		return;
 	}
 
+	//get the ircUser Object for the nick in question
 	ircUser* user = (*user_i).second;
 
+	//verify that the object exists
 	if(user == NULL)
 	{
-		std::cout << "removeUser" << std::endl;
+		std::cerr << "posix_ircUserDB::removeUser: user " << nick 
+			<< " had a NULL object"  << std::endl;
+
+		//print the users for error checking
 		printAllUsers();
 	}
 
-	//remove it forom channels;
+
+	//remove it from channels;
 	channels_it channels;
+
+	//for each channel's list of users 
 	for(channels = _usersByChannel.begin(); channels != _usersByChannel.end(); channels++)
 	{
+		//for each nick in the channel's roster
 		nicklist_it nicks;
 		for (nicks = (*channels).second.begin(); nicks != (*channels).second.end(); nicks++){
 
+			//make sure there isn't a null value in the vector
 			//TODO figure out why this is necessary >.>
 			if((*nicks) == NULL)
 			{
-				std::cout << "removeUser(inner loop)" << std::endl;
+				std::cerr << "posix_ircUserDB::removeUser: there was a null pointer in " 
+					<< (*channels).first << "'s roster" << std::endl; 
+
+				//print the users for debug info
 				printAllUsers();
+
+				//skip to the next user in the roster
 				continue;
 			}
-			std::cout << "Given user id is: " << user->userId() << std::endl;
-			std::cout << "DB user id is: " << (*nicks)->userId() << std::endl;
+
+			//compare the id of the user in question to the id of the one 
+			//we want to delete from the channel
 			if((*nicks)->userId() == user->userId())
 			{
+				//if we found nick in this channel, we can remove it
+				//from the vector and then skip to the next channel
 				(*channels).second.erase(nicks);
 				break;
 			}
 		}
 	}
 	
-	//remove from usersbyid
+	//all of the ircUser references for this object in the channes should be
+	//cleaned up now, so we will move to the global structs.
 	
-	std::cout << "just removing it from the arrays now" << std::endl;
-
+	//remove from usersbyid
 	_usersByID.erase(_usersByID.find(user->userId()));
 	
 	//remove from users by nick
 	_usersByNick.erase(_usersByNick.find(user->nick()));
 
+	//now that all the refernces are cleaned up,
+	//we can delete the object itself
 	delete user;
 }	
 
