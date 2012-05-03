@@ -284,42 +284,11 @@ bashbot::bashQuote* bashbot::parseQuote(std::stringstream* src)
 	bashbot::bashQuote* quote = new bashbot::bashQuote();
 	while(!src->eof())
 	{
-	//	std::cout << "bashbot: allocating buffer" << std::endl;
-	//	std::cout << "bashbot: streamsize is " << src->str().size() << std::endl;
-		char* buf = new char[GLBUFFERSIZE];
-		memset(buf, 0, GLBUFFERSIZE);
 
-		int sptr = src->tellg();
-		if(sptr < 0)
-		{
-			std::cerr << "bashbot: stream pointer was less than zero" << std::endl;
-		}
-		int end = src->str().find("\n",sptr);
-
-		end = end - sptr;
-		if(end < GLBUFFERSIZE -1){
-			src->read(buf, (std::streamsize) end);
-		}
-
-		src->seekg(end + sptr + 1);
-		if(src->eof())
-		{
-			delete buf;
-			return quote;
-		}
-
-		int othersptr = src->tellg();	
-		//std::cout << "bashbot: pointer before: " << sptr << " after: " << othersptr << std::endl;
-
+		std::string line;
+		std::getline(*src, line, '\n');
 		if(src->bad()){};
 			//try to fail gracefully
-
-		std::string line(buf);
-	//	std::cout << "bashbot: deleteing buffer" << std::endl;
-		//std::cout << "bashbot: buf contents is: " << buf << std::endl;
-		//std::cout << "bashbot: line is: " << line << std::endl;
-		delete buf;
-
 
 		if(line.find("p class=\"qt\"") != std::string::npos)
 		{
