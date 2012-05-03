@@ -30,7 +30,7 @@ void omnibot::alertMessage(ircMessage& msg)
 		//before doing any of this...
 		if(!isOmniOp(msg.user())){
 			//tell them omnibot only list
-			_irc->sendMessage(msg.channel(), msg.user()->nick() + ": I only listen to OmniOps :P");
+			_irc->sendMessage(msg.channel(), msg.user().nick() + ": I only listen to OmniOps :P");
 		}
 
 		if (!toParse.substr(1, 4).compare("load")){
@@ -100,10 +100,10 @@ void omnibot::dropPlugin(std::string pluginName){
 	_manager.unload(pluginName);
 }
 
-bool omnibot::isOmniOp(ircUser* usr){
+bool omnibot::isOmniOp(ircUser& usr){
 	return true;
 }
 
-bool omnibot::isRegistered(ircUser* usr){
+bool omnibot::isRegistered(ircUser& usr){
 	return true;
 }

@@ -25,7 +25,7 @@ bool ircUser::isAuthenticated() const
 	return _isAuthenticated;
 }
 
-ircMessage::ircMessage(): _message(""), _user(NULL), _channel(""){}
+ircMessage::ircMessage(): _message(""), _user(), _channel(""){}
 
 ircMessage::ircMessage(const ircMessage& msg): _message(msg._message), _user(msg._user),_channel(msg._channel){
 	//std::cout << "ircMessage: copied message size: " <<  _message.size() << std::endl;
@@ -33,8 +33,8 @@ ircMessage::ircMessage(const ircMessage& msg): _message(msg._message), _user(msg
 	//	std::cout  << "ircMessage: copied message is: " << _message << std::endl;
 }
 
-ircMessage::ircMessage(ircUser* user_, std::string Message, std::string channel_){
-	_user = user_;
+ircMessage::ircMessage(ircUser* user_, std::string Message, std::string channel_):_user(*user_){
+//	_user = user_;
 	_message = Message;
 	_channel = channel_;
 }
@@ -60,7 +60,7 @@ bool ircMessage::isPrivateMsg() const{
 
 }
 
-ircUser* ircMessage::user(){
+ircUser& ircMessage::user(){
 	return _user;
 }
 

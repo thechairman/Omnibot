@@ -18,15 +18,17 @@ void OmniPlugin::passMessage(OmniPlugin* plugin, ircMessage& msg){
 //		plugin->thread.arg((void*) apair);
 //		plugin->thread.start();
 //	}
-	std::cout << "adding task to thread" << std::endl;	
+	std::cout << "adding task to thread" << std::endl;
+	std::cout << "createing PluginRunner" << std::endl;	
 	OmniPlugin::PluginRunner* runner = new PluginRunner();
 
+	std::cout << "assigning PluginRunner internals" << std::endl;
 	runner->plugin = plugin;
 
 	runner->msg = msg;
 
 	//setup the the thread and fire it off
-	
+	std::cout << "queue task" <<std::endl;
 	plugin->thread.addTask(runner, OmniThreadedClass::MODE_A);
 
 }

@@ -176,15 +176,30 @@ bool bashbot::refreshCache()
 std::string bashbot::search(std::string searchString)
 {
 	std::cout << "bashbot: serch url: " << baseURL << "/?search=" << searchString << "&sort=0&show=25" << std::endl;
+
+	//use libcurl to grap the web page
+	std::cout << "bashbot: search: fetching the page" << std::endl;
+
 	bashBuffer* buffer = webget(baseURL + "/?search=" 
 			+ searchString + "&sort=0&show=25");
+
+	//lib curl gave us the buffer, now lets dump it into a string
+	std::cout << "bashbot: search: putting buffer contents into a string" << std::endl;
 
 	std::string stuff(buffer->begin(), buffer->end());
 
 	//dump string into string stream;
+	std::cout << "bashbot: search: building a string stream" << std::endl;
+
 	std::stringstream html(stuff);
 
+	//strip the numbers out of the search
+	std::cout << "bashbot: search: stripping the numbers" << std::endl;
+
 	std::vector<std::string> nums = getBashNums(html);
+
+	//build the string
+	std::cout << "bashbot: search: building the bash string" << std::endl;
 
 	std::string line = "| BASH |: "; 
 	for(unsigned int i = 0; i < nums.size(); ++i )
@@ -192,8 +207,11 @@ std::string bashbot::search(std::string searchString)
 		line += nums[i] + " ";
 	}
 
+	//delete the bash buffer now that we're done with it
 	delete buffer;
 
+	//return the string of bash numbers
+	std::cout << "bashbot: search: returned" << std::endl;
 	return line;
 }
 bashbot::bashQuote* bashbot::nextBash()
@@ -375,24 +393,29 @@ std::string bashbot::getInitialLine(std::string line)
 std::vector<std::string> bashbot::getBashNums(std::stringstream& src)
 {
 	std::vector<std::string> nums;
+	std::cout << "bashbot::getBashNums: entering loop" << std::endl;
 	while(!src.eof())
 	{
-		char* buf = new char[GLBUFFERSIZE];
-		src.getline(buf, GLBUFFERSIZE);
+		//char* buf = new char[GLBUFFERSIZE];
+		//src.getline(buf, GLBUFFERSIZE);
+	
+		std::string line;
+		std::getline(src, line, '\n');
 
 		if(src.bad()){}
 			//try to fail gracefully
 
-		std::string line(buf);
-		delete buf;
+		//delete buf;
 
 
 		if(line.find("p class=\"qt\"") != std::string::npos)
 		{
+			std::cout << "bashbot::getBashNums: found a num" << std::endl;
 			nums.push_back(getNum(line));
 		}
 	}
 
+	std::cout << "basbot::getBashNums: finished parseing nums" << std::endl;
 	return nums;
 }
 

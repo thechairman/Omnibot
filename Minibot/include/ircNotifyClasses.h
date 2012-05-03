@@ -29,7 +29,7 @@ class ircMessage{
 	friend class ircInterface;
 private:
 	std::string _message;
-	ircUser* _user;
+	ircUser _user;
 	std::string _channel;
 public:
 	ircMessage();
@@ -38,7 +38,7 @@ public:
 	std::string message() const;
 	std::string channel() const;
 	bool isPrivateMsg() const;
-	ircUser* user();
+	ircUser& user();
 };
 
 class ircEvent{

@@ -25,8 +25,8 @@ class omnibot: public ircInterfaceClient{
 	void part(std::string);
 	bool loadPlugin(std::string);
 	void dropPlugin(std::string);
-	bool isOmniOp(ircUser*);
-	bool isRegistered(ircUser*);
+	bool isOmniOp(ircUser&);
+	bool isRegistered(ircUser&);
 
 };
 

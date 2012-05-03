@@ -14,7 +14,7 @@ class testClass: public ircInterfaceClient{
 
 void testClass::alertEvent(ircEvent& e){}
 void testClass::alertMessage(ircMessage& m){
-	std::cout << "TestClass: " << m.user()->nick() << ": " << m.message() << std::endl;
+	std::cout << "TestClass: " << m.user().nick() << ": " << m.message() << std::endl;
 }
 
 int main()
