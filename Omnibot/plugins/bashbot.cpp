@@ -265,8 +265,17 @@ bashbot::bashBuffer* bashbot::webget(std::string url)
 	return buffer;
 
 }
-void bashbot::printQuote(bashbot::bashQuote* quote, std::string channel) 
+void bashbot::printQuote(bashbot::bashQuote* quote, std::string channel)	
 {
+	//this has happend atleast once, lets gaurd against it and se if it happens again
+	if(qoute == NULL)
+	{
+		std::cout << "bashbot::printQuote: quote struct points to null" std::endl;
+		utils->sendMessage(channel, "Error, try again");
+		return;
+	}
+
+
 	std::cout << "bashbot: printqoute quote length is: " << quote->lines.size() << std::endl;
 	std::string prefix = "| BASH " + quote->num + " |: ";
 
