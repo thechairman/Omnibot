@@ -223,6 +223,7 @@ bashbot::bashQuote* bashbot::nextBash()
 	
 	if(cache->size() < CACHE_MIN)
 	{	
+		std::cout << "bashbot::nextBash: refresshing bash cache" <<std::endl;
 		cachebuilder* cb = new cachebuilder(this);
 		cacheThread->addTask(cb, OmniThreadedClass::MODE_A);
 	}
@@ -268,9 +269,10 @@ bashbot::bashBuffer* bashbot::webget(std::string url)
 void bashbot::printQuote(bashbot::bashQuote* quote, std::string channel)	
 {
 	//this has happend atleast once, lets gaurd against it and se if it happens again
-	if(qoute == NULL)
+	if(quote == NULL)
 	{
-		std::cout << "bashbot::printQuote: quote struct points to null" std::endl;
+		std::cout << "bashbot::printQuote: quote struct points to null" << std::endl;
+		std::cout << "bashbot::printQuote: qoute cache has " << cache->size()<<" quotes" <<std::endl;
 		utils->sendMessage(channel, "Error, try again");
 		return;
 	}

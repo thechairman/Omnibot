@@ -582,7 +582,15 @@ void posix_ircUserDB::printChannelUsers(std::string channel)
 	for(channelUser = users.begin(); channelUser != users.end(); channelUser++)
 	{
 		if((*channelUser) != NULL)
+		{
+			if((*channelUser)->_nick.size() > 32)
+			{
+				std::cout << "something's really wrong here, nick is more than 32 chars: " << (*channelUser)->_nick.size() << std::endl;
+				//this is temporary I want to see when this case happens.
+				exit(1);
+			}
 			std::cout << (*channelUser)->nick() << std::endl;
+		}
 		else 
 			std::cout << "NULL" << std::endl;
 	}

@@ -10,7 +10,7 @@ class hURLbot:public OmniPlugin {
 		std::string name();
 
 	private:
-		static const unsigned int MAX_URLS = 10;
+		static const unsigned int MAX_URLS = 50;
 		std::deque<std::string> urls;
 		PluginUtils* utils;
 
