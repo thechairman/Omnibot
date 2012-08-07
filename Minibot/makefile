@@ -13,6 +13,8 @@ EXECUTABLE = ${BUILD_DIR}Minibot
 #All objects not specifically related to executables go here
 LIB_OBJS = ${BUILD_DIR}ircInterface.o\
 	   ${BUILD_DIR}posix_ircio.o\
+	   ${BUILD_DIR}posix_ircConnStatus.o\
+	   ${BUILD_DIR}ircConnStatus.o\
 	   ${BUILD_DIR}ircNotifyClasses.o\
 	   ${BUILD_DIR}ircUserAuth.o\
 	   ${BUILD_DIR}ircUserDB.o \
@@ -49,7 +51,7 @@ ${BUILD_DIR}%.o : ./src/%.cpp
 	@mkdir -p ${BUILD_DIR}
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ ${INCLUDES} -D_GLIBCXX_DEBUG -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	g++ ${INCLUDES} -D_GLIBCXX_DEBUG -g -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

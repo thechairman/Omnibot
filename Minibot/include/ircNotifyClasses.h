@@ -51,7 +51,9 @@ class ircEvent{
 			ET_NICK_CHANGE,
 			ET_QUIT,
 			ET_KICK,
-			ET_KILL
+			ET_KILL,
+
+			ET_CONN_LOST
 		};
 
 		EventType type();
@@ -91,5 +93,6 @@ class ircEvent{
 		static ircEvent quit(std::string, std::string);
 		static ircEvent kill(std::string, std::string, std::string);
 		static ircEvent kick(std::string, std::string, std::string);
+		static ircEvent connectionLost();
 };
 #endif

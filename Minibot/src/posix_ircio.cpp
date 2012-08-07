@@ -1,6 +1,7 @@
-#include"posix_ircio.h"
+#include "posix_ircio.h"
 #include <strings.h>
-#include<errno.h>
+#include <errno.h>
+#include <sys/select.h>
 
 extern int errno;
 bool posix_ircio::open(std::string server, int port)
@@ -48,8 +49,9 @@ bool posix_ircio::open(std::string server, int port)
 void posix_ircio::close()
 {
 	isOpen = false;
+	usleep(SELECT_NSECS / 1000);
+	::close(socket);
 }
-
 bool posix_ircio::write(std::string& str)
 {
 	std::cout << "ircio: using file discriptor: " << socket << std::endl;
@@ -81,6 +83,14 @@ bool posix_ircio::read(std::string& temp)
 void posix_ircio::listen()
 {
 	std::string leftovers = "";
+
+	timespec timeout;
+	timeout.tv_sec = SELECT_SECS;
+	timeout.tv_nsec = SELECT_NSECS;
+
+	fd_set selectSet;
+	FD_SET(socket, &selectSet);
+
 	while(isOpen)
 	{
 
@@ -88,6 +98,12 @@ void posix_ircio::listen()
 
 		//read on the socket
 		//std::cout << "gonna hang on the socket again" << std::endl;
+		int selectval = pselect(1, &selectSet ,NULL, NULL, &timeout, NULL);
+		/*if(!selectval)
+		{
+			continue;
+		}*/
+		std::cout << "ircio: hanging on socket, selectval was " << selectval << std::endl;
 		int chars = (int)::read(socket, buf, BUFSIZE);	
 		if(chars < 0)
 		{	std::cout << "ircio: errno is: " << errno << std::endl;

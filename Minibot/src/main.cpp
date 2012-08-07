@@ -26,7 +26,7 @@ int main()
 	
 	irc.connect("madhax.net", 6667);
 //	sleep(2);
-	irc.registerUser("Omnibot", "Omnibot", "Omnibot");
+	irc.registerUser("Omnitester", "Omnitester", "Omnitester");
 //	sleep(10);
 	irc.join("#alpha1");
 	irc.join("#main");

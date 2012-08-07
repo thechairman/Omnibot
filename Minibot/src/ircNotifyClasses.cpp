@@ -166,3 +166,7 @@ ircEvent ircEvent::kick(std::string nick, std::string doer, std::string reason){
 	return e;
 
 }
+ircEvent ircEvent::connectionLost(){
+	ircEvent e;
+	e._type = ET_CONN_LOST;
+}

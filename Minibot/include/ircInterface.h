@@ -7,21 +7,23 @@
 #include <iostream>
 
 //#include "posix_ircio.h"
-#include "ircio.h"
+#include "ircio.h"		//this probably includes the call back class
 
 #include "ircInterfaceClient.h" //this includes the event, message and user classes
 #include "ircUserDB.h"
 #include "ircUserAuth.h"
 #include "ircUsersInterface.h"
+#include "ircConnStatus.h"     //this includes the callback class
 
 //Frakking circular dependencies
 class ircUserAuth;
 
-class ircInterface : public ircioCallBack{
+class ircInterface : public ircioCallBack, public ircConnStatusCB{
 
 	public:
 	ircInterface();
 	virtual ~ircInterface();
+	void setAutoReconnect(bool);
 	int connect(std::string server, int port);
 	int registerUser(std::string nick, std::string uname, std::string rname);
 	int join(std::string channel);
@@ -33,6 +35,7 @@ class ircInterface : public ircioCallBack{
 	int quit();
 	void registerForNotify(ircInterfaceClient* client);
 	void onMessage(std::string);
+	void onConnectionDeath();
 
 	ircUsersInterface* usersInterface();
 	
@@ -64,6 +67,8 @@ class ircInterface : public ircioCallBack{
 	//handles a message received from the socket
 	void handleString(std::string msg);
 
+	void removeChannel(std::string);
+
 	//TODO find a way to get this to just ircio
 	ircio* _serverConnection;
 	std::vector<ircInterfaceClient*> clients;
@@ -73,11 +78,22 @@ class ircInterface : public ircioCallBack{
 	ircUserDB* _userDB;
 	ircUserAuth* _userAuth;
 	ircUsersInterface* _usersInterface;
+	ircConnStatus* _connStatus;
+
+	bool _autoReconnect;
+	std::string _server;
+	int _port;
+	std::string _nick;
+	std::string _uname;
+	std::string _rname;
+	std::vector<std::string> _channels;
 
 	//some constants
 	static const int NUM_MSG_HDRS = 2;
 	static const int NUM_EVT_HDRS = 3;
 	static const int SLEEP_INTRV = 7;
+	static const int AUTO_RECONN_RETRY_INTV = 3;
+	static const int MAX_AUTO_RECONN_ATTEMPTS = 10; 
 	//irc strings	
 	static const std::string PRIVMSG;	//message header
 	static const std::string NOTICE;	//message header

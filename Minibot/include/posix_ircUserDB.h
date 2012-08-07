@@ -40,6 +40,8 @@ class posix_ircUserDB: public ircUserDB {
 		void printChannelUsers(std::string);
 
 	private:
+		std::ofstream dbLog;
+
 		//methods for ircINterface use
 		void setRegistered(std::string,bool);
 		void setAuthenticated(std::string, bool);

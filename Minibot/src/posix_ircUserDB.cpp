@@ -4,6 +4,10 @@
 #include <sstream>
 posix_ircUserDB::posix_ircUserDB()
 {
+
+	//initialize log file
+	dbLog.open("userDb.log", std::ios_base::out | std::ios_base::app | std::ios_base::ate);
+
 	//initialize the random number generator
 	srand(time(NULL));
 
@@ -33,7 +37,7 @@ void posix_ircUserDB::addUser(std::string nick, bool registered = false, bool au
 	//check to see if the nick wasn't in the database or it had no associated ircUser Object
 	if(iter == _usersByNick.end() || (*iter).second == NULL)
 	{
-		std::cout << "posix_ircUserDB::addUser the user wasn't found in the database." << std::endl;
+		dbLog << "posix_ircUserDB::addUser the user wasn't found in the database." << std::endl;
 
 		//create new user object
 		ircUser* temp = new ircUser();
@@ -59,7 +63,7 @@ void posix_ircUserDB::addUser(std::string nick, bool registered = false, bool au
 		//apparently for now everyone is authenticated
 		temp->_isAuthenticated = authenticated;
 
-		std::cout << "posix_ircUserDB::addUser: user object created, adding to database..." << std::endl;
+		dbLog << "posix_ircUserDB::addUser: user object created, adding to database..." << std::endl;
 
 		//add it to both maps
 		_usersByNick[nick] = temp;
@@ -68,14 +72,14 @@ void posix_ircUserDB::addUser(std::string nick, bool registered = false, bool au
 		/*{
 			ircUser* ohai = _usersByNick[nick];
 
-			std::cout << "posix_ircUserDB: the new nick object in usersbynick: " << std::hex << ohai << std::dec << std::endl;
+			dbLog << "posix_ircUserDB: the new nick object in usersbynick: " << std::hex << ohai << std::dec << std::endl;
 		}*/
 	}
 
 	//if the nick is in the database we don't need to do anything
 	else
 	{
-		std::cout << "posix_ircUserDB::addUser: use was already in the DB" << std::endl;
+		dbLog << "posix_ircUserDB::addUser: use was already in the DB" << std::endl;
 	}
 }
 
@@ -156,14 +160,14 @@ void posix_ircUserDB::removeUser(std::string nick)
 
 void posix_ircUserDB::addUserToChannel(std::string nick, std::string channel)
 {
-	std::cout << "posix_ircUserDB: adding user: " << nick << std::endl;
-	std::cout << "before: " << std::endl;
+	dbLog << "posix_ircUserDB: adding user: " << nick << std::endl;
+	dbLog << "before: " << std::endl;
 	printChannelUsers(channel);
 	usersByNick_it user = _usersByNick.find(nick);
 
 	_usersByChannel[channel].push_back((*user).second);
 
-	std::cout << "after:" << std::endl;
+	dbLog << "after:" << std::endl;
 	printChannelUsers(channel);
 }
 
@@ -175,7 +179,7 @@ void posix_ircUserDB::removeUserFromChannel(std::string nick, std::string channe
 	//make sure it existes
 	if(iter == _usersByChannel.end())
 	{
-		std::cout << "posix_ircUserDB::removeUserFromChannel(): no such channel" << std::endl;
+		dbLog << "posix_ircUserDB::removeUserFromChannel(): no such channel" << std::endl;
 		return;
 	}
 
@@ -190,7 +194,7 @@ void posix_ircUserDB::removeUserFromChannel(std::string nick, std::string channe
 	//make sure that user actually esits
 	if(temp == _usersByNick.end())
 	{
-		std::cout << "posix_ircUserDB::removeUserFromChannel(): no such nick exists" << std::endl;
+		dbLog << "posix_ircUserDB::removeUserFromChannel(): no such nick exists" << std::endl;
 		return;
 	}
 
@@ -209,7 +213,7 @@ void posix_ircUserDB::removeUserFromChannel(std::string nick, std::string channe
 		//handle them if we find any
 		if((*channelUser) == NULL)
 		{
-			std::cout << "RemoveUserFromChannel" << std::endl;
+			dbLog << "RemoveUserFromChannel" << std::endl;
 			printAllUsers();
 			continue;
 		}
@@ -269,7 +273,7 @@ ircUser* posix_ircUserDB::getUser(std::string nick)
 
 	if(user == NULL)
 	{
-		std::cout << "getUser nick" << std::endl;
+		dbLog << "getUser nick" << std::endl;
 		printAllUsers();
 	}
 	return user;
@@ -288,7 +292,7 @@ ircUser* posix_ircUserDB::getUser(unsigned int ID)
 
 	if(user == NULL)
 	{
-		std::cout << "getUser id" << std::endl;
+		dbLog << "getUser id" << std::endl;
 		printAllUsers();
 	}
 	return user;
@@ -359,7 +363,7 @@ void posix_ircUserDB::setRegistered(std::string nick,bool registered)
 	
 	if(user == NULL)
 	{
-		std::cout << "setRegistered" << std::endl;
+		dbLog << "setRegistered" << std::endl;
 		printAllUsers();
 	}
 
@@ -383,7 +387,7 @@ void posix_ircUserDB::setAuthenticated(std::string nick, bool authenticated)
 
 	if(user == NULL)
 	{
-		std::cout << "setAauthenticated" << std::endl;
+		dbLog << "setAauthenticated" << std::endl;
 		printAllUsers();
 	}
 	user->_isAuthenticated = authenticated;
@@ -464,19 +468,19 @@ unsigned int posix_ircUserDB::getNextAvailableID()
 
 void posix_ircUserDB::saveData()
 {
-	std::cout << "posix_ircUserDB: saving data..." << std::endl;
+	dbLog << "posix_ircUserDB: saving data..." << std::endl;
 	std::ofstream dbfile;
 	dbfile.open("users.db");
 	
 	dbfile << _registeredNicksToIDs.size();
-	std::cout << "-----Saved Data------" << std::endl;
-	std::cout << "number of registered nicks: " << _registeredNicksToIDs.size() << std::endl;
+	dbLog << "-----Saved Data------" << std::endl;
+	dbLog << "number of registered nicks: " << _registeredNicksToIDs.size() << std::endl;
 	for(registeredId_it iter = _registeredNicksToIDs.begin(); iter != _registeredNicksToIDs.end(); iter++)
 	{
 		dbfile << iter->first;
-		std::cout << "nick: " << iter->first << std::endl;
+		dbLog << "nick: " << iter->first << std::endl;
 		dbfile << iter->second;
-		std::cout << "id: " << iter->second << std::endl << std::endl;
+		dbLog << "id: " << iter->second << std::endl << std::endl;
 	}
 }
 
@@ -485,14 +489,14 @@ void posix_ircUserDB::loadData()
 	std::ifstream dbfile;
 	dbfile.open("users.db");
 
-	std::cout <<"posix_ircUserDB: opening database file..." << std::endl;
+	dbLog <<"posix_ircUserDB: opening database file..." << std::endl;
 	if(!dbfile.good())
 		return;
 
 	size_t mapsize;
 	dbfile >> mapsize;
 
-	std::cout <<"posix_ircUserDB: there are "<< mapsize << " registered nicks" << std::endl;
+	dbLog <<"posix_ircUserDB: there are "<< mapsize << " registered nicks" << std::endl;
 
 	for (size_t i = 0; i < mapsize; ++i)
 	{
@@ -502,7 +506,7 @@ void posix_ircUserDB::loadData()
 		dbfile >> id;
 		_registeredNicksToIDs[nick] = id;
 
-//		std::cout << "posix_ircUserDB: loaded nick: " << nick << " id: " << id << std::endl;
+//		dbLog << "posix_ircUserDB: loaded nick: " << nick << " id: " << id << std::endl;
 
 	}
 }
@@ -568,7 +572,7 @@ void posix_ircUserDB::printAllUsers()
 		}
 	}
 
-	std::cout << users.str();
+	dbLog << users.str();
 }
 
 void posix_ircUserDB::printChannelUsers(std::string channel)
@@ -578,20 +582,20 @@ void posix_ircUserDB::printChannelUsers(std::string channel)
 
 	std::vector<ircUser*>::iterator channelUser;
 
-	std::cout << "-----Users in channel " << channel << "-----" << std::endl;
+	dbLog << "-----Users in channel " << channel << "-----" << std::endl;
 	for(channelUser = users.begin(); channelUser != users.end(); channelUser++)
 	{
 		if((*channelUser) != NULL)
 		{
 			if((*channelUser)->_nick.size() > 32)
 			{
-				std::cout << "something's really wrong here, nick is more than 32 chars: " << (*channelUser)->_nick.size() << std::endl;
+				dbLog << "something's really wrong here, nick is more than 32 chars: " << (*channelUser)->_nick.size() << std::endl;
 				//this is temporary I want to see when this case happens.
 				exit(1);
 			}
-			std::cout << (*channelUser)->nick() << std::endl;
+			dbLog << (*channelUser)->nick() << std::endl;
 		}
 		else 
-			std::cout << "NULL" << std::endl;
+			dbLog << "NULL" << std::endl;
 	}
 }

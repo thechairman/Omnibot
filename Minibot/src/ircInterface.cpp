@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+
+#include "ircTypes.h"
 //parse vars
 
 //catch nicks
@@ -45,7 +47,7 @@ void printUser(ircUser* user)
 
 }
 
-ircInterface::ircInterface(){
+ircInterface::ircInterface():_autoReconnect(false){
 	_serverConnection = ircio::create();
 
 	std::cout << "ircInterface: initializing user database..." << std::endl;
@@ -57,6 +59,9 @@ ircInterface::ircInterface(){
 	_userAuth->authMethod(ircUserAuth::AUTH_NICKSERV);
 
 	_usersInterface = new ircUsersInterface(_userDB);
+
+	_connStatus = ircConnStatus::instance();
+
 }
 
 ircInterface::~ircInterface(){
@@ -64,42 +69,75 @@ ircInterface::~ircInterface(){
 	delete _userAuth;
 	delete _userDB;
 	delete _serverConnection;
+	
+	//TODO clean up _connStatus
+}
+void ircInterface::setAutoReconnect(bool reconnect)
+{
+	_autoReconnect = reconnect;
 }
 
 int ircInterface::connect(std::string server, int port){
+	std::cout << "ircInterface: initing connection monitoring" <<std::endl;
+	_connStatus->init();
+	
+	_server = server;
+	_port = port;
 
+	std::cout << "ircInterface: connecting to server " << server << ":" << port << std::endl;
 	_serverConnection->registerCallBack(this);
 	_serverConnection->open(server, port);
 	_serverConnection->sleep(SLEEP_INTRV);
+	_connStatus->registerCallBack(this);
+	
+	std::cout << "ircInterface: waiting to hear back from teh connect flag" << std::endl;
+	if(_connStatus->waitOnConnect())
+	{
+		std::cout << "ircInterface: connect failure" <<std::endl;
+		return 1;
+
+	}
+
+	std::cout << "ircInterface: Successfully connected" << std::endl;
 	return 0;
 }
 
 int ircInterface::registerUser(std::string nick, std::string uname, std::string rname){
+
+	_nick = nick;
+	_uname = uname;
+	_rname = rname;
 
 	std::string msg = NICK + " " + nick+ "\r\n";
 	sendString(msg);
 	msg = "USER " + uname + " 0 * :" + rname + "\r\n";
 	sendString(msg);
 	_serverConnection->sleep(SLEEP_INTRV);
+	if(_connStatus->waitOnConnect())
+	{
+		return 1;
+	}
 	return 0;
 }
 
 
 
 int ircInterface::join(std::string channel){
+	_channels.push_back(channel);
 	std::string msg = JOIN + " :" + channel + "\r\n";
 	sendString(msg);
 	return 0;
 }
 
 int ircInterface::part(std::string channel, std::string reason){
+	removeChannel(channel);
 	std::string msg = "PART " + channel + " :" +reason;
 	sendString(msg);
 	return 0;
 }
 
-
 int ircInterface::part(std::string channel){
+	removeChannel(channel);
 	std::string msg = "PART " + channel + "\r\n";
 	sendString(msg);
 	return 0;
@@ -175,7 +213,8 @@ void ircInterface::onMessage(std::string pkge){
 		//contents of the message with a space
 		std::string type = msg.substr(0, msg.find_first_of(' '));
 
-			
+		//_connStatus->pingRcvd();	
+
 		//first check for messages that start with message names
 		//check for ping
 		if(!type.compare(PING))
@@ -208,7 +247,11 @@ void ircInterface::onMessage(std::string pkge){
 				handle_privmsg(msg, prefix);
 			}
 			else if(!type.compare(NOTICE))
-			{
+			{	
+				if(_connStatus->state() == CS_IDLE)
+				{
+				 	_connStatus->connected();
+				}
 				handle_notice(msg, prefix);
 			}
 			else if(!type.compare(QUIT))
@@ -244,10 +287,64 @@ void ircInterface::onMessage(std::string pkge){
 				//add function to parse the nicklist
 				handle_nicklist(msg);
 			}
+			else if(!type.compare("001"))
+			{
+				_connStatus->registered();
+			}
 		}
 	}
 }
+void ircInterface::onConnectionDeath()
+{
+	std::cout << "ircInterface: uh-oh connection died, trying to restablish" <<std::endl;
+	//clean up _serverConnection
+	_serverConnection->close();
+	
+	//try and connect again
+	bool attempting = false;;
+	int attempts = 0;
 
+	if(_autoReconnect)
+	{
+		do
+		{
+			
+			attempting = false;
+			if(connect(_server, _port))
+			{
+				attempting = true;
+				++attempts;
+				_serverConnection->close();
+				_serverConnection->sleep(AUTO_RECONN_RETRY_INTV);
+				continue;
+
+			}
+			if(registerUser(_nick, _uname, _rname))
+			{
+				attempting = true;
+				++attempts;
+				_serverConnection->close();
+				_serverConnection->sleep(AUTO_RECONN_RETRY_INTV);
+				continue;
+			}
+
+		}
+		while(attempting && attempts < MAX_AUTO_RECONN_ATTEMPTS);
+
+		if(!attempting)
+		{
+			std::cout << "ircInterface: whew, that was close but we reconnected" <<std::endl;
+			return;
+		}
+	}
+
+	//notify the client through the event handler.
+	std::cerr << "ircInterface: connection lost..." << std::endl;
+	ircEvent e = ircEvent::connectionLost();
+	notifyEvent(e);
+
+
+}
 void ircInterface::handle_nicklist(std::string nickMsg)
 {	
 	std::string channel = nickMsg.substr(nickMsg.find_first_of('=') + 2);
@@ -451,3 +548,15 @@ void ircInterface::sendPong(){
 	sendString(temp);
 }
 
+void ircInterface::removeChannel(std::string channel)
+{
+	std::vector<std::string>::iterator iter;
+	for(iter =_channels.begin(); iter != _channels.end(); iter++)
+	{
+		if(!iter->compare(channel))
+		{
+			_channels.erase(iter);
+			break;
+		}
+	}
+}
