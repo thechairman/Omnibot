@@ -5,10 +5,12 @@
 
 #include "Threads/OmniThread.h"
 #include "Threads/OmniThreadedClass.h"
-#include "ircNotifyClasses.h"
-#include "PluginUtils.h"
 #include <utility>
 #include <deque>
+#include "ircNotifyClasses.h"
+#include "PluginUtils.h"
+
+#include "OmniCommChannel.h"
 
 class PluginUtils;
 
@@ -26,8 +28,10 @@ class OmniPlugin {
 		OmniPlugin();
 
 		static void passMessage(OmniPlugin*, ircMessage&);
+		static void passOmniCommChannel(OmniPlugin*, OmniCommChannel*);
 		//static void* startThread(void*);
 		virtual void onMessage(ircMessage&) = 0;
+		virtual void onOmniCommConnect(OmniCommChannel*);
 		virtual bool init(PluginUtils*) = 0;
 		virtual void wrapUp() = 0;
 		virtual std::string name() = 0;
@@ -44,6 +48,7 @@ class OmniPlugin {
 			private:
 				OmniPlugin* plugin;
 				ircMessage msg;
+				OmniCommChannel* channel;
 				
 			friend class OmniPlugin;
 		};

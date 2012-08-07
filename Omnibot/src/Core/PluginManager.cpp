@@ -2,10 +2,11 @@
 #include <sstream>
 #include <iostream>
 
-PluginManager::PluginManager(ircInterface* irc, NickManager& nicks){
-
+PluginManager::PluginManager(ircInterface* irc, NickManager& nicks)
+{
 	_utils = new PluginUtils(irc, *this, nicks);
 	_factory = PluginFactory::instance();
+	_commChannels = new OmniCommChannelManager();
 
 }
 
@@ -93,4 +94,30 @@ std::string PluginManager::listLoadedPlugins()
 	}
 
 	return list.str();
+}
+
+OmniCommChannel* PluginManager::setupChannel(std::string name)
+{
+	OmniPlugin* target = NULL;
+	for(int i = 0; i < _plugins.size(); ++i)
+	{
+		if(!_plugins[i]->name().compare(name))
+		{
+			target = _plugins[i];
+			break;
+		}
+			
+	}
+
+	if(target == NULL)
+	{
+		return NULL;
+	}
+
+	OmniCommEndpoints eps = _commChannels->getNewEndpoints();
+
+	OmniPlugin::passOmniCommChannel(target, eps.second);
+	
+	return eps.first;
+	
 }

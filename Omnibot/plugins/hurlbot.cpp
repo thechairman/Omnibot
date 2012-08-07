@@ -32,6 +32,8 @@ void hURLbot::onMessage(ircMessage& msg){
 
 }
 
+void hURLbot::onOmniCommConnect(OmniCommChannel* channel){}
+
 bool hURLbot::init(PluginUtils* utils_){
 	utils = utils_;
 	return true;

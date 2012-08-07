@@ -1,6 +1,6 @@
 #include "OmniCommChannelManager.h"
 
-std::pair<OmniCommSignalQueue*, OmniCommSignalQueue*> OmniCommChannelManager::getNewQueues()
+OmniCommSignalQueuePair OmniCommChannelManager::getNewQueues()
 {
 	OmniCommSignalQueue* retvals[QUEUES_PER_ENDPOINT];
        	unsigned int rvi;	//retval index
@@ -21,18 +21,18 @@ std::pair<OmniCommSignalQueue*, OmniCommSignalQueue*> OmniCommChannelManager::ge
 		retvals[rvi] = OmniCommSignalQueue::create();
 	}
 
-	return std::pair<OmniCommSignalQueue*, OmniCommSignalQueue*>(retvals[0], retvals[1]);
+	return OmniCommSignalQueuePair(retvals[0], retvals[1]);
 }
 
- std::pair<OmniCommChannel*, OmniCommChannel*> OmniCommChannelManager::getNewEndpoints()
+OmniCommEndpoints OmniCommChannelManager::getNewEndpoints()
 {
-	std::pair<OmniCommSignalQueue*, OmniCommSignalQueue*> queuePair = getNewQueues();
+	OmniCommSignalQueuePair queuePair = getNewQueues();
 	OmniCommChannel* endpoints[ENDPOINTS_RETURNED];
 
 	endpoints[0] = new OmniCommChannel(*(queuePair.first), *(queuePair.second));
 	endpoints[1] = new OmniCommChannel(*(queuePair.second), *(queuePair.first));
 
-	std::pair<OmniCommChannel*, OmniCommChannel*> endpointPair(endpoints[0], endpoints[1]);
+	OmniCommEndpoints endpointPair(endpoints[0], endpoints[1]);
 
 	return endpointPair;
 

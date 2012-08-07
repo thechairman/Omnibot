@@ -46,3 +46,8 @@ std::vector<ircUser> PluginUtils::getAllRegisteredUsers()
 std::vector<ircUser> PluginUtils::getAuthenticatedUsers()
 {
 }
+
+OmniCommChannel* PluginUtils::openOmniCommChannel(std::string name)
+{
+	return _manager->setupChannel(name);
+}

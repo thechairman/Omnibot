@@ -2,13 +2,15 @@
 #define _PLUGIN_MANAGER_
 
 #include <string>
+#include <vector>
 #include "ircInterface.h"
 #include "ircNotifyClasses.h"
 #include "PluginFactory.h"
 #include "OmniPluginInterface.h"
 #include "PluginUtils.h"
 #include "NickManager.h"
-#include <vector>
+
+#include "OmniCommChannelManager.h"
 
 class OmniPlugin;
 class PluginUtils;
@@ -25,10 +27,14 @@ class PluginManager{
 
 		std::string listLoadedPlugins();
 
+		OmniCommChannel* setupChannel(std::string);
+
 	private:
 		PluginUtils* _utils;
 		std::vector<OmniPlugin*> _plugins;
 		PluginFactory* _factory;
+		OmniCommChannelManager* _commChannels;
+
 
 };
 

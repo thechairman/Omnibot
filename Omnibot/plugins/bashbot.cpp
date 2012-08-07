@@ -53,6 +53,8 @@ void bashbot::onMessage(ircMessage& msg)
 	}
 }
 
+void bashbot::onOmniCommConnect(OmniCommChannel* channel){}
+
 bool bashbot::init(PluginUtils* u)
 {
 

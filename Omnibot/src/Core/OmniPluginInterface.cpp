@@ -33,6 +33,17 @@ void OmniPlugin::passMessage(OmniPlugin* plugin, ircMessage& msg){
 
 }
 
+void OmniPlugin::passOmniCommChannel(OmniPlugin* plugin, OmniCommChannel* chan)
+{
+	OmniPlugin::PluginRunner* runner = new PluginRunner();
+
+	runner->plugin = plugin;
+
+	runner->channel = chan;
+
+	plugin->thread.addTask(runner, OmniThreadedClass::MODE_B);
+
+}
 OmniPlugin::OmniPlugin(){
 	thread.init();
 }
@@ -49,7 +60,10 @@ void OmniPlugin::PluginRunner::runA()
 	delete this;
 }
 
-void OmniPlugin::PluginRunner::runB(){}
+void OmniPlugin::PluginRunner::runB(){
+	plugin->onOmniCommConnect(channel);
+	delete this;
+}
 void OmniPlugin::PluginRunner::runC(){}
 void OmniPlugin::PluginRunner::runD(){}
 

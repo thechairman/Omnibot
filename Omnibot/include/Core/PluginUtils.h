@@ -6,6 +6,8 @@
 #include"NickManager.h"
 #include"PluginAttrs.h"
 
+#include "OmniCommChannel.h"
+
 //won't compile with out this here
 //think it has something to do with omnibot including plugin in manager
 //before this in the include chain
@@ -30,6 +32,8 @@ class PluginUtils {
 		std::vector<ircUser> getAllRegisteredUsers();
 		std::vector<ircUser> getAuthenticatedUsers();
 
+		OmniCommChannel* openOmniCommChannel(std::string);
+	
 	private:
 		ircInterface *_irc;
 		PluginManager *_manager;

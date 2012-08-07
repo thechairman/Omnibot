@@ -5,7 +5,10 @@
 CC = g++
 
 #TODO: should probably figure out how to pass this from the parent make process
-INCLUDES = -I ../include -I ../include/Core -I ../../Minibot/include
+INCLUDES = -I ../include \
+	   -I ../include/Core \
+	   -I ../../Minibot/include \
+	   -I ../include/OmniComm
 LIBS = '-lcurl'
 
 PLUGINS = hurlbot.o\

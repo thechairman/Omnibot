@@ -15,6 +15,7 @@ class bashbot:public OmniPlugin
 {
 	public: 
 		void onMessage(ircMessage&);
+		void onOmniCommConnect(OmniCommChannel*);
 		bool init(PluginUtils*);
 		void wrapUp();
 		std::string name();
