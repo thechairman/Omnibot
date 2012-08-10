@@ -12,8 +12,18 @@ class hURLbot:public OmniPlugin {
 
 	private:
 		static const unsigned int MAX_URLS = 50;
-		std::deque<std::string> urls;
+		static const double CULL_INTERVAL = 600;
+		static const double TWENTY_FOUR_HOURS = 86400;
+		time_t lastCulling;
+		struct stampedUrl{
+			time_t timeStamp;
+			std::string url;
+
+		};
+		std::deque<stampedUrl> urls;
 		PluginUtils* utils;
+
+		void cullStaleUrls();
 
 
 };

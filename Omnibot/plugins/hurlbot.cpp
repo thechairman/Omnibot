@@ -11,9 +11,9 @@ void hURLbot::onMessage(ircMessage& msg){
 
 		utils->sendPM(user.nick(), "Here ya go:");
 
-		std::deque<std::string>::iterator iter;
+		std::deque<stampedUrl>::iterator iter;
 		for(iter = urls.begin(); iter != urls.end(); iter++){
-			utils->sendPM(user.nick(), (*iter));
+			utils->sendPM(user.nick(), (*iter).url);
 		}
 
 	}
@@ -22,10 +22,20 @@ void hURLbot::onMessage(ircMessage& msg){
 		size_t pos = msg.message().find("http");
 		if ( pos != std::string::npos){
 			std::string url = msg.message().substr(pos, msg.message().find_first_of(' ', pos));
+			stampedUrl newUrl;
+			time(&newUrl.timeStamp);
+			newUrl.url = url;
+			if(difftime(newUrl.timeStamp, lastCulling) > CULL_INTERVAL)
+			{
+				cullStaleUrls();
+				time(&lastCulling);
+			}
+			
 			if(urls.size() == MAX_URLS){
 				urls.pop_front();
 			}
-			urls.push_back(url);
+
+			urls.push_back(newUrl);
 		}
 		
 	}
@@ -46,4 +56,20 @@ void hURLbot::wrapUp(){
 std::string hURLbot::name(){
 	std::string name = "hurlbot";
 	return name;
+}
+void hURLbot::cullStaleUrls(){
+	size_t initialSize = urls.size();
+	for(unsigned int i = 0; i < initialSize; ++i)
+	{
+		stampedUrl url = urls.front();
+		time_t currentTime;
+		time(&currentTime);
+
+		if(difftime(currentTime, url.timeStamp) < TWENTY_FOUR_HOURS)
+		{
+			break;
+		}
+
+		urls.pop_front();
+	}	
 }
