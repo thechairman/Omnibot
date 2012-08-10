@@ -87,7 +87,8 @@ CLEAN_STR = ${BUILD_THREADS}/*.d \
 #		These are only needed until dynamic loading is implement
 #################################################################################
 PLUGIN_OBJS = ${PLUGIN_DIR}/hurlbot.o\
-	      ${PLUGIN_DIR}/bashbot.o
+	      ${PLUGIN_DIR}/bashbot.o\
+	      ${PLUGIN_DIR}/tomebot.o
 
 #################################################################################
 

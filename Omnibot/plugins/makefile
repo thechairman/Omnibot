@@ -12,7 +12,8 @@ INCLUDES = -I ../include \
 LIBS = '-lcurl'
 
 PLUGINS = hurlbot.o\
-	  bashbot.o
+	  bashbot.o\
+	  tomebot.o
 
 all: ${PLUGINS}
 
