@@ -31,7 +31,7 @@ class OmniPlugin {
 		static void passOmniCommChannel(OmniPlugin*, OmniCommChannel*);
 		//static void* startThread(void*);
 		virtual void onMessage(ircMessage&) = 0;
-		virtual void onOmniCommConnect(OmniCommChannel*);
+		virtual void onOmniCommConnect(OmniCommChannel*)=0;
 		virtual bool init(PluginUtils*) = 0;
 		virtual void wrapUp() = 0;
 		virtual std::string name() = 0;
