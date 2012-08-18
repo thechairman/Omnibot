@@ -50,24 +50,11 @@ void printUser(ircUser* user)
 ircInterface::ircInterface():_autoReconnect(false){
 	_serverConnection = ircio::create();
 
-	std::cout << "ircInterface: initializing user database..." << std::endl;
-	_userDB = ircUserDB::create();
-
-	std::cout << "ircINterface: initializing user authentication" << std::endl;
-	_userAuth = new ircUserAuth(this, _userDB);
-
-	_userAuth->authMethod(ircUserAuth::AUTH_NICKSERV);
-
-	_usersInterface = new ircUsersInterface(_userDB);
-
 	_connStatus = ircConnStatus::instance();
 
 }
 
 ircInterface::~ircInterface(){
-	delete _usersInterface;
-	delete _userAuth;
-	delete _userDB;
 	delete _serverConnection;
 	
 	//TODO clean up _connStatus
@@ -174,10 +161,6 @@ void ircInterface::registerForNotify(ircInterfaceClient* client){
 	std::cout << "IrcInterface: register client for notifications" << std::endl;
 }
 
-ircUsersInterface* ircInterface::usersInterface()
-{
-	return _usersInterface;
-}
 
 void ircInterface::notifyEvent(ircEvent& e){
 	std::vector<ircInterfaceClient*>::iterator iter;
@@ -225,7 +208,7 @@ void ircInterface::onMessage(std::string pkge){
 
 		else if(!type.compare(ERROR))
 		{	
-			//need to figure out hwat to do here
+			//TODO need to figure out hwat to do here
 			//for now lets just try and not spam the other levels
 			return;
 		}
@@ -285,7 +268,11 @@ void ircInterface::onMessage(std::string pkge){
 			else if(!type.compare(NICKLIST))
 			{
 				//add function to parse the nicklist
-				handle_nicklist(msg);
+				std::vector<ircEvent> e = handle_nicklist(msg);
+				for(unsigned int i = 0; i < e.size(); ++i)
+				{
+					notifyEvent(e[i]);
+				}
 			}
 			else if(!type.compare("001"))
 			{
@@ -345,24 +332,15 @@ void ircInterface::onConnectionDeath()
 
 
 }
-void ircInterface::handle_nicklist(std::string nickMsg)
+std::vector<ircEvent> ircInterface::handle_nicklist(std::string nickMsg)
 {	
 	std::string channel = nickMsg.substr(nickMsg.find_first_of('=') + 2);
 	channel = channel.substr(0, channel.find_first_of(' '));
 	std::string nick = nickMsg.substr(nickMsg.find_first_of(':') + 1);
 	
-	std::cout << "ircInterface: List of nicks: " << nick << std::endl;
 
-	std::stringstream nicks(nick);
+	return _nickListParser.parseNickList(nick, channel);
 
-	while(getline(nicks, nick, ' '))
-	{
-		std::string temp;
-		temp = _userAuth->addUser(nick);
-		_userDB->addUserToChannel(temp, channel);
-
-		std::cout << "ircInterface: added nick: " << temp << " to channel: " << channel << std::endl;
-	}
 
 }
 //again this entire function could be inspircd specific
@@ -381,7 +359,7 @@ void ircInterface::handle_vars(std::string varList)
 
 		if(!var.compare("STATUSMSG"))
 		{
-			_userAuth->nickPrefixes(val);
+			_nickListParser.setNickPrefixes(val);
 			std::cout << "ircInterface: nick Prefixes are: " << val << std::endl;
 		}
 	}
@@ -392,7 +370,6 @@ ircEvent ircInterface::handle_quit(std::string msg, std::string prefix)
 	std::string nick = prefix.substr(prefix.find_first_of(':') + 1, 
 					 prefix.find_first_of('!') -1);
 
-	_userDB->removeUser(nick);
 
 	//TODO handle the quit reasons, for now its an empty string
 	return ircEvent::quit(nick, "");
@@ -407,8 +384,6 @@ ircEvent ircInterface::handle_join(std::string msg, std::string prefix)
 	std::string channel = msg.substr(msg.find_first_of(' ') + 2);
 
 
-	_userAuth->addUser(nick);
-	_userDB->addUserToChannel(nick, channel);
 
 	return ircEvent::join(channel, nick);
 }
@@ -419,7 +394,6 @@ ircEvent ircInterface::handle_part(std::string msg, std::string prefix)
 					 prefix.find_first_of('!') -1);
 
 	std::string channel = msg.substr(msg.find_first_of(' ') + 1);
-	_userDB->removeUserFromChannel(nick, channel);
 
 	//TODO handle part reasons for now it's an empty string
 	return ircEvent::part(channel, nick, "");
@@ -436,11 +410,11 @@ ircEvent ircInterface::handle_nick(std::string msg, std::string prefix)
 	std::cout << "ircInterface: nick changed: " << nick << "->" << newNick << std::endl;
 
 
-	_userDB->nickChange(nick, newNick);
 
 	return ircEvent::nickChange(nick, newNick);
 }
 
+//TODO need to figure out how to do this
 void ircInterface::handle_notice(std::string msg, std::string prefix){
 
 	//grab user data
@@ -448,8 +422,9 @@ void ircInterface::handle_notice(std::string msg, std::string prefix){
 					 prefix.find_first_of('!') -1);
 
 	//check if we are using AUTH_NICKSERV and that the message is from nickserv
-	if((!nick.compare("NickServ") || !nick.compare("nickserv")) 
-			&& _userAuth->authMethod() == ircUserAuth::AUTH_NICKSERV)
+	//
+	if((!nick.compare("NickServ") || !nick.compare("nickserv")))
+			//&& _userAuth->authMethod() == ircUserAuth::AUTH_NICKSERV)
 	{
 		//send the message to the auth module
 
@@ -458,7 +433,7 @@ void ircInterface::handle_notice(std::string msg, std::string prefix){
 		if(msg.find("\r\n") != std::string::npos)
 			msg = msg.substr(0, msg.find("\r\n"));
 
-		_userAuth->nickServInfo(msg);
+		//_userAuth->nickServInfo(msg);
 		//then we're done here
 		return;
 	}
@@ -475,21 +450,8 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 	std::string nick = prefix.substr(prefix.find_first_of(':') + 1, 
 					 prefix.find_first_of('!') -1);
 
+	ircUser temp(nick);
 
-	//TODO this is a  temp solution that could cause hella memory leaks if not fixed later
-	ircUser* temp = NULL;
-	
-	std::map<std::string, ircUser*>::iterator it;
-
-	std::cout << "ircInterface: the nick were looking for is: " << nick << std::endl;
-
-	temp = _userDB->getUser(nick);
-	if(!temp)
-	{
-		std::cout << "ircInterface: uh-oh, this nick returned null... brace yourself for impact!" << std::endl;
-	}
-	
-	printUser(temp);
 
 	//TODO this should be streamlined if possible
 	std::string channel =  msg.substr(msg.find_first_of(' ') + 1,
@@ -503,6 +465,8 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 
 	//see if its somebody or a channel
 	//TODO an organized
+	//TODO change these over to see if the string matches a channel
+	std::map<std::string, ircUser*>::iterator it;
 	for(it = users.begin(); it != users.end(); it++){
 		if(!(*it).first.compare(channel)){
 			channel = "";
@@ -524,19 +488,17 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 		std::cout << "looking at minibot commands..." << std::endl;	
 		if(!msg.substr(1, msg.find_first_of(' ')).compare("auth"))
 		{
-			_userAuth->verifyAuth(temp, msg.substr(msg.find_first_of(' ')+1 ));
 			return;
 		}
 		else if(!msg.substr(1, msg.find_first_of(' ')).compare("users"))
 		{
-			_userDB->printAllUsers();
 			return;
 		}
 
 
 	}
 
-	ircMessage m(temp, msg, channel);
+	ircMessage m(&temp, msg, channel);
 
 	
 	notifyMessage(m);

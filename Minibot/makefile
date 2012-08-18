@@ -20,7 +20,8 @@ LIB_OBJS = ${BUILD_DIR}ircInterface.o\
 	   ${BUILD_DIR}ircUserDB.o \
 	   ${BUILD_DIR}posix_ircUserDB.o\
 	   ${BUILD_DIR}ircio.o\
-	   ${BUILD_DIR}ircUsersInterface.o
+	   ${BUILD_DIR}ircUsersInterface.o\
+	   ${BUILD_DIR}ircNickListParser.o
 
 #all objects related only to the executable
 EXE_OBJS = ${LIB_OBJS}\

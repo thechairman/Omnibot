@@ -5,6 +5,7 @@
 
 class ircUsersInterface{
 	public:
+		ircUsersInterface();
 		ircUsersInterface(ircUserDB*);
 		~ircUsersInterface();
 

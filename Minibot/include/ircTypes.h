@@ -1,6 +1,8 @@
 #ifndef _IRCTYPES_H_
 #define _IRCTYPES_H_
 
+typedef unsigned int ircUserId_t;
+
 
 enum connSetup_t
 {

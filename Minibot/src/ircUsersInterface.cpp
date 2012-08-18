@@ -1,6 +1,7 @@
 #include "ircUsersInterface.h"
 #include "ircNotifyClasses.h"
 
+ircUsersInterface::ircUsersInterface(): _DB(NULL){}
 ircUsersInterface::ircUsersInterface(ircUserDB* db): _DB(db){}
 ircUsersInterface::~ircUsersInterface(){}
 

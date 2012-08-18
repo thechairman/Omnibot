@@ -14,9 +14,10 @@
 #include "ircUserAuth.h"
 #include "ircUsersInterface.h"
 #include "ircConnStatus.h"     //this includes the callback class
+#include "ircNickListParser.h"
 
 //Frakking circular dependencies
-class ircUserAuth;
+//class ircUserAuth;
 
 class ircInterface : public ircioCallBack, public ircConnStatusCB{
 
@@ -51,7 +52,7 @@ class ircInterface : public ircioCallBack, public ircConnStatusCB{
 	//these handle each type of message found by
 	//on message
 	void handle_vars(std::string);
-	void handle_nicklist(std::string);
+	std::vector<ircEvent> handle_nicklist(std::string);
 	void handle_privmsg(std::string, std::string);
 	void handle_notice(std::string, std::string);
 	ircEvent handle_quit(std::string, std::string);
@@ -75,9 +76,10 @@ class ircInterface : public ircioCallBack, public ircConnStatusCB{
 
 	//map to hold nicks -> user structs
 	std::map<std::string, ircUser*> users;
-	ircUserDB* _userDB;
-	ircUserAuth* _userAuth;
-	ircUsersInterface* _usersInterface;
+//	ircUserDB* _userDB;
+//	ircUserAuth* _userAuth;
+//	ircUsersInterface* _usersInterface;
+	ircNickListParser _nickListParser;
 	ircConnStatus* _connStatus;
 
 	bool _autoReconnect;

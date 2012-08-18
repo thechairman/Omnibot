@@ -43,6 +43,7 @@ public:
 
 class ircEvent{
 	friend class ircInterface;
+	friend class ircNickListParser;
 	public:
 		enum EventType{
 			ET_ERROR,
