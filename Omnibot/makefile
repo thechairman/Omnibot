@@ -68,6 +68,7 @@ CORE_OBJS = ${BUILD_CORE}/omnibot.o\
 	    ${BUILD_CORE}/LinuxPluginFactory.o\
 	    ${BUILD_CORE}/PluginUtils.o\
 	    ${BUILD_CORE}/OmniPluginInterface.o\
+	    ${BUILD_CORE}/OmniConfigParser.o\
 	    ${BUILD_CORE}/main.o
 
 #These are the elemets that need to be cleaned up on a "make clean"

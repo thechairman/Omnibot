@@ -1,10 +1,34 @@
 #include "ircInterface.h"
 #include "omnibot.h"
 
+#include "OmniConfigParser.h"
+
 #include<poll.h>
 #include<unistd.h>
 
 #include<iostream>
+
+void connectWithConfig(ircInterface& irc)
+{
+	OmniConfigParser* parser = OmniConfigParser::instance();
+	parser->parse();
+
+	std::cout << "serverName = " << parser->serverName() << std::endl;
+	std::cout << "serverPort = " << parser->serverPort() << std::endl;
+	std::cout << "nick = " << parser->nick() << std::endl;
+
+	irc.connect(parser->serverName(), parser->serverPort());
+	irc.registerUser(parser->nick(), parser->nick(), parser->nick());
+
+	std::vector<std::string> channels = parser->channels();
+
+	for(size_t i = 0; i < channels.size(); ++i)
+	{
+		irc.join(channels[i]);
+	}
+
+}
+
 int main(){	
 	std::cout << "initilizing the irc interface..." << std::endl;
 	ircInterface irc;
@@ -14,11 +38,14 @@ int main(){
 	//irc.registerForNotify(&omni);
 
 	std::cout << "connecting to server..." << std::endl;
-	irc.connect("madhax.net", 6667);
+/*	irc.connect("madhax.net", 6667);
 	irc.registerUser("Omnibot", "Omnibot", "Omnibot");
 	irc.join("#alpha1");
 //	irc.join("#main");
 	irc.join("#test2");
+*/
+
+	connectWithConfig(irc);
 
 
 	bool loop = true;

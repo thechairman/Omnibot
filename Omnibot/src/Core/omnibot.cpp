@@ -9,7 +9,7 @@
 	need a default server... maybe I should just take
 	the empty constructor out
 }*/
-omnibot::omnibot(ircInterface* irc_):_irc(irc_),_nicks(_irc->usersInterface()),_manager(_irc, _nicks){
+omnibot::omnibot(ircInterface* irc_):_irc(irc_),_nicks(new ircUsersInterface()),_manager(_irc, _nicks){
 	std::cout << std::hex << &irc_ << std::dec << std::endl;
 	_irc->registerForNotify(this);
 }
