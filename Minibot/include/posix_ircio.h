@@ -28,7 +28,7 @@ class posix_ircio : public ircio{
 
 	private:
 		static const long SELECT_SECS = 0;
-		static const long SELECT_NSECS = 10000;
+		static const long SELECT_NSECS = 100;
 		static void* startListening(void* ptr);
 		virtual void listen();
 		virtual void onReceive(std::string);

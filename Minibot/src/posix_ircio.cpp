@@ -3,6 +3,8 @@
 #include <errno.h>
 #include <sys/select.h>
 
+#include <iostream>
+
 extern int errno;
 bool posix_ircio::open(std::string server, int port)
 {
@@ -12,6 +14,7 @@ bool posix_ircio::open(std::string server, int port)
 	{
 		return false;
 	}
+	std::cout << "ircio: got the fd" << std::endl;
 
 	//look up the host
 	hostent* serverhost = gethostbyname(server.c_str());
@@ -19,6 +22,7 @@ bool posix_ircio::open(std::string server, int port)
 	{
 		return false;
 	}
+	std::cout << "ircio: found the host entry" << std::endl;
 
 	//setup the sock address struct
 	sockaddr_in sockadder;
@@ -30,6 +34,7 @@ bool posix_ircio::open(std::string server, int port)
 			(char*)&sockadder.sin_addr.s_addr, serverhost->h_length);
 
 	sockadder.sin_port = htons(port);
+	std::cout << "ircio: set up the socket address struct" << std::endl;
 
 	//open trhe socket
 	sockaddr* temp = (sockaddr*) &sockadder;
@@ -37,6 +42,7 @@ bool posix_ircio::open(std::string server, int port)
 	if(result < 0){
 		return false;
 	}
+	std::cout << "ircio: open the socket" << std::endl;
 
 	//start a p thread running listening on the socket
 	isOpen = true;
@@ -84,26 +90,31 @@ void posix_ircio::listen()
 {
 	std::string leftovers = "";
 
-	timespec timeout;
-	timeout.tv_sec = SELECT_SECS;
-	timeout.tv_nsec = SELECT_NSECS;
 
-	fd_set selectSet;
-	FD_SET(socket, &selectSet);
 
 	while(isOpen)
 	{
+		timeval timeout;
+		timeout.tv_sec = SELECT_SECS;
+		timeout.tv_usec = SELECT_NSECS;
+
+
+		fd_set selectSet;
+		FD_ZERO(&selectSet);
+		FD_SET(socket, &selectSet);
 
 		char buf[BUFSIZE] = {0};
 
 		//read on the socket
 		//std::cout << "gonna hang on the socket again" << std::endl;
-		int selectval = pselect(1, &selectSet ,NULL, NULL, &timeout, NULL);
-		/*if(!selectval)
+		//std::cout << "ircio: timespec seconds = " << timeout.tv_sec << " timespec nsec = " << timeout.tv_usec << std::endl;
+		int selectval = select(socket + 1, &selectSet ,NULL, NULL, &timeout);
+		//if select fails or times out we want to continue;
+		//std::cout << "ircio: hanging on socket, selectval was " << selectval << std::endl;
+		if(selectval < 1)
 		{
 			continue;
-		}*/
-		std::cout << "ircio: hanging on socket, selectval was " << selectval << std::endl;
+		}
 		int chars = (int)::read(socket, buf, BUFSIZE);	
 		if(chars < 0)
 		{	std::cout << "ircio: errno is: " << errno << std::endl;
@@ -121,12 +132,17 @@ void posix_ircio::listen()
 				case EISDIR:
 					//should brobably break responsibly here 
 					//and lt the uper levles know what happened;
-					onReceive("ERROR  Connection brokent \r\n");
+					onReceive("IRCERROR  Connection broken\r\n");
 					return;
 				
 			}
 
 			continue;
+		}
+
+		if(chars == 0)
+		{
+			onReceive("IRCERROR zero lenth read\r\n");
 		}
 
 		//this shouldn't be needed if

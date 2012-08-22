@@ -213,6 +213,13 @@ void ircInterface::onMessage(std::string pkge){
 			return;
 		}
 
+		else if(!type.compare("IRCERROR"))
+		{
+			//handle connection errors in conn status
+			_connStatus->connectionIoError();
+
+		}
+
 		//now check for messages that start with nicks or server titles
 		else 
 		{	

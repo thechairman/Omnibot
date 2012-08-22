@@ -1,4 +1,4 @@
-#include <unistd.h>
+#include0 <unistd.h>
 #include <iostream>
 
 #include "posix_ircConnStatus.h"
@@ -81,6 +81,11 @@ void* posix_ircConnStatus::monitorThread(void* stat)
 			continue;
 		}
 
+		switch(connStat->_state)
+		{
+			
+		}
+
 		sleep(MONT_INTV);
 	}
 
@@ -102,4 +107,9 @@ bool posix_ircConnStatus::validatePings()
 		return false;
 	}
 	return true;
+}
+
+void posix_ircConnStatus::connectionIoError()
+{
+	_state = CS_FAILED;
 }

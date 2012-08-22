@@ -16,11 +16,7 @@ LIB_OBJS = ${BUILD_DIR}ircInterface.o\
 	   ${BUILD_DIR}posix_ircConnStatus.o\
 	   ${BUILD_DIR}ircConnStatus.o\
 	   ${BUILD_DIR}ircNotifyClasses.o\
-	   ${BUILD_DIR}ircUserAuth.o\
-	   ${BUILD_DIR}ircUserDB.o \
-	   ${BUILD_DIR}posix_ircUserDB.o\
 	   ${BUILD_DIR}ircio.o\
-	   ${BUILD_DIR}ircUsersInterface.o\
 	   ${BUILD_DIR}ircNickListParser.o
 
 #all objects related only to the executable

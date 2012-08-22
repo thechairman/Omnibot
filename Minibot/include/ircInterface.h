@@ -10,9 +10,9 @@
 #include "ircio.h"		//this probably includes the call back class
 
 #include "ircInterfaceClient.h" //this includes the event, message and user classes
-#include "ircUserDB.h"
-#include "ircUserAuth.h"
-#include "ircUsersInterface.h"
+//#include "ircUserDB.h"
+//#include "ircUserAuth.h"
+//#include "ircUsersInterface.h"
 #include "ircConnStatus.h"     //this includes the callback class
 #include "ircNickListParser.h"
 

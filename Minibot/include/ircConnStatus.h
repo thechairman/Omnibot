@@ -21,6 +21,8 @@ class ircConnStatus
 		virtual connState_t state() =0;
 		virtual void registerCallBack(ircConnStatusCB* ) = 0;
 
+		virtual void connectionIoError() =0;
+
 		static ircConnStatus* instance();
 
 	protected:

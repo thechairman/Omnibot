@@ -24,6 +24,8 @@ class posix_ircConnStatus: public ircConnStatus
 		void registered();
 		void nameCollision();
 
+		void connectionIoError();
+
 	private:
 		//private constants
 		static const unsigned int MONT_INTV = 5;
