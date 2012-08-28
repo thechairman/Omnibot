@@ -31,10 +31,10 @@ void connectWithConfig(ircInterface& irc)
 
 int main(){	
 	std::cout << "initilizing the irc interface..." << std::endl;
-	ircInterface irc;
+	//ircInterface irc;
 	//std::cout << std::hex << &irc << std::dec << std::endl;
 	std::cout << "firing up the omnibot..." <<std::endl;
-	omnibot omni(&irc);
+	omnibot omni;
 	//irc.registerForNotify(&omni);
 
 	std::cout << "connecting to server..." << std::endl;
@@ -45,7 +45,8 @@ int main(){
 	irc.join("#test2");
 */
 
-	connectWithConfig(irc);
+	//connectWithConfig(irc);
+	omni.connect();
 
 
 	bool loop = true;
@@ -64,7 +65,6 @@ int main(){
 		}
 	}
 	std::cout << "exit while loop in main" << std::endl;
-	irc.quit();
+	//irc.quit();
 }
-
 

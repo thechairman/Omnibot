@@ -1,7 +1,7 @@
 #ifndef _NICK_MANAGER_
 #define _NICK_MANAGER_
 
-#include"ircUsersInterface.h"
+//#include"ircUsersInterface.h"
 #include"ircNotifyClasses.h"
 #include"ircInterface.h"
 
@@ -11,7 +11,7 @@
 class NickManager{
 
 	public:
-		NickManager(ircUsersInterface*);
+		NickManager();
 		~NickManager();
 
 		std::vector<ircUser> getChannelUsers(std::string);
@@ -24,7 +24,7 @@ class NickManager{
 		std::vector<ircUser> getAuthenticatedUsers();
 
 	private:
-		ircUsersInterface* _UI;
+//		ircUsersInterface* _UI;
 };
 	
 #endif

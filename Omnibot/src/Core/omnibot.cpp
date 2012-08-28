@@ -1,17 +1,28 @@
-
+#include "OmniConfigParser.h"
 #include "omnibot.h"
 
 
 #include <iostream>
-/*omnibot::omnibot(){
-	should create an irc instance here and connec
+omnibot::omnibot():_irc(new ircInterface()), _nicks(), _manager(_irc, _nicks),_blocker(OmniBlocker::create()),_passedIrc(false){
+/*	should create an irc instance here and connec
 	but i don't think this is possible... you would 
 	need a default server... maybe I should just take
-	the empty constructor out
-}*/
-omnibot::omnibot(ircInterface* irc_):_irc(irc_),_nicks(new ircUsersInterface()),_manager(_irc, _nicks){
+	the empty constructor out*/
+
+	_irc->registerForNotify(this);
+
+}
+omnibot::omnibot(ircInterface* irc_):_irc(irc_),_nicks(),_manager(_irc, _nicks),_blocker(OmniBlocker::create()),_passedIrc(true){
 	std::cout << std::hex << &irc_ << std::dec << std::endl;
 	_irc->registerForNotify(this);
+}
+
+omnibot::~omnibot()
+{
+	if(!_passedIrc)
+	{
+		delete _irc;
+	}
 }
 
 void omnibot::alertMessage(ircMessage& msg)
@@ -32,6 +43,8 @@ void omnibot::alertMessage(ircMessage& msg)
 			//tell them omnibot only list
 			_irc->sendMessage(msg.channel(), msg.user().nick() + ": I only listen to OmniOps :P");
 		}
+
+		//std::cout << "omnibot: " << toParse << std::endl;
 
 		if (!toParse.substr(1, 4).compare("load")){
 			if(loadPlugin(toParse.substr(6)))
@@ -60,6 +73,16 @@ void omnibot::alertMessage(ircMessage& msg)
 		{
 			join(toParse.substr(6));
 		}
+		else if(!toParse.substr(1,4).compare("quit"))
+		{
+			_irc->quit();
+			//TODO need to notify main() that we're done here
+			//a counting semaphore would do this nicely, but
+			//have to be wrapped in a class so that we could 
+			//abstract away the machine specifc aspects.
+			_blocker->release();
+			exit(0);
+		}
 		else if(!toParse.substr(1,4).compare("part"))
 		{
 			part(toParse.substr(6));
@@ -86,6 +109,31 @@ void omnibot::alertMessage(ircMessage& msg)
 }
 
 void omnibot::alertEvent(ircEvent& e){}
+void omnibot::connect()
+{
+
+	OmniConfigParser* parser = OmniConfigParser::instance();
+	parser->parse();
+
+	std::cout << "serverName = " << parser->serverName() << std::endl;
+	std::cout << "serverPort = " << parser->serverPort() << std::endl;
+	std::cout << "nick = " << parser->nick() << std::endl;
+
+	_irc->connect(parser->serverName(), parser->serverPort());
+	_irc->registerUser(parser->nick(), parser->nick(), parser->nick());
+
+	std::vector<std::string> channels = parser->channels();
+
+	for(size_t i = 0; i < channels.size(); ++i)
+	{
+		_irc->join(channels[i]);
+	
+	}
+}
+void omnibot::exec()
+{
+	_blocker->block();
+}
 void omnibot::join(std::string channel){
 	_irc->join(channel);
 }

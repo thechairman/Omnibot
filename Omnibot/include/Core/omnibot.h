@@ -3,30 +3,36 @@
 
 #include "NickManager.h"
 #include "PluginManager.h"
+#include "OmniBlocker.h"
 #include "ircInterface.h"
 #include "ircInterfaceClient.h"
 
 class omnibot: public ircInterfaceClient{
 	public:
-//		omnibot();
+		omnibot();
 		omnibot(ircInterface*);
+		virtual ~omnibot();
 		void alertEvent(ircEvent&);
 		void alertMessage(ircMessage&);
+		void connect();
+		void exec();
 
 	private:
 		ircInterface* _irc;
 		NickManager _nicks;
 		PluginManager _manager;
+		OmniBlocker* _blocker;
+		bool _passedIrc;
 		
-	//probably a ton of methods here about what to do
-	//with various things to do when certain messages 
-	//are recieved
-	void join(std::string);
-	void part(std::string);
-	bool loadPlugin(std::string);
-	void dropPlugin(std::string);
-	bool isOmniOp(ircUser&);
-	bool isRegistered(ircUser&);
+		//probably a ton of methods here about what to do
+		//with various things to do when certain messages 
+		//are recieved
+		void join(std::string);
+		void part(std::string);
+		bool loadPlugin(std::string);
+		void dropPlugin(std::string);
+		bool isOmniOp(ircUser&);
+		bool isRegistered(ircUser&);
 
 };
 
