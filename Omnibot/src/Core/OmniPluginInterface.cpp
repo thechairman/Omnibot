@@ -1,5 +1,8 @@
 
 #include "OmniPluginInterface.h"
+#include "ircLog.h"
+
+const std::string FILENAME = "OmniPlugin.cpp";
 
 void OmniPlugin::passMessage(OmniPlugin* plugin, ircMessage& msg){
 
@@ -18,17 +21,23 @@ void OmniPlugin::passMessage(OmniPlugin* plugin, ircMessage& msg){
 //		plugin->thread.arg((void*) apair);
 //		plugin->thread.start();
 //	}
-	std::cout << "adding task to thread" << std::endl;
-	std::cout << "createing PluginRunner" << std::endl;	
+	//std::cout << "adding task to thread" << std::endl;
+	//std::cout << "createing PluginRunner" << std::endl;
+	
+	ircLog::instance()->logf(FILENAME, "adding task to thread");
+	ircLog::instance()->logf(FILENAME, "creating plugin runner");
+
 	OmniPlugin::PluginRunner* runner = new PluginRunner();
 
-	std::cout << "assigning PluginRunner internals" << std::endl;
+	//std::cout << "assigning PluginRunner internals" << std::endl;
+	ircLog::instance()->logf(FILENAME, "assigning PluginRunner internals");
 	runner->plugin = plugin;
 
 	runner->msg = msg;
 
 	//setup the the thread and fire it off
-	std::cout << "queue task" <<std::endl;
+	//std::cout << "queue task" <<std::endl;
+	ircLog::instance()->logf(FILENAME, "Queueing task");
 	plugin->thread.addTask(runner, OmniThreadedClass::MODE_A);
 
 }

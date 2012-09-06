@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 
-
+#include "ircLog.h"
 #include "ircTypes.h"
 //parse vars
 
@@ -13,6 +13,9 @@
 //update statuses
 
 //add timer to reconnecet if we disconnect
+
+
+const std::string FILENAME = "ircInterface.cpp";
 
 const std::string ircInterface::PRIVMSG = "PRIVMSG";
 const std::string ircInterface::NOTICE = "NOTICE";
@@ -43,7 +46,8 @@ void printUser(ircUser* user)
 	else
 		userdata << "false";
 
-	std::cout << userdata.str() << std::endl;
+//	std::cout << userdata.str() << std::endl;
+	ircLog::instance()->logf(FILENAME, userdata.str());
 
 }
 
@@ -65,27 +69,33 @@ void ircInterface::setAutoReconnect(bool reconnect)
 }
 
 int ircInterface::connect(std::string server, int port){
-	std::cout << "ircInterface: initing connection monitoring" <<std::endl;
+	//std::cout << "ircInterface: initing connection monitoring" <<std::endl;
+	ircLog::instance()->logf(FILENAME, "initing connection monitoring");
 	_connStatus->init();
 	
 	_server = server;
 	_port = port;
 
-	std::cout << "ircInterface: connecting to server " << server << ":" << port << std::endl;
+	//std::cout << "ircInterface: connecting to server " << server << ":" << port << std::endl;
+	ircLog::instance()->logf(FILENAME, "Connecting to server %s:%d", server.c_str(), port);
 	_serverConnection->registerCallBack(this);
 	_serverConnection->open(server, port);
 	_serverConnection->sleep(SLEEP_INTRV);
 	_connStatus->registerCallBack(this);
 	
-	std::cout << "ircInterface: waiting to hear back from teh connect flag" << std::endl;
+	//std::cout << "ircInterface: waiting to hear back from teh connect flag" << std::endl;
+	ircLog::instance()->logf(FILENAME, "waiting to hear back from the connect flag");
 	if(_connStatus->waitOnConnect())
 	{
-		std::cout << "ircInterface: connect failure" <<std::endl;
+		//std::cout << "ircInterface: connect failure" <<std::endl;
+		ircLog::instance()->logf(FILENAME, "connect failure");
 		return 1;
 
 	}
 
-	std::cout << "ircInterface: Successfully connected" << std::endl;
+	//std::cout << "ircInterface: Successfully connected" << std::endl;
+	ircLog::instance()->logf(FILENAME, "Succesfully Connected");
+
 	return 0;
 }
 
@@ -131,7 +141,8 @@ int ircInterface::part(std::string channel){
 }
 
 int ircInterface::sendMessage(std::string channel, std::string message){
-	std::cout << "Sending Message \""  << message <<"\" to channel \"" << channel <<"\"" << std::endl;
+	//std::cout << "Sending Message \""  << message <<"\" to channel \"" << channel <<"\"" << std::endl;
+	ircLog::instance()->logf(FILENAME, "Sending Message \"%s\" to channel \"%s\"", message.c_str(), channel.c_str());
 
 	std::string msg = "PRIVMSG " + channel + " :" + message +"\r\n";
 	sendString(msg);
@@ -158,7 +169,9 @@ int ircInterface::quit(){
 
 void ircInterface::registerForNotify(ircInterfaceClient* client){
 	clients.push_back(client);
-	std::cout << "IrcInterface: register client for notifications" << std::endl;
+	//std::cout << "IrcInterface: register client for notifications" << std::endl;
+	ircLog::instance()->logf(FILENAME, "Register client at %x for notifications", client);
+
 }
 
 
@@ -170,7 +183,8 @@ void ircInterface::notifyEvent(ircEvent& e){
 }	
 void ircInterface::notifyMessage(ircMessage& m){
 
-	std::cout << "ircINterface: notifying clients of incoming messages" << std::endl;
+	//std::cout << "ircINterface: notifying clients of incoming messages" << std::endl;
+	ircLog::instance()->logf(FILENAME, "Notifying clients of incomming messages");
 
 	std::vector<ircInterfaceClient*>::iterator iter;
 	for(iter = clients.begin(); iter < clients.end(); iter++){
@@ -178,11 +192,14 @@ void ircInterface::notifyMessage(ircMessage& m){
 	}
 }	
 void ircInterface::sendString(std::string str){
-	std::cout << "ircInterface: the address of this instance: " << this <<std::endl;
+	//std::cout << "ircInterface: the address of this instance: " << this <<std::endl;
+	ircLog::instance()->logf(FILENAME, "the address of this instance %x", this);
 	if(!_serverConnection->write(str))
-		std::cout<<"oh no! string didn't send!" << std::endl;
+		//std::cout<<"oh no! string didn't send!" << std::endl;
+		ircLog::instance()->logf(FILENAME, "Oh No! String Didn't send!");
 	else
-		std::cout<< "sent string to server:  "<< str << std::endl;
+		//std::cout<< "sent string to server:  "<< str << std::endl;
+		ircLog::instance()->logf(FILENAME, "sent string ot server: %s", str.c_str());
 }
 
 void ircInterface::onMessage(std::string pkge){
@@ -190,7 +207,8 @@ void ircInterface::onMessage(std::string pkge){
 		std::string msg = pkge.substr(0, pkge.find("\r\n"));
 		pkge = pkge.substr(pkge.find("\r\n") + 2);
 
-		std::cout << "ircInterface: raw message is : "<<msg<<std::endl;
+		//std::cout << "ircInterface: raw message is : "<<msg<<std::endl;
+		ircLog::instance()->logf(FILENAME, "raw message is: %s", msg.c_str());
 		
 		//alot of the control strings will start with  the type sperated from the 
 		//contents of the message with a space
@@ -290,7 +308,9 @@ void ircInterface::onMessage(std::string pkge){
 }
 void ircInterface::onConnectionDeath()
 {
-	std::cout << "ircInterface: uh-oh connection died, trying to restablish" <<std::endl;
+	//std::cout << "ircInterface: uh-oh connection died, trying to restablish" <<std::endl;
+	ircLog::instance()->logf(FILENAME, "Uh-Oh connection died, trying to restablish");
+
 	//clean up _serverConnection
 	_serverConnection->close();
 	
@@ -327,7 +347,8 @@ void ircInterface::onConnectionDeath()
 
 		if(!attempting)
 		{
-			std::cout << "ircInterface: whew, that was close but we reconnected" <<std::endl;
+			//std::cout << "ircInterface: whew, that was close but we reconnected" <<std::endl;
+			ircLog::instance()->logf(FILENAME, "whew, that was close but we reconnected");
 			return;
 		}
 	}
@@ -367,7 +388,8 @@ void ircInterface::handle_vars(std::string varList)
 		if(!var.compare("STATUSMSG"))
 		{
 			_nickListParser.setNickPrefixes(val);
-			std::cout << "ircInterface: nick Prefixes are: " << val << std::endl;
+			//std::cout << "ircInterface: nick Prefixes are: " << val << std::endl;
+			ircLog::instance()->logf(FILENAME, "nick prefixes are: ", val.c_str());
 		}
 	}
 }
@@ -414,7 +436,8 @@ ircEvent ircInterface::handle_nick(std::string msg, std::string prefix)
 
 	std::string newNick = msg.substr(msg.find_first_of(' ') + 1);
 	
-	std::cout << "ircInterface: nick changed: " << nick << "->" << newNick << std::endl;
+	//std::cout << "ircInterface: nick changed: " << nick << "->" << newNick << std::endl;
+	ircLog::instance()->logf(FILENAME, "nick changed %s -> %s", nick.c_str(), newNick.c_str());
 
 
 
@@ -488,11 +511,13 @@ void ircInterface::handle_privmsg(std::string msg, std::string prefix){
 	if(msg.find("\r\n") != std::string::npos)
 	msg = msg.substr(0, msg.find("\r\n"));
 	
-	std::cout << "is this a command? " << msg.substr(0, msg.find_first_of(' ')) << std::endl;
+	//std::cout << "is this a command? " << msg.substr(0, msg.find_first_of(' ')) << std::endl;
+	ircLog::instance()->logf(FILENAME, "is this a command? %s", msg.substr(0, msg.find_first_of(' ')).c_str());
 	if(msg[0] == CMD_DELIM)
 	{
 
-		std::cout << "looking at minibot commands..." << std::endl;	
+		//std::cout << "looking at minibot commands..." << std::endl;	
+		ircLog::instance()->logf(FILENAME, "looking at minibot commands...");
 		if(!msg.substr(1, msg.find_first_of(' ')).compare("auth"))
 		{
 			return;

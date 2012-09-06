@@ -38,7 +38,7 @@ class ircInterface : public ircioCallBack, public ircConnStatusCB{
 	void onMessage(std::string);
 	void onConnectionDeath();
 
-	ircUsersInterface* usersInterface();
+//	ircUsersInterface* usersInterface();
 	
 
 	private:

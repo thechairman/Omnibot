@@ -1,8 +1,11 @@
-#include0 <unistd.h>
+#include <unistd.h>
 #include <iostream>
 
 #include "posix_ircConnStatus.h"
 #include "ircTypes.h"
+#include "ircLog.h"
+
+const std::string FILENAME = "posix_ircConnStat.h";
 
 posix_ircConnStatus::posix_ircConnStatus()
 {
@@ -37,6 +40,7 @@ connState_t posix_ircConnStatus::state()
 
 void posix_ircConnStatus::pingRcvd()
 {
+	ircLog::instance()->logf(FILENAME, "Recieved ping/message");
 	pthread_mutex_lock(&pingMux);
 	time(&lastPing);
 	pthread_mutex_unlock(&pingMux);
@@ -100,10 +104,12 @@ bool posix_ircConnStatus::validatePings()
 	time(&t);
 	double dif = difftime(lastPing, t);
 
-	std::cout << "ircConnStatus: ping diff = " << dif << std::endl;
+	//std::cout << "ircConnStatus: ping diff = " << dif << std::endl;
+	ircLog::instance()->logf(FILENAME, "ping difference = %d", dif);
 
 	if(dif > PING_TIME_OUT)
 	{	
+		ircLog::instance()->logf(FILENAME, "Ping time out");
 		return false;
 	}
 	return true;

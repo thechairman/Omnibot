@@ -5,6 +5,10 @@
 
 #include <iostream>
 
+#include "ircLog.h"
+
+std::string FILENAME = "posix_ircio.cpp";
+
 extern int errno;
 bool posix_ircio::open(std::string server, int port)
 {
@@ -14,7 +18,8 @@ bool posix_ircio::open(std::string server, int port)
 	{
 		return false;
 	}
-	std::cout << "ircio: got the fd" << std::endl;
+	//std::cout << "ircio: got the fd" << std::endl;
+	ircLog::instance()->logf(FILENAME, "got the fd");
 
 	//look up the host
 	hostent* serverhost = gethostbyname(server.c_str());
@@ -22,7 +27,8 @@ bool posix_ircio::open(std::string server, int port)
 	{
 		return false;
 	}
-	std::cout << "ircio: found the host entry" << std::endl;
+	//std::cout << "ircio: found the host entry" << std::endl;
+	ircLog::instance()->logf(FILENAME, "found the host entry");
 
 	//setup the sock address struct
 	sockaddr_in sockadder;
@@ -34,7 +40,8 @@ bool posix_ircio::open(std::string server, int port)
 			(char*)&sockadder.sin_addr.s_addr, serverhost->h_length);
 
 	sockadder.sin_port = htons(port);
-	std::cout << "ircio: set up the socket address struct" << std::endl;
+	//std::cout << "ircio: set up the socket address struct" << std::endl;
+	ircLog::instance()->logf(FILENAME, "set up the socket address struct");
 
 	//open trhe socket
 	sockaddr* temp = (sockaddr*) &sockadder;
@@ -42,7 +49,8 @@ bool posix_ircio::open(std::string server, int port)
 	if(result < 0){
 		return false;
 	}
-	std::cout << "ircio: open the socket" << std::endl;
+	//std::cout << "ircio: open the socket" << std::endl;
+	ircLog::instance()->logf(FILENAME, "open the socket");
 
 	//start a p thread running listening on the socket
 	isOpen = true;
@@ -60,13 +68,15 @@ void posix_ircio::close()
 }
 bool posix_ircio::write(std::string& str)
 {
-	std::cout << "ircio: using file discriptor: " << socket << std::endl;
+	//std::cout << "ircio: using file discriptor: " << socket << std::endl;
+	ircLog::instance()->logf(FILENAME, "using a file discriptor");
 
 	int written =(int) ::write(socket, str.c_str(), str.size());
 
 	if(written <0)
 	{
 		std::cout << "ircio: errno is: " << errno << std::endl;
+		ircLog::instance()->logf(FILENAME, "errno is: %d", errno);
 		return false;
 	}
 	else
@@ -117,7 +127,8 @@ void posix_ircio::listen()
 		}
 		int chars = (int)::read(socket, buf, BUFSIZE);	
 		if(chars < 0)
-		{	std::cout << "ircio: errno is: " << errno << std::endl;
+		{	//std::cout << "ircio: errno is: " << errno << std::endl;
+			ircLog::instance()->logf(FILENAME, "errno is: %d", errno);
 
 			switch(errno)
 			{
@@ -160,7 +171,8 @@ void posix_ircio::listen()
 		{
 			split += 2;
 		}
-		std::cout<< "ircio: temp size: " << temp.size() << " split: " << split << std::endl;
+		//std::cout<< "ircio: temp size: " << temp.size() << " split: " << split << std::endl;
+		ircLog::instance()->logf(FILENAME, "temp size: %d\tsplit: %d", temp.size(), split);
 
 		if(split > temp.size())
 		{
@@ -171,7 +183,9 @@ void posix_ircio::listen()
 			leftovers = temp.substr(split);
 			temp = temp.substr(0, split);
 
-			std::cout << "Leftovers: " << leftovers << std::endl << "temp: " << temp << std::endl;
+			//std::cout << "Leftovers: " << leftovers << std::endl << "temp: " << temp << std::endl;
+			ircLog::instance()->logf(FILENAME, "Leftovers: %s", leftovers.c_str());
+			ircLog::instance()->logf(FILENAME, "temp: %s", temp.c_str());
 		}
 
 		//call on receive

@@ -1,19 +1,25 @@
+#include <iostream>
+
 #include "OmniConfigParser.h"
 #include "omnibot.h"
+#include "ircLog.h"
 
 
-#include <iostream>
+const std::string FILENAME = "Core/omnibot.cpp";
+
 omnibot::omnibot():_irc(new ircInterface()), _nicks(), _manager(_irc, _nicks),_blocker(OmniBlocker::create()),_passedIrc(false){
 /*	should create an irc instance here and connec
 	but i don't think this is possible... you would 
 	need a default server... maybe I should just take
 	the empty constructor out*/
 
+	//ircLog::instance()->logf(FILENAME, "ircInteface instance: %x", &irc_);
 	_irc->registerForNotify(this);
 
 }
 omnibot::omnibot(ircInterface* irc_):_irc(irc_),_nicks(),_manager(_irc, _nicks),_blocker(OmniBlocker::create()),_passedIrc(true){
-	std::cout << std::hex << &irc_ << std::dec << std::endl;
+	//std::cout << std::hex << &irc_ << std::dec << std::endl;
+	ircLog::instance()->logf(FILENAME, "ircInteface instance: %x", &irc_);
 	_irc->registerForNotify(this);
 }
 
@@ -30,7 +36,8 @@ void omnibot::alertMessage(ircMessage& msg)
 	std::string toParse = msg.message();
 
 
-	std::cout << "Omnibot received string: " + toParse <<  std::endl;
+	//std::cout << "Omnibot received string: " + toParse <<  std::endl;
+	ircLog::instance()->logf(FILENAME, "Omnibot received string: %s", toParse.c_str());
 
 	//parse omnibot commands
 	//may just want to prefix omnibot
@@ -94,7 +101,8 @@ void omnibot::alertMessage(ircMessage& msg)
 		else
 		{
 			//pass string to plugins
-			std::cout << "Omnibot: sending message to plugin manager" << std::endl;
+			//std::cout << "Omnibot: sending message to plugin manager" << std::endl;
+			ircLog::instance()->logf(FILENAME, "sending message to plugin manager");
 			_manager.pushMessage(msg);
 		}
 
@@ -103,7 +111,8 @@ void omnibot::alertMessage(ircMessage& msg)
 	else
 	{
 		//pass string to plugin Manager
-		std::cout << "Omnibot: sending message to plugin manager" << std::endl;
+		//std::cout << "Omnibot: sending message to plugin manager" << std::endl;
+		ircLog::instance()->logf(FILENAME, "sending message to plugin manager");
 		_manager.pushMessage(msg);
 	}
 }
@@ -115,9 +124,12 @@ void omnibot::connect()
 	OmniConfigParser* parser = OmniConfigParser::instance();
 	parser->parse();
 
-	std::cout << "serverName = " << parser->serverName() << std::endl;
-	std::cout << "serverPort = " << parser->serverPort() << std::endl;
-	std::cout << "nick = " << parser->nick() << std::endl;
+	//std::cout << "serverName = " << parser->serverName() << std::endl;
+	//std::cout << "serverPort = " << parser->serverPort() << std::endl;
+	//std::cout << "nick = " << parser->nick() << std::endl;
+	ircLog::instance()->logf(FILENAME, "serverName = %s", parser->serverName().c_str() );
+	ircLog::instance()->logf(FILENAME, "serverPort = %d", parser->serverPort() );
+	ircLog::instance()->logf(FILENAME, "nick = %s", parser->nick().c_str() );
 
 	_irc->connect(parser->serverName(), parser->serverPort());
 	_irc->registerUser(parser->nick(), parser->nick(), parser->nick());

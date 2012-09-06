@@ -1,5 +1,12 @@
+
+//#include <string>
+
 #include "pthread_ThreadPool.h"
 #include "OmniPooledThread.h"
+
+#include "ircLog.h"
+
+const std::string FILENAME  = "pthread_ThreadPool.cpp";
 
 OmniPooledThread* pthread_ThreadPool::requestThread()
 {
@@ -43,6 +50,7 @@ int pthread_ThreadPool::addThread(pthread_PooledThread*& thread){
 		return 0;
 	}
 	_threadPool.push_back(thread);
+	ircLog::instance()->logf(FILENAME, "Created new thread with id %d", thread->id());
 
 	return 1;
 }

@@ -30,7 +30,7 @@ void connectWithConfig(ircInterface& irc)
 }
 
 int main(){	
-	std::cout << "initilizing the irc interface..." << std::endl;
+	//std::cout << "initilizing the irc interface..." << std::endl;
 	//ircInterface irc;
 	//std::cout << std::hex << &irc << std::dec << std::endl;
 	std::cout << "firing up the omnibot..." <<std::endl;
