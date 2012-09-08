@@ -15,6 +15,7 @@
 #include<iostream>
 
 #include"ircio.h"
+#include"ircBuffer.h"
 
 class posix_ircio : public ircio{
 
@@ -40,6 +41,8 @@ class posix_ircio : public ircio{
 		//at some point
 		bool isOpen;
 		std::vector<ircioCallBack*> callbacks;
+
+		ircBuffer _buffer;
 
 
 };

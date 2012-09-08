@@ -202,11 +202,11 @@ void ircInterface::sendString(std::string str){
 		ircLog::instance()->logf(FILENAME, "sent string ot server: %s", str.c_str());
 }
 
-void ircInterface::onMessage(std::string pkge){
-	while(pkge.find("\r\n") != std::string::npos){
+void ircInterface::onMessage(std::string msg){
+/*	while(pkge.find("\r\n") != std::string::npos){
 		std::string msg = pkge.substr(0, pkge.find("\r\n"));
 		pkge = pkge.substr(pkge.find("\r\n") + 2);
-
+*/
 		//std::cout << "ircInterface: raw message is : "<<msg<<std::endl;
 		ircLog::instance()->logf(FILENAME, "raw message is: %s", msg.c_str());
 		
@@ -304,7 +304,7 @@ void ircInterface::onMessage(std::string pkge){
 				_connStatus->registered();
 			}
 		}
-	}
+//	}
 }
 void ircInterface::onConnectionDeath()
 {

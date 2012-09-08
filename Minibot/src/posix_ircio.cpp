@@ -98,7 +98,8 @@ bool posix_ircio::read(std::string& temp)
 
 void posix_ircio::listen()
 {
-	std::string leftovers = "";
+//	std::string leftovers = "";
+	ircBuffer buffer;
 
 
 
@@ -160,7 +161,9 @@ void posix_ircio::listen()
 		//the buffer is zeroed
 		//buf[chars] = '\0';
 		
-		std::string buffer(buf);
+		buffer.addBytes(buf, BUFSIZE);
+
+/*		std::string buffer(buf);
 		std::string temp = leftovers + buffer;
 		size_t split = temp.rfind("\r\n");
 		if(split == std::string::npos)
@@ -190,6 +193,12 @@ void posix_ircio::listen()
 
 		//call on receive
 		onReceive(temp);
+		*/
+
+		while(buffer.hasNextMessage())
+		{
+			onReceive(buffer.nextMessage());
+		}
 
 	}
 }
