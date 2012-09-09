@@ -26,6 +26,7 @@ class OmniPlugin {
 	public:
 
 		OmniPlugin();
+		~OmniPlugin();
 
 		static void passMessage(OmniPlugin*, ircMessage&);
 		static void passOmniCommChannel(OmniPlugin*, OmniCommChannel*);

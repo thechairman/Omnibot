@@ -55,9 +55,13 @@ void OmniPlugin::passOmniCommChannel(OmniPlugin* plugin, OmniCommChannel* chan)
 }
 OmniPlugin::OmniPlugin(){
 	thread.init();
+	thread.start();
 }
 
 
+OmniPlugin::~OmniPlugin(){
+	thread.clean();
+}
 
 
 OmniPlugin::PluginRunner::PluginRunner():plugin(NULL){}

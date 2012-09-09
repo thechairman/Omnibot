@@ -18,11 +18,13 @@ pthread_PooledThread::~pthread_PooledThread()
 
 int pthread_PooledThread::start()
 {
+	ircLog::instance()->logf(FILENAME, "thread %u : started", (unsigned int) _thread);
 	_started = true;
 	return 0;
 }
 int pthread_PooledThread::stop()
 {
+	ircLog::instance()->logf(FILENAME, "thread %u : stoped", (unsigned int) _thread);
 	_started = false;
 	return 0;
 }
@@ -33,13 +35,13 @@ int pthread_PooledThread::join()
 int pthread_PooledThread::addTask(OmniThreadedClass* task, OmniThreadedClass::Mode mode)
 {
 	//std::cout << "pooledThread: adding task to queue "<< std::endl;
-	ircLog::instance()->logf(FILENAME, "thread %d : adding task to queue", (unsigned int) _thread);
+	ircLog::instance()->logf(FILENAME, "thread %u : adding task to queue", (unsigned int) _thread);
 	std::pair<OmniThreadedClass*, OmniThreadedClass::Mode>* tmp = 
 		new std::pair<OmniThreadedClass*, OmniThreadedClass::Mode>(task, mode);
 	
 	_tasks.push_back(tmp);
 	//std::cout << "pooledThread: task queue has " << _tasks.size() << "tasks" << std::endl;
-	ircLog::instance()->logf(FILENAME, "thread %d: task queue has %d tasks", (unsigned int) _thread, _tasks.size());
+	ircLog::instance()->logf(FILENAME, "thread %u: task queue has %d tasks", (unsigned int) _thread, _tasks.size());
 	sem_post(&_taskSem);
 	return 0;
 
@@ -59,7 +61,7 @@ void* pthread_PooledThread::workFunction(void* thread_)
 {
 	pthread_PooledThread* thread = static_cast<pthread_PooledThread*>(thread_);
 	//std::cout << "PooledThread: executing task" << std::endl;
-	ircLog::instance()->logf(FILENAME, "thread %d: executing task", (unsigned int)  thread->id());
+	ircLog::instance()->logf(FILENAME, "thread %u: executing task", (unsigned int)  thread->id());
 	while(thread->_running)
 	{
 		while(thread->_started)
@@ -67,7 +69,7 @@ void* pthread_PooledThread::workFunction(void* thread_)
 			sem_wait(&(thread->_taskSem));
 
 			//std::cout << "PooledThread: executing next task" << std::endl;
-			ircLog::instance()->logf(FILENAME, "thread %d: executing next task", (unsigned int) thread->id());
+			ircLog::instance()->logf(FILENAME, "thread %u: executing next task", (unsigned int) thread->id());
 			std::pair<OmniThreadedClass*, OmniThreadedClass::Mode>* task;
 			task = thread->_tasks.front();
 			thread->_tasks.pop_front();
@@ -86,6 +88,8 @@ bool pthread_PooledThread::initThread()
 {
 	_running = true;
 	int failed = pthread_create(&_thread, NULL, workFunction, (void*) this);
+
+	ircLog::instance()->logf(FILENAME, "thread %u : initilized; started = %s", (unsigned int) _thread, (_started)?"true":"false");
 	
 	if(!failed)
 		return true;

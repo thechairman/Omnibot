@@ -24,6 +24,8 @@ OmniPooledThread* pthread_ThreadPool::requestThread()
 		addThread(tmp);
 	}
 
+	tmp->_held = true;
+
 	return tmp;
 
 }
@@ -36,6 +38,8 @@ void pthread_ThreadPool::releaseThread(OmniPooledThread* tmp)
 		if((*i)->id() == thread->id())
 		{
 			//release the thread and return;
+			(*i)->_held = false;
+			return;
 		}
 	}
 
