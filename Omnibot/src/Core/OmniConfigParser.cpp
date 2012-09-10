@@ -160,6 +160,25 @@ int  OmniConfigParser::parse()
 				continue;
 				
 			}
+
+			case PS_AUTHENTICATION:
+			{
+
+				size_t start, end;
+				start = 0;
+				end = line.find_first_of('=');
+				std::string field = line.substr(start, end - 1);
+				if(!field.compare("auth_method"))
+				{
+					//TODO parse auth methods nickserv, local active, local passive
+				}
+				else
+				{
+					return P_INVALID_FIELD;
+				}
+				continue;
+			}
+
 			default:
 				return P_INVALID_STATE;
 		}
