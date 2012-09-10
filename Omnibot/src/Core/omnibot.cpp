@@ -141,6 +141,18 @@ void omnibot::connect()
 		_irc->join(channels[i]);
 	
 	}
+
+	std::vector<std::string> plugins = parser->plugins();
+
+	for(size_t i = 0; i < plugins.size(); ++i)
+	{
+		bool plugin_rc = _manager.load(plugins[i]);
+		if(plugin_rc)
+			ircLog::instance()->logf(FILENAME, "succefully loaded plugin %s on connect", plugins[i].c_str());
+		else
+			ircLog::instance()->logf(FILENAME, "failed to load plugin %s on connect", plugins[i].c_str());
+	
+	}
 }
 void omnibot::exec()
 {
