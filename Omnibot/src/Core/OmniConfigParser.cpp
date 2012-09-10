@@ -4,11 +4,17 @@
 
 #include "OmniConfigParser.h"
 
+#include "ircLog.h"
+
+const std::string FILENAME = "OmniConfigParser.cpp";
+
 const std::string OmniConfigParser::OMNI_CONFIG_FILE_NAME = "omniserverdata.cfg";
 
 const std::string OmniConfigParser::NICKS = "nick";
 const std::string OmniConfigParser::SERVER = "server";
 const std::string OmniConfigParser::CHANNELS = "channels";
+const std::string OmniConfigParser::PLUGINS = "plugins";
+const std::string OmniConfigParser::AUTHENTICATION = "authentication";
 
 OmniConfigParser* OmniConfigParser::_instance = NULL;
 
@@ -29,6 +35,10 @@ std::vector<std::string> OmniConfigParser::channels()
 	return _channels;
 }
 
+std::vector<std::string> OmniConfigParser::plugins()
+{
+	return _plugins;
+}
 int  OmniConfigParser::parse()
 {
 	std::ifstream configFile(OMNI_CONFIG_FILE_NAME.c_str());
@@ -75,6 +85,14 @@ int  OmniConfigParser::parse()
 			{
 				state = PS_CHANNELS;
 			}
+			else if(!section.compare(PLUGINS))
+			{
+				state = PS_PLUGINS;
+			}
+			else if(!section.compare(AUTHENTICATION))
+			{
+				state = PS_AUTHENTICATION;
+			}
 			else
 			{
 				return P_INVALID_SECTION;
@@ -119,15 +137,29 @@ int  OmniConfigParser::parse()
 				end = line.find_first_of('=');
 				//get string
 				line =  line.substr(end + 2);
-				std::cout << "configPaser: channel before stripping = " << line << std::endl;
+				ircLog::instance()->logf(FILENAME, "channel before stripping = %s", line.c_str());
 				//end = line.size();
 				line.erase(std::remove(line.begin(), line.end(), '"'), line.end());
 				//line = line.substr(0, end - 2);
-				std::cout << "configParser: channel after stripping = " << line << std::endl;
+				ircLog::instance()->logf(FILENAME, "channel after stripping = %s", line.c_str());
 				_channels.push_back(line);
 				continue;
 			}
-
+			case PS_PLUGINS:
+			{
+				size_t end;
+				end = line.find_first_of('=');
+				//get string
+				line =  line.substr(end + 2);
+				ircLog::instance()->logf(FILENAME, "plugin before stripping = %s", line.c_str());
+				//end = line.size();
+				line.erase(std::remove(line.begin(), line.end(), '"'), line.end());
+				//line = line.substr(0, end - 2);
+				ircLog::instance()->logf(FILENAME, "plugin after stripping = %s", line.c_str());
+				_plugins.push_back(line);
+				continue;
+				
+			}
 			default:
 				return P_INVALID_STATE;
 		}

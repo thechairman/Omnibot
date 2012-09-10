@@ -6,6 +6,8 @@
 #include <cstdarg>
 
 
+#define LOG_BOOL(x) (x)?"true":"false"
+
 class ircLog {
 
 	public:
