@@ -2,7 +2,7 @@ VPATH = ./src
 
 CC = g++
 AR = ar
-LIBS = -lpthread -lstdc++
+LIBS = -lpthread -lstdc++ -lrt
 INCLUDES = -I ./include
 
 BUILD_DIR = ./build/

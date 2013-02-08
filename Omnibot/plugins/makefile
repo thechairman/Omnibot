@@ -13,7 +13,8 @@ LIBS = '-lcurl'
 
 PLUGINS = hurlbot.o\
 	  bashbot.o\
-	  tomebot.o
+	  tomebot.o\
+	  8ballbot.o
 
 all: ${PLUGINS}
 

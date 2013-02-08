@@ -18,7 +18,8 @@ LIBS = -lOmniThread \
        -lOmniComm \
        -lpthread \
        -lMinibot \
-       -lcurl 
+       -lcurl	\
+       -lrt 
 
 INCLUDES = -I ./include \
 	   -I ./include/Core \
@@ -71,7 +72,16 @@ CORE_OBJS = ${BUILD_CORE}/omnibot.o\
 	    ${BUILD_CORE}/OmniConfigParser.o\
 	    ${BUILD_CORE}/OmniBlocker.o\
 	    ${BUILD_CORE}/posix_OmniBlocker.o\
-	    ${BUILD_CORE}/main.o
+	    ${BUILD_CORE}/main.o\
+	    ${BUILD_CORE}/OmniJoinCmd.o\
+	    ${BUILD_CORE}/OmniLeaveCmd.o\
+	    ${BUILD_CORE}/OmniQuitCmd.o\
+	    ${BUILD_CORE}/OmniLoadCmd.o\
+	    ${BUILD_CORE}/OmniDropCmd.o\
+	    ${BUILD_CORE}/OmniListCmd.o\
+	    ${BUILD_CORE}/OmniCommand.o\
+	    ${BUILD_CORE}/OmniCommandBuilder.o
+
 
 #These are the elemets that need to be cleaned up on a "make clean"
 CLEAN_STR = ${BUILD_THREADS}/*.d \
@@ -91,7 +101,8 @@ CLEAN_STR = ${BUILD_THREADS}/*.d \
 #################################################################################
 PLUGIN_OBJS = ${PLUGIN_DIR}/hurlbot.o\
 	      ${PLUGIN_DIR}/bashbot.o\
-	      ${PLUGIN_DIR}/tomebot.o
+	      ${PLUGIN_DIR}/tomebot.o\
+	      ${PLUGIN_DIR}/8ballbot.o
 
 #################################################################################
 
