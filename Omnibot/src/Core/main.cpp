@@ -34,7 +34,7 @@ int main(){
 	//ircInterface irc;
 	//std::cout << std::hex << &irc << std::dec << std::endl;
 	std::cout << "firing up the omnibot..." <<std::endl;
-	omnibot omni;
+	omnibot* omni = new omnibot();
 	//irc.registerForNotify(&omni);
 
 	std::cout << "connecting to server..." << std::endl;
@@ -46,7 +46,7 @@ int main(){
 */
 
 	//connectWithConfig(irc);
-	omni.connect();
+	omni->connect();
 
 
 	bool loop = true;

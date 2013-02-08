@@ -15,12 +15,18 @@ omnibot::omnibot():_irc(new ircInterface()), _nicks(), _manager(_irc, _nicks),_b
 
 	//ircLog::instance()->logf(FILENAME, "ircInteface instance: %x", &irc_);
 	_irc->registerForNotify(this);
+	_commands = new std::vector<OmniCommand*>();
+	createCommands();
+	ircLog::instance()->logf(FILENAME, "size of _commands after createCommands %u", _commands->size());
 
 }
 omnibot::omnibot(ircInterface* irc_):_irc(irc_),_nicks(),_manager(_irc, _nicks),_blocker(OmniBlocker::create()),_passedIrc(true){
 	//std::cout << std::hex << &irc_ << std::dec << std::endl;
 	ircLog::instance()->logf(FILENAME, "ircInteface instance: %x", &irc_);
 	_irc->registerForNotify(this);
+	_commands = new std::vector<OmniCommand*>();
+	createCommands();
+	ircLog::instance()->logf(FILENAME, "size of _commands after createCommands %u", _commands->size());
 }
 
 omnibot::~omnibot()
@@ -29,6 +35,9 @@ omnibot::~omnibot()
 	{
 		delete _irc;
 	}
+
+	clearCommands();
+	delete _commands;
 }
 
 void omnibot::alertMessage(ircMessage& msg)
@@ -39,88 +48,41 @@ void omnibot::alertMessage(ircMessage& msg)
 	//std::cout << "Omnibot received string: " + toParse <<  std::endl;
 	ircLog::instance()->logf(FILENAME, "Omnibot received string: %s", toParse.c_str());
 
-	//parse omnibot commands
-	//may just want to prefix omnibot
-	//or both...
-	if(toParse.at(0) == '!'){
+	size_t i;
+	
+	ircLog::instance()->logf(FILENAME, "using commands at %x", _commands);
+	ircLog::instance()->logf(FILENAME, "number of commands %u", _commands->size());
 
-		//should probably first see if its an omniop
-		//before doing any of this...
-		if(!isOmniOp(msg.user())){
-			//tell them omnibot only list
-			_irc->sendMessage(msg.channel(), msg.user().nick() + ": I only listen to OmniOps :P");
-		}
-
-		//std::cout << "omnibot: " << toParse << std::endl;
-
-		if (!toParse.substr(1, 4).compare("load")){
-			if(loadPlugin(toParse.substr(6)))
-			{
-				_irc->sendMessage(msg.channel(), toParse.substr(6) + " loaded...");
-			}
-			else
-			{
-				_irc->sendMessage(msg.channel(), toParse.substr(6) + " failed to load :(");
-
-			}
-		}
-		else if(!toParse.substr(1, 4).compare("drop"))
-		{
-			dropPlugin(toParse.substr(6));
-		}
-		else if(!toParse.substr(1,2).compare("op"))
-		{
-
-		}
-		else if(!toParse.substr(1,4).compare("unop"))
-		{
-
-		}
-		else if(!toParse.substr(1,4).compare("join"))
-		{
-			join(toParse.substr(6));
-		}
-		else if(!toParse.substr(1,4).compare("quit"))
-		{
-			_irc->quit();
-			//TODO need to notify main() that we're done here
-			//a counting semaphore would do this nicely, but
-			//have to be wrapped in a class so that we could 
-			//abstract away the machine specifc aspects.
-			_blocker->release();
-			exit(0);
-		}
-		else if(!toParse.substr(1,4).compare("part"))
-		{
-			part(toParse.substr(6));
-		}
-		else if(!toParse.substr(1,4).compare("list"))
-		{
-			_irc->sendMessage(msg.channel(), "Loaded Plugins: " + _manager.listLoadedPlugins());
-		}
-		else
-		{
-			//pass string to plugins
-			//std::cout << "Omnibot: sending message to plugin manager" << std::endl;
-			ircLog::instance()->logf(FILENAME, "sending message to plugin manager");
-			_manager.pushMessage(msg);
-		}
-
-
-	}
-	else
+	for(i = 0; i < _commands->size(); ++i)
 	{
-		//pass string to plugin Manager
-		//std::cout << "Omnibot: sending message to plugin manager" << std::endl;
-		ircLog::instance()->logf(FILENAME, "sending message to plugin manager");
+
+		ircLog::instance()->logf(FILENAME, "trying command %s", (*_commands)[i]->name().c_str());
+
+		if((*_commands)[i]->isCommandString(msg))
+		{
+			if((*_commands)[i]->exec(msg))
+			{
+				//TODO handle resultStrs;
+				//probably by dumping them in the channel
+			}
+
+		}
+	}
+
+	if(i >= _commands->size())
+	{
+		ircLog::instance()->logf(FILENAME, "sending message to plugin mananger");
 		_manager.pushMessage(msg);
 	}
+
+
 }
 
 void omnibot::alertEvent(ircEvent& e){}
 void omnibot::connect()
 {
 
+	ircLog::instance()->logf(FILENAME, "size of _commands in connect() %u", _commands->size());
 	OmniConfigParser* parser = OmniConfigParser::instance();
 	parser->parse();
 
@@ -178,4 +140,30 @@ bool omnibot::isOmniOp(ircUser& usr){
 
 bool omnibot::isRegistered(ircUser& usr){
 	return true;
+}
+
+void omnibot::createCommands()
+{
+	OmniCommandBuilder builder;
+
+	builder.setPrefix('!');
+	builder.setTools(_irc, &_manager);
+
+	ircLog::instance()->logf(FILENAME, "address of _commands = %X", _commands);
+
+	builder.getCommands((*_commands));
+
+	ircLog::instance()->logf(FILENAME, "size of _commands after getCommands %u", _commands->size());
+
+}
+void omnibot::clearCommands()
+{
+
+	ircLog::instance()->logf(FILENAME, "clearing command vector");
+	for(size_t i = 0; i < _commands->size(); ++i)
+	{
+		delete (*_commands)[i];
+	}
+
+	_commands->clear();
 }
