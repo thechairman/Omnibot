@@ -11,8 +11,11 @@ class tomebot:public OmniPlugin {
 		std::string name();
 
 	private:
-		static const unsigned int MAX_LINES = 10;
-		static const size_t TIME_BUFF_SIZE = 20;
+
+		static const size_t CMD_LEN = 5; 		/**< the lenght of "!tome"*/
+		static const unsigned int MAX_LINES = 10;	/**< the maximum lines to buffer*/
+		static const size_t TIME_BUFF_SIZE = 20;	/**< size of the buffer used to create the time stamp*/
+
 		static const char tomeFile[30];
 		std::deque<std::string> lines;
 		PluginUtils* utils;
