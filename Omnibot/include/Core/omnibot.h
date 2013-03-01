@@ -19,7 +19,7 @@ class omnibot: public ircInterfaceClient{
 		virtual ~omnibot();
 		void alertEvent(ircEvent&);
 		void alertMessage(ircMessage&);
-		void connect();
+		int connect();
 		void exec();
 
 	private:

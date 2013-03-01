@@ -15,6 +15,7 @@ const std::string OmniConfigParser::SERVER = "server";
 const std::string OmniConfigParser::CHANNELS = "channels";
 const std::string OmniConfigParser::PLUGINS = "plugins";
 const std::string OmniConfigParser::AUTHENTICATION = "authentication";
+const std::string OmniConfigParser::RECONNECTIONS = "reconnections";
 
 OmniConfigParser* OmniConfigParser::_instance = NULL;
 
@@ -38,6 +39,14 @@ std::vector<std::string> OmniConfigParser::channels()
 std::vector<std::string> OmniConfigParser::plugins()
 {
 	return _plugins;
+}
+bool OmniConfigParser::autoReconnect()
+{
+	return _autoReconnect;
+}
+int OmniConfigParser::maxReconnRetries()
+{
+	return _maxReconnRetries;
 }
 int  OmniConfigParser::parse()
 {
@@ -92,6 +101,10 @@ int  OmniConfigParser::parse()
 			else if(!section.compare(AUTHENTICATION))
 			{
 				state = PS_AUTHENTICATION;
+			}
+			else if(!section.compare(RECONNECTIONS))
+			{
+				state = PS_RECONNECTION;
 			}
 			else
 			{
@@ -171,6 +184,45 @@ int  OmniConfigParser::parse()
 				if(!field.compare("auth_method"))
 				{
 					//TODO parse auth methods nickserv, local active, local passive
+				}
+				else
+				{
+					return P_INVALID_FIELD;
+				}
+				continue;
+			}
+
+			case PS_RECONNECTION:
+			{
+				
+				size_t start, end;
+				start = 0;
+				end = line.find_first_of('=');
+				std::string field = line.substr(start, end - 1);
+				std::string temp;
+				if(!field.compare("auto reconnect"))
+				{
+					temp = line.substr(end + 2);
+					if(!temp.compare("true") || !temp.compare("1"))
+					{
+						_autoReconnect = true;
+						ircLog::instance()->logf(FILENAME, "auto reconnect = true");
+					}
+					else if(!temp.compare("false") || !temp.compare("0"))
+					{
+						_autoReconnect = false;
+						ircLog::instance()->logf(FILENAME, "auto reconnect = false");
+					}
+					else
+					{
+						return  P_INVALID_VALUE;
+					}
+
+				}
+				else if(!field.compare("max retries"))
+				{
+					_maxReconnRetries = atoi(line.substr(end+2).c_str());
+					ircLog::instance()->logf(FILENAME, "max retires = %d", _maxReconnRetries);
 				}
 				else
 				{

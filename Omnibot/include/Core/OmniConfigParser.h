@@ -13,15 +13,17 @@ class OmniConfigParser{
 	int serverPort();
 	std::vector<std::string> channels();
 	std::vector<std::string> plugins();
+	bool autoReconnect();
+	int maxReconnRetries();	
 	static OmniConfigParser* instance();
-	int  parse();
-	
+	int  parse();	
 	enum parseCodes
 	{
 		P_SUCCESS,
 		P_INVALID_SECTION,
 		P_INVALID_STATE,
 		P_INVALID_FIELD,
+		P_INVALID_VALUE,
 		P_IO_ERROR
 	};
 
@@ -39,7 +41,8 @@ class OmniConfigParser{
 		PS_SERVER,
 		PS_CHANNELS,
 		PS_PLUGINS,
-		PS_AUTHENTICATION
+		PS_AUTHENTICATION,
+		PS_RECONNECTION
 	};
 
 #if 0
@@ -116,13 +119,17 @@ class OmniConfigParser{
 	static const std::string CHANNELS;
 	static const std::string PLUGINS;
 	static const std::string AUTHENTICATION;
+	static const std::string RECONNECTIONS;
 
 	
 	std::string _nick;
 	std::string _serverName;
 	int _serverPort;
 	std::vector<std::string> _channels;
-	std::vector<std::string> _plugins;;
+	std::vector<std::string> _plugins;
+	bool _autoReconnect;
+	int _maxReconnRetries;
+
 	
 };
 #endif

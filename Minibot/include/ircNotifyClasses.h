@@ -42,8 +42,8 @@ public:
 };
 
 class ircEvent{
-	friend class ircInterface;
-	friend class ircNickListParser;
+	//friend class ircInterface;
+	//friend class ircNickListParser;
 	public:
 		enum EventType{
 			ET_ERROR,
@@ -58,18 +58,19 @@ class ircEvent{
 		};
 
 		EventType type();
-		std::string channel();
+/*		std::string channel();
 		std::string nick();
 		std::string newNick();
 		std::string doer();
 		std::string description();
-
-	private:
+*/
+	protected:
+		ircEvent(EventType);
 		EventType _type;
 
 		//list uses here
 		//channel()
-		std::string _arg1;
+/*		std::string _arg1;
 		
 
 		//list uses here
@@ -84,10 +85,10 @@ class ircEvent{
 		//list uses here
 		//doer()
 		std::string _arg4;
-
+*/
 		//put some static methods down here for creating each type of 
 		//event **could perhaps make these public**
-		static ircEvent error(std::string);
+/*		static ircEvent error(std::string);
 		static ircEvent join(std::string, std::string);
 		static ircEvent part(std::string, std::string, std::string);
 		static ircEvent nickChange(std::string, std::string);
@@ -95,5 +96,6 @@ class ircEvent{
 		static ircEvent kill(std::string, std::string, std::string);
 		static ircEvent kick(std::string, std::string, std::string);
 		static ircEvent connectionLost();
+*/
 };
 #endif

@@ -3,6 +3,7 @@
 #include "OmniConfigParser.h"
 #include "omnibot.h"
 #include "ircLog.h"
+#include "ircTypes.h"
 
 
 const std::string FILENAME = "Core/omnibot.cpp";
@@ -78,9 +79,43 @@ void omnibot::alertMessage(ircMessage& msg)
 
 }
 
-void omnibot::alertEvent(ircEvent& e){}
-void omnibot::connect()
+void omnibot::alertEvent(ircEvent& e)
 {
+    switch(e.type())
+    {
+	    case ircEvent::ET_CONN_LOST:
+		{
+			OmniConfigParser* parser = OmniConfigParser::instance();
+			if(parser->autoReconnect())
+			{
+				int i;
+				int error;
+				for(i = 0, error = 0; i < parser->maxReconnRetries(); ++i)
+				{
+					error = connect();
+					if(!error)
+					{
+						break;
+					}
+
+					//some kind of sleep here.
+				}
+
+				if( i == parser->maxReconnRetries() )
+				{
+					ircLog::instance()->logf(FILENAME, "Could not reconnect to server %d", error);
+					std::cerr << "failed to reconnect: error " << error << std::endl;
+					exit (1);
+				}
+
+			}
+		}
+    }
+
+}
+int omnibot::connect()
+{
+	int rc = 0;
 
 	ircLog::instance()->logf(FILENAME, "size of _commands in connect() %u", _commands->size());
 	OmniConfigParser* parser = OmniConfigParser::instance();
@@ -93,8 +128,28 @@ void omnibot::connect()
 	ircLog::instance()->logf(FILENAME, "serverPort = %d", parser->serverPort() );
 	ircLog::instance()->logf(FILENAME, "nick = %s", parser->nick().c_str() );
 
-	_irc->connect(parser->serverName(), parser->serverPort());
-	_irc->registerUser(parser->nick(), parser->nick(), parser->nick());
+	//try to connect; test if successful
+	rc = _irc->connect(parser->serverName(), parser->serverPort());
+
+	if(rc)
+	{
+		return rc;
+	}
+
+
+	//try to register with the bot's primary name; test for success
+	rc = _irc->registerUser(parser->nick(), parser->nick(), parser->nick());
+
+	if(rc == NICK_COLLISION)
+	{
+		//TODO add alternate nick to parameters
+		return rc;
+	}
+	else if(rc)
+	{
+		return rc;
+	}
+
 
 	std::vector<std::string> channels = parser->channels();
 
@@ -115,6 +170,8 @@ void omnibot::connect()
 			ircLog::instance()->logf(FILENAME, "failed to load plugin %s on connect", plugins[i].c_str());
 	
 	}
+
+	return rc;
 }
 void omnibot::exec()
 {

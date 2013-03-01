@@ -5,7 +5,7 @@
 #include "ircTypes.h"
 #include "ircLog.h"
 
-const std::string FILENAME = "posix_ircConnStat.h";
+const std::string FILENAME = "posix_ircConnStat.cpp";
 
 posix_ircConnStatus::posix_ircConnStatus():
 	_monitorRunning(false),
@@ -188,8 +188,9 @@ void posix_ircConnStatus::monitorTick(sigval val)
 	{
 		
 		// stop the timer
-		connStat->_time.it_value.tv_sec = 0;
-		timer_settime(connStat->_monitorTimer, 0, &connStat->_time, NULL);
+		//connStat->_time.it_value.tv_sec = 0;
+		//timer_settime(connStat->_monitorTimer, 0, &connStat->_time, NULL);
+		connStat->stopTimer();
 	}
 }
 
@@ -197,31 +198,38 @@ void posix_ircConnStatus::monitorTick(sigval val)
 void posix_ircConnStatus::monitor()
 {
 	 ircLog::instance()->logf(FILENAME, "Evaluating connection state...");
+	 ircLog::instance()->logf(FILENAME, "Current State is %d", (int)_state);
 
 	switch(_state)
 	{
 
 		case CS_IDLE:
+			//ircLog::instance()->logf(FILENAME, "executing IDLE analysis");
 			break;
 
 		case CS_FAILED:
+			//ircLog::instance()->logf(FILENAME, "Executing FAILED analysis");
 			stopTimer();
+			interface->onConnectionDeath();
 			break;
 
 		case CS_CONNECTED:
+			//ircLog::instance()->logf(FILENAME, "Executing CONNECTED analysis");
+			break;
 
+		case CS_REGISTERED:
+			//ircLog::instance()->logf(FILENAME, "Exectuing REGISTERED analysis");
 			if(!validatePings())
 			{
 				//roll back the connection status and let the interface know
+				ircLog::instance()->logf(FILENAME, "ping time out: %d seconds",
+					PING_TIME_OUT);
 				_monitorRunning = false;
 				stopTimer();
 				interface->onConnectionDeath();
 				return;
 			}
 			break;
-
-		//case CS_REGISTER:
-		//	break;
 
 		default:
 			break;
@@ -231,21 +239,26 @@ void posix_ircConnStatus::monitor()
 
 bool posix_ircConnStatus::validatePings()
 {
+	bool rc;
 	pthread_mutex_lock(&pingMux);
 	
 	time_t t;
 	time(&t);
-	double dif = difftime(lastPing, t);
+	double dif = difftime(t, lastPing);
 
 	//std::cout << "ircConnStatus: ping diff = " << dif << std::endl;
-	ircLog::instance()->logf(FILENAME, "ping difference = %d", dif);
+	ircLog::instance()->logf(FILENAME, "ping difference = %f", dif);
 
+	rc = true;
 	if(dif > PING_TIME_OUT)
 	{	
 		ircLog::instance()->logf(FILENAME, "Ping time out");
-		return false;
+		rc = false;
 	}
-	return true;
+
+	pthread_mutex_unlock(&pingMux);
+
+	return rc;
 }
 
 int posix_ircConnStatus::initTimer()
@@ -284,6 +297,10 @@ void posix_ircConnStatus::stopTimer()
 	if(_mode == MM_TIMER)
 	{
 		_time.it_value.tv_sec = 0;
+		_time.it_value.tv_nsec = 0;
+		_time.it_interval.tv_sec = 0;
+		_time.it_interval.tv_nsec = 0;
+			
 		timer_settime(_monitorTimer, 0, &_time, NULL);
 	}
 }

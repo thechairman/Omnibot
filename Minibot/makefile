@@ -16,6 +16,7 @@ LIB_OBJS = ${BUILD_DIR}ircInterface.o\
 	   ${BUILD_DIR}posix_ircConnStatus.o\
 	   ${BUILD_DIR}ircConnStatus.o\
 	   ${BUILD_DIR}ircNotifyClasses.o\
+	   ${BUILD_DIR}ircEvents.o\
 	   ${BUILD_DIR}ircio.o\
 	   ${BUILD_DIR}ircNickListParser.o\
 	   ${BUILD_DIR}ircLog.o\

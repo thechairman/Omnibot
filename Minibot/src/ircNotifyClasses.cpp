@@ -64,11 +64,13 @@ ircUser& ircMessage::user(){
 	return _user;
 }
 
+ircEvent::ircEvent(ircEvent::EventType e):_type(e){}
+
 ircEvent::EventType ircEvent::type(){
 	return _type;
 }
 
-std::string ircEvent::channel(){
+/*std::string ircEvent::channel(){
 	if(_type != ET_CHANNEL_JOIN && _type != ET_CHANNEL_PART)
 		return "INVALID";
 	else 
@@ -170,3 +172,4 @@ ircEvent ircEvent::connectionLost(){
 	ircEvent e;
 	e._type = ET_CONN_LOST;
 }
+*/

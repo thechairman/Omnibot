@@ -1,5 +1,6 @@
 #include<sstream>
 #include "ircNickListParser.h"
+#include "ircEvents.h"
 
 void ircNickListParser::setNickPrefixes(std::string prefixes)
 {
@@ -17,7 +18,7 @@ std::vector<ircEvent> ircNickListParser::parseNickList(std::string nicklist, std
 		if(_prefixes.find(currentNick[0]) != std::string::npos)
 			currentNick = currentNick.substr(1);
 
-		nicksInList.push_back(ircEvent::join(channel, currentNick));
+		nicksInList.push_back(ircEvent_join(channel, currentNick));
 	}
 
 	return nicksInList;

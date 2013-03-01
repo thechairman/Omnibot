@@ -38,7 +38,7 @@ class posix_ircConnStatus: public ircConnStatus
 
 		//private constants
 		static const unsigned int MONT_INTV = 5;	/**<time between evaluation in secs*/
-		static const double PING_TIME_OUT = 120;	/**<connection time out*/
+		static const double PING_TIME_OUT = 180;	/**<connection time out*/
 
 		MonitorMode_t _mode;		/**<evaluation mode*/		
 

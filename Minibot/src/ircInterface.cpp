@@ -6,6 +6,7 @@
 
 #include "ircLog.h"
 #include "ircTypes.h"
+#include "ircEvents.h"
 //parse vars
 
 //catch nicks
@@ -69,6 +70,8 @@ void ircInterface::setAutoReconnect(bool reconnect)
 }
 
 int ircInterface::connect(std::string server, int port){
+
+	int rc = CONNECT_SUCCESS;
 	//std::cout << "ircInterface: initing connection monitoring" <<std::endl;
 	ircLog::instance()->logf(FILENAME, "initing connection monitoring");
 	_connStatus->init();
@@ -85,18 +88,21 @@ int ircInterface::connect(std::string server, int port){
 	
 	//std::cout << "ircInterface: waiting to hear back from teh connect flag" << std::endl;
 	ircLog::instance()->logf(FILENAME, "waiting to hear back from the connect flag");
-	if(_connStatus->waitOnConnect())
+	rc = _connStatus->waitOnConnect();
+	if(rc)
 	{
 		//std::cout << "ircInterface: connect failure" <<std::endl;
 		ircLog::instance()->logf(FILENAME, "connect failure");
-		return 1;
 
 	}
+	else
+	{
 
 	//std::cout << "ircInterface: Successfully connected" << std::endl;
 	ircLog::instance()->logf(FILENAME, "Succesfully Connected");
 
-	return 0;
+	}
+	return rc;
 }
 
 int ircInterface::registerUser(std::string nick, std::string uname, std::string rname){
@@ -110,11 +116,9 @@ int ircInterface::registerUser(std::string nick, std::string uname, std::string 
 	msg = "USER " + uname + " 0 * :" + rname + "\r\n";
 	sendString(msg);
 	_serverConnection->sleep(SLEEP_INTRV);
-	if(_connStatus->waitOnConnect())
-	{
-		return 1;
-	}
-	return 0;
+	
+	return _connStatus->waitOnConnect();
+
 }
 
 
@@ -214,12 +218,12 @@ void ircInterface::onMessage(std::string msg){
 		//contents of the message with a space
 		std::string type = msg.substr(0, msg.find_first_of(' '));
 
-		//_connStatus->pingRcvd();	
 
 		//first check for messages that start with message names
 		//check for ping
 		if(!type.compare(PING))
 		{
+			_connStatus->pingRcvd();	
 			sendPong();
 			return;
 		}
@@ -241,6 +245,7 @@ void ircInterface::onMessage(std::string msg){
 		//now check for messages that start with nicks or server titles
 		else 
 		{	
+			_connStatus->pingRcvd();	
 			//type is actually a prefix containing the host mask etc
 			std::string prefix = type;
 			// the actual message past the prefix
@@ -355,7 +360,8 @@ void ircInterface::onConnectionDeath()
 
 	//notify the client through the event handler.
 	std::cerr << "ircInterface: connection lost..." << std::endl;
-	ircEvent e = ircEvent::connectionLost();
+	//ircEvent e = ircEvent::connectionLost();
+	ircEvent e = (ircEvent) ircEvent_connLost::ircEvent_connLost();
 	notifyEvent(e);
 
 
@@ -401,7 +407,8 @@ ircEvent ircInterface::handle_quit(std::string msg, std::string prefix)
 
 
 	//TODO handle the quit reasons, for now its an empty string
-	return ircEvent::quit(nick, "");
+	//return ircEvent::quit(nick, "");
+	return (ircEvent) ircEvent_quit(nick);
 }
 
 ircEvent ircInterface::handle_join(std::string msg, std::string prefix)
@@ -414,7 +421,7 @@ ircEvent ircInterface::handle_join(std::string msg, std::string prefix)
 
 
 
-	return ircEvent::join(channel, nick);
+	return ircEvent_join(channel, nick);
 }
 
 ircEvent ircInterface::handle_part(std::string msg, std::string prefix)
@@ -425,7 +432,7 @@ ircEvent ircInterface::handle_part(std::string msg, std::string prefix)
 	std::string channel = msg.substr(msg.find_first_of(' ') + 1);
 
 	//TODO handle part reasons for now it's an empty string
-	return ircEvent::part(channel, nick, "");
+	return (ircEvent) ircEvent_part(nick, channel);
 }
 
 ircEvent ircInterface::handle_nick(std::string msg, std::string prefix)
@@ -441,7 +448,7 @@ ircEvent ircInterface::handle_nick(std::string msg, std::string prefix)
 
 
 
-	return ircEvent::nickChange(nick, newNick);
+	return (ircEvent) ircEvent_nickChange(nick, newNick);
 }
 
 //TODO need to figure out how to do this
