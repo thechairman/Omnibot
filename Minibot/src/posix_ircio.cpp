@@ -214,7 +214,22 @@ void posix_ircio::onReceive(std::string msg){
 
 void posix_ircio::registerCallBack(ircioCallBack* callback)
 {
-	callbacks.push_back(callback);	
+	bool found = false;
+
+	for(size_t i = 0; i < callbacks.size(); ++i)
+	{
+		if(callbacks[i] == callback)
+		{
+			//this instance is already registered
+			found = true;	
+		}
+	}
+
+	//add the call back if we didn't find 
+	if(!found){
+		
+		callbacks.push_back(callback);	
+	}
 }
 
 void* posix_ircio::startListening(void* ptr){
