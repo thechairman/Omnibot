@@ -66,7 +66,7 @@ CORE_OBJS = ${BUILD_CORE}/omnibot.o\
 	    ${BUILD_CORE}/PluginFactory.o\
 	    ${BUILD_CORE}/PluginManager.o\
 	    ${BUILD_CORE}/NickManager.o\
-	    ${BUILD_CORE}/LinuxPluginFactory.o\
+	    ${BUILD_CORE}/StaticPluginFactory.o\
 	    ${BUILD_CORE}/PluginUtils.o\
 	    ${BUILD_CORE}/OmniPluginInterface.o\
 	    ${BUILD_CORE}/OmniConfigParser.o\
@@ -101,6 +101,7 @@ CLEAN_STR = ${BUILD_THREADS}/*.d \
 #################################################################################
 PLUGIN_OBJS = ${PLUGIN_DIR}/hurlbot.o\
 	      ${PLUGIN_DIR}/bashbot.o\
+	      ${PLUGIN_DIR}/qdbbot.o\
 	      ${PLUGIN_DIR}/tomebot.o\
 	      ${PLUGIN_DIR}/8ballbot.o
 

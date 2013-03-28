@@ -1,12 +1,12 @@
 #include "PluginFactory.h"
 
-#include "LinuxPluginFactory.h"
+#include "StaticPluginFactory.h"
 PluginFactory* PluginFactory::_instance = NULL;
 
 PluginFactory* PluginFactory::instance(){
 	if(_instance == NULL)
 	{
-		_instance = new LinuxPluginFactory();
+		_instance = new StaticPluginFactory();
 	}
 
 	return _instance;

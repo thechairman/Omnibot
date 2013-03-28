@@ -119,4 +119,4 @@ std::string tomebot::getEntryTimeStamp()
 	date = cdate;
 
 	return date;
-}2
+}

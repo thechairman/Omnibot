@@ -1,4 +1,4 @@
-#include <LinuxPluginFactory.h>
+#include <StaticPluginFactory.h>
 
 #include"hurlbot.h"
 #include"bashbot.h"
@@ -6,7 +6,7 @@
 #include"tomebot.h"
 #include"8ballbot.h"
 
-OmniPlugin* LinuxPluginFactory::load(std::string pluginName){
+OmniPlugin* StaticPluginFactory::load(std::string pluginName){
 	
 	OmniPlugin* plugin = NULL;
 	if(!pluginName.compare("hurlbot")){
@@ -28,5 +28,5 @@ OmniPlugin* LinuxPluginFactory::load(std::string pluginName){
 	return plugin;
 }
 
-LinuxPluginFactory::~LinuxPluginFactory(){}
-LinuxPluginFactory::LinuxPluginFactory(){}
+StaticPluginFactory::~StaticPluginFactory(){}
+StaticPluginFactory::StaticPluginFactory(){}
