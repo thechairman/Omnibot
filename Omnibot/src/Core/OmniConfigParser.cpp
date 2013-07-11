@@ -16,6 +16,16 @@ const std::string OmniConfigParser::CHANNELS = "channels";
 const std::string OmniConfigParser::PLUGINS = "plugins";
 const std::string OmniConfigParser::AUTHENTICATION = "authentication";
 const std::string OmniConfigParser::RECONNECTIONS = "reconnections";
+const std::string OmniConfigParser::PLUGIN_LOADING = "plugin loading";
+
+const std::string 	OmniConfigParser::DEFAULT_NICK = "Omnibot";
+const std::string 	OmniConfigParser::DEFAULT_SERVER = "";
+const int 		OmniConfigParser::DEFAULT_PORT = 6667;
+const bool 		OmniConfigParser::DEFAUT_AUTOCONNECT = false;
+const int  		OmniConfigParser::DEFAULT_RETRIES = 0;
+//const std::string 	OmniConfigParser::DEFAULT_PLUGINDIR = ;
+//const pluginLoadModes 	OmniConfigParser::DEFAULT_LOADMODE = ;
+
 
 OmniConfigParser* OmniConfigParser::_instance = NULL;
 
@@ -47,6 +57,14 @@ bool OmniConfigParser::autoReconnect()
 int OmniConfigParser::maxReconnRetries()
 {
 	return _maxReconnRetries;
+}
+OmniConfigParser::pluginLoadModes OmniConfigParser::pluginLoadMode()
+{
+	return _pluginLoadMode;
+}
+std::string OmniConfigParser::pluginDirectory()
+{
+	return _pluginDir;
 }
 int  OmniConfigParser::parse()
 {
@@ -105,6 +123,10 @@ int  OmniConfigParser::parse()
 			else if(!section.compare(RECONNECTIONS))
 			{
 				state = PS_RECONNECTION;
+			}
+			else if(!section.compare(PLUGIN_LOADING))
+			{
+				state = PS_PLUGIN_LOADING;
 			}
 			else
 			{
@@ -229,6 +251,34 @@ int  OmniConfigParser::parse()
 					return P_INVALID_FIELD;
 				}
 				continue;
+			}
+
+			case PS_PLUGIN_LOADING:
+			{
+				size_t start, end;
+				start = 0;
+				end = line.find_first_of('=');
+				std::string field = line.substr(start, end - 1);
+				std::string temp;
+
+				if(!field.compare("mode"))
+				{
+					temp = line.substr(end + 2);
+					if(temp.find("dynamic") != std::string::npos)
+					{
+						_pluginLoadMode = PLM_DYNAMIC;
+					}
+					else if(temp.find("static") != std::string::npos)
+					{
+						_pluginLoadMode = PLM_STATIC;
+					}
+
+				}
+				else if(!field.compare("directory"))
+				{
+					_pluginDir = line.substr(end + 2);
+				}
+
 			}
 
 			default:

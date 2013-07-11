@@ -8,15 +8,8 @@
 class OmniConfigParser{
 
 	public:
-	std::string nick();
-	std::string serverName();
-	int serverPort();
-	std::vector<std::string> channels();
-	std::vector<std::string> plugins();
-	bool autoReconnect();
-	int maxReconnRetries();	
-	static OmniConfigParser* instance();
-	int  parse();	
+
+
 	enum parseCodes
 	{
 		P_SUCCESS,
@@ -26,6 +19,25 @@ class OmniConfigParser{
 		P_INVALID_VALUE,
 		P_IO_ERROR
 	};
+
+	enum pluginLoadModes
+	{
+		PLM_STATIC,
+		PLM_DYNAMIC
+	};
+
+
+	std::string nick();
+	std::string serverName();
+	int serverPort();
+	std::vector<std::string> channels();
+	std::vector<std::string> plugins();
+	bool autoReconnect();
+	int maxReconnRetries();
+	pluginLoadModes pluginLoadMode();
+	std::string pluginDirectory();	
+	static OmniConfigParser* instance();
+	int  parse();	
 
 
 	protected:
@@ -42,7 +54,8 @@ class OmniConfigParser{
 		PS_CHANNELS,
 		PS_PLUGINS,
 		PS_AUTHENTICATION,
-		PS_RECONNECTION
+		PS_RECONNECTION,
+		PS_PLUGIN_LOADING
 	};
 
 #if 0
@@ -112,7 +125,8 @@ class OmniConfigParser{
 #endif	
 
 	static OmniConfigParser* _instance;
-
+	
+	//section headers
 	static const std::string OMNI_CONFIG_FILE_NAME;
 	static const std::string NICKS;
 	static const std::string SERVER;
@@ -120,8 +134,19 @@ class OmniConfigParser{
 	static const std::string PLUGINS;
 	static const std::string AUTHENTICATION;
 	static const std::string RECONNECTIONS;
+	static const std::string PLUGIN_LOADING;
+
+	//field defaults
+	static const std::string DEFAULT_NICK;
+	static const std::string DEFAULT_SERVER;
+	static const int DEFAULT_PORT;
+	static const bool DEFAUT_AUTOCONNECT;
+	static const int  DEFAULT_RETRIES;
+	static const std::string DEFAULT_PLUGINDIR;
+	static const pluginLoadModes DEFAULT_LOADMODE;
 
 	
+	//config fields
 	std::string _nick;
 	std::string _serverName;
 	int _serverPort;
@@ -129,6 +154,9 @@ class OmniConfigParser{
 	std::vector<std::string> _plugins;
 	bool _autoReconnect;
 	int _maxReconnRetries;
+	std::string _pluginDir;
+	pluginLoadModes _pluginLoadMode;
+	
 
 	
 };
