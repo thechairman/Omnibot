@@ -12,6 +12,10 @@ std::string FILENAME = "posix_ircio.cpp";
 extern int errno;
 bool posix_ircio::open(std::string server, int port)
 {
+	if(isOpen)
+	{
+		close();
+	}
 	//get a file descriptor
 	socket = ::socket(AF_INET, SOCK_STREAM, 0);
 	if(socket < 0)
@@ -62,9 +66,12 @@ bool posix_ircio::open(std::string server, int port)
 
 void posix_ircio::close()
 {
-	isOpen = false;
-	usleep(SELECT_NSECS / 1000);
-	::close(socket);
+	if(isOpen)
+	{
+		isOpen = false;
+		usleep(SELECT_NSECS / 1000);
+		::close(socket);
+	}
 }
 bool posix_ircio::write(std::string& str)
 {
@@ -154,6 +161,7 @@ void posix_ircio::listen()
 
 		if(chars == 0)
 		{
+			close();	
 			onReceive("IRCERROR zero lenth read\r\n");
 		}
 
