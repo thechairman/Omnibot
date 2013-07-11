@@ -7,6 +7,13 @@
 
 #define FILENAME "tomebot.cpp"
 
+#ifdef DYNAMIC_LOADING
+extern "C" OmniPlugin* CreatePlugin()
+{
+	return static_cast<OmniPlugin*> (new tomebot());
+}
+#endif
+
 const char tomebot::tomeFile[30] = "tome.txt";
 
 void tomebot::onMessage(ircMessage& msg){

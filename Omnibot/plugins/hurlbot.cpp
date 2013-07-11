@@ -1,5 +1,12 @@
 #include "hurlbot.h"
 
+#ifdef DYNAMIC_LOADING
+extern "C" OmniPlugin* CreatePlugin()
+{
+	return static_cast<OmniPlugin*> (new hURLbot());
+}
+#endif
+
 void hURLbot::onMessage(ircMessage& msg){
 	std::cout<<"hURLbot: got a message of length: " << msg.message().size() << std::endl;
 	if(!msg.message().compare("!hurl")){

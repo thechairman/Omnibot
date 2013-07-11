@@ -2,6 +2,13 @@
 
 #include "8ballbot.h"
 
+#ifdef DYNAMIC_LOADING
+extern "C" OmniPlugin* CreatePlugin()
+{
+	return static_cast<OmniPlugin*> (new eightBallBot());
+}
+#endif
+
 const std::string eightBallBot::replys[NUM_OF_STATEMENTS] ={
 
 	"Signs point to yes.",

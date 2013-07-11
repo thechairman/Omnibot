@@ -7,6 +7,15 @@
 
 #include "qdbbot.h"
 #include "Threads/pthread_Thread.h"
+
+
+#ifdef DYNAMIC_LOADING
+extern "C" OmniPlugin* CreatePlugin()
+{
+	return static_cast<OmniPlugin*> (new qdbbot());
+}
+#endif
+
 const std::string qdbbot::baseURL = "qdb.us";
 
 void qdbbot::onMessage(ircMessage& msg)

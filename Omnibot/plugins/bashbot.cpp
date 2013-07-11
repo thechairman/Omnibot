@@ -7,6 +7,14 @@
 
 #include "bashbot.h"
 #include "Threads/pthread_Thread.h"
+
+#ifdef DYNAMIC_LOADING
+extern "C" OmniPlugin* CreatePlugin()
+{
+	return static_cast<OmniPlugin*> ( new bashbot());
+}
+#endif
+
 const std::string bashbot::baseURL = "www.bash.org";
 
 void bashbot::onMessage(ircMessage& msg)
