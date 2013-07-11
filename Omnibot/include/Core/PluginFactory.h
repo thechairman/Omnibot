@@ -19,6 +19,8 @@ class PluginFactory{
 	static PluginFactory* instance();
 	virtual ~PluginFactory();
 	virtual OmniPlugin* load(std::string) = 0;
+	virtual void unload(std::string) = 0;
+	virtual std::string listPlugins() = 0;
 
 	protected:
 	PluginFactory();

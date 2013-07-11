@@ -18,14 +18,24 @@ OmniPlugin* StaticPluginFactory::load(std::string pluginName){
 	else if(!pluginName.compare("qdbbot")){
 		plugin = dynamic_cast<OmniPlugin*>  (new qdbbot());
 	}
-/*	else if(!pluginName.compare("tomebot")){
+	else if(!pluginName.compare("tomebot")){
 		plugin = dynamic_cast<OmniPlugin*>  (new tomebot());
-	}*/
+	}
 	else if(!pluginName.compare("8ballbot")){
 		plugin = dynamic_cast<OmniPlugin*>  (new eightBallBot());
 	}
 
 	return plugin;
+}
+
+void StaticPluginFactory::unload(std::string pluginName)
+{
+	return;
+}
+
+std::string StaticPluginFactory::listPlugins()
+{
+	return "hurlbot bashbot qdbot tomebot 8ballbot";
 }
 
 StaticPluginFactory::~StaticPluginFactory(){}
