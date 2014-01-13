@@ -41,7 +41,7 @@ OmniPlugin* LinuxPluginFactory::load(std::string pluginName){
 		pluginLib += "/";
 	}
 
-	pluginLib += pluginName + ".so";
+	pluginLib += "lib" + pluginName + ".so";
 
 	void* libHandle = dlopen(pluginLib.c_str(), RTLD_LAZY);
 
