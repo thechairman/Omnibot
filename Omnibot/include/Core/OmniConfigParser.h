@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-
+#include "OmniCfgReader.h"
 
 class OmniConfigParser{
 
@@ -57,6 +57,8 @@ class OmniConfigParser{
 		PS_RECONNECTION,
 		PS_PLUGIN_LOADING
 	};
+
+	OmniCfgReader _reader;
 
 #if 0
 	class fields
@@ -128,22 +130,7 @@ class OmniConfigParser{
 	
 	//section headers
 	static const std::string OMNI_CONFIG_FILE_NAME;
-	static const std::string NICKS;
-	static const std::string SERVER;
-	static const std::string CHANNELS;
-	static const std::string PLUGINS;
-	static const std::string AUTHENTICATION;
-	static const std::string RECONNECTIONS;
-	static const std::string PLUGIN_LOADING;
 
-	//field defaults
-	static const std::string DEFAULT_NICK;
-	static const std::string DEFAULT_SERVER;
-	static const int DEFAULT_PORT;
-	static const bool DEFAUT_AUTOCONNECT;
-	static const int  DEFAULT_RETRIES;
-	static const std::string DEFAULT_PLUGINDIR;
-	static const pluginLoadModes DEFAULT_LOADMODE;
 
 	
 	//config fields
@@ -156,8 +143,106 @@ class OmniConfigParser{
 	int _maxReconnRetries;
 	std::string _pluginDir;
 	pluginLoadModes _pluginLoadMode;
-	
 
-	
+	class ConfigSection
+	{
+		public:
+			virtual bool isSection(std::string) = 0;
+			virtual parseCodes loadEntry(std::string)= 0;
+			virtual void clear() = 0;
+	};
+
+	class NickSection :public ConfigSection
+	{
+		public:
+		NickSection(OmniCfgReader&, OmniConfigParser*);
+		bool isSection(std::string);
+		parseCodes loadEntry(std::string);
+		void clear();
+
+		private:
+		static const std::string THIS_SECTION;//NICKS;
+		static const std::string DEFAULT_NICK;
+		OmniCfgReader& _reader;
+		OmniConfigParser* _parser;
+
+	};
+	class ServerSection:public ConfigSection
+	{
+		public:
+		ServerSection(OmniCfgReader&, OmniConfigParser*);
+		bool isSection(std::string);
+		parseCodes loadEntry(std::string);
+		void clear();
+
+		private:
+		static const std::string THIS_SECTION;//SERVER;
+		static const std::string DEFAULT_SERVER;
+		static const int DEFAULT_PORT;
+		OmniCfgReader& _reader;
+		OmniConfigParser* _parser;
+
+	};
+	class ChannelsSection:public ConfigSection
+	{
+		public:
+		ChannelsSection(OmniCfgReader&, OmniConfigParser*);
+		bool isSection(std::string);
+		parseCodes loadEntry(std::string);
+		void clear();
+
+		private:
+		static const std::string THIS_SECTION;//CHANNELS;
+		OmniCfgReader& _reader;
+		OmniConfigParser* _parser;
+
+	};
+	class PluginsSection:public ConfigSection
+	{
+		public:
+		PluginsSection(OmniCfgReader&, OmniConfigParser*);
+		bool isSection(std::string);
+		parseCodes loadEntry(std::string);
+		void clear();
+
+		private:
+		static const std::string THIS_SECTION; //PLUGINS;
+		static const std::string DEFAULT_PLUGIN_DIR;
+		static const pluginLoadModes DEFAULT_LOAD_MODE;
+		OmniCfgReader& _reader;
+		OmniConfigParser* _parser;
+
+	};
+	class AuthSection:public ConfigSection
+	{
+		public:
+		AuthSection(OmniCfgReader&, OmniConfigParser*);
+		bool isSection(std::string);
+		parseCodes loadEntry(std::string);
+		void clear();
+
+		private:
+		static const std::string THIS_SECTION; //AUTHENTICATION;
+		OmniCfgReader& _reader;
+		OmniConfigParser* _parser;
+
+	};
+	class ReconnSection:public ConfigSection
+	{
+		public:
+		ReconnSection(OmniCfgReader&, OmniConfigParser*);
+		bool isSection(std::string);
+		parseCodes loadEntry(std::string);
+		void clear();
+
+		private:
+		static const std::string THIS_SECTION; //RECONNECTIONS;
+		static const bool DEFAULT_AUTOCONNECT;
+		static const int  DEFAULT_RETRIES;
+		OmniCfgReader& _reader;
+		OmniConfigParser* _parser;
+
+	};
 };
+
 #endif
