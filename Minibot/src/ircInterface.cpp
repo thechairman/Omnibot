@@ -203,7 +203,7 @@ void ircInterface::sendString(std::string str){
 		ircLog::instance()->logf(FILENAME, "Oh No! String Didn't send!");
 	else
 		//std::cout<< "sent string to server:  "<< str << std::endl;
-		ircLog::instance()->logf(FILENAME, "sent string ot server: %s", str.c_str());
+		ircLog::instance()->logf(FILENAME, "sent string ot server: %s", str.substr(0,str.size() -2).c_str());
 }
 
 void ircInterface::onMessage(std::string msg){
