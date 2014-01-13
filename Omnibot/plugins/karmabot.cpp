@@ -1,59 +1,168 @@
 #include "karmabot.h"
+#include <fstream>
+#include <sstream>
+
+const std::string karmabot::KARMA_FNAME = "karma.txt";
+const std::string karmabot::INCREMENTOR = "++";
+const std::string karmabot::DECREMENTOR = "--";
+const std::string karmabot::COMMAND_STR = "!karma";
 
 void karmabot::onMessage(ircMessage& msg)
 {
-	if(!msg.compare("!karma"))
+//	if(!msg.compare("!karma"))
+//	{
+//		if(!msg.user().isAuthenticated())
+//		{
+//			utils->sendMessage(msg.channel(), msg.user().nick() + ": You need to authenticate with NickServe");
+//			return;
+//		}
+//		unsigned int karma = _karma[msg.user().userId()];
+//
+//		std::stringstream str << msg.user()->nick() << ": " << karma;
+//		utils->sendMessage(msg.channel(), str.str());
+//	}
+
+
+	size_t increment_loc = msg.message().find(INCREMENTOR);
+	size_t decrement_loc = msg.message().find(DECREMENTOR);
+	//if we are trying to get somebody's karma total
+	if(!msg.message().substr(0, COMMAND_LEN).compare(COMMAND_STR))
 	{
-		if(!msg.user().isAuthenticated())
+		int karma = 0;
+		std::string target;
+
+		if(msg.message().find(" ") == std::string::npos)
 		{
-			utils->sendMessage(msg.channel(), msg.user().nick() + ": You need to authenticate with NickServe");
-			return;
-		}
-		unsigned int karma = _karma[msg.user().userId()];
-
-		std::stringstream str << msg.user()->nick() << ": " << karma;
-		utils->sendMessage(msg.channel(), str.str());
-	}
-
-	if(msg.message().find(" ") == std::string::npos)
-	{
-		ircUser* target == NULL;
-		if(msg.message().find("++") != std::string::npos)
-		{
-			target = utils->getUser(0, msg.message().find("++"));
-
-			incrementKarma(target);
-
-		}
-		else if (msg.message().find("--") != std::string::npos)
-		{
-			target = utils->getUser(0, msg.message().find("--"));
-			decrementKarma(target);
+			target = msg.user().nick();
 		}
 		else
 		{
-			return;
+			//get first character past the space
+			int start = msg.message().find(" ") + 1;
+			int dist = msg.message().find(" ", start) - start;
+			target = msg.message().substr(start, dist);
 		}
+
+		std::map<std::string, int>::iterator nick_pos;
+		nick_pos = _karma.find(target);
+
+		if(nick_pos != _karma.end())
+		{
+			karma = nick_pos->second;
+		}
+		else
+		{
+			karma = 0;
+			std::pair<std::string, int> thing(target, karma);
+			_karma.insert(thing);
+		}
+
+		
+	}
+	else if (increment_loc != std::string::npos)
+	{
+		std::string nick;
+	       	nick = msg.message().substr( 0, increment_loc);
+		incrementKarma(nick);
+	}
+	else if (decrement_loc != std::string::npos)
+	{
+		std::string nick;
+	       	nick = msg.message().substr( 0, decrement_loc);
+		decrementKarma(nick);
 	}
 
+//	if(msg.message().find(" ") == std::string::npos)
+//	{
+//		ircUser* target == NULL;
+//		if(msg.message().find("++") != std::string::npos)
+//		{
+//			target = utils->getUser(0, msg.message().find("++"));
+//
+//			incrementKarma(target);
+//
+//		}
+//		else if (msg.message().find("--") != std::string::npos)
+//		{
+//			target = utils->getUser(0, msg.message().find("--"));
+//			decrementKarma(target);
+//		}
+//		else
+//		{
+//			return;
+//		}
+//	}
+
 }
 
-void karmabot::decrementKarma(ircUser* target)
+void karmabot::onOmniCommConnect(OmniCommChannel* o){}
+void karmabot::decrementKarma(std::string nick)
 {
-	
+	std::map<std::string, int>::iterator iter;
+	iter = _karma.find(nick);
+	if(iter == _karma.end())
+	{
+		_karma[nick] = -1;
+	}
+	else
+	{
+		 (_karma[nick])--; 
+	}
 }
 
-void karmabot::incrementKarma(ircUser* target)
+void karmabot::incrementKarma(std::string nick)
 {
 
+	std::map<std::string, int>::iterator iter;
+	iter = _karma.find(nick);
+	if(iter == _karma.end())
+	{
+		_karma[nick] = 1;
+	}
+	else
+	{
+		 (_karma[nick])++; 
+	}
 }
 
 void karmabot::loadKarma()
 {
+	std::ifstream karmaFile;
+	karmaFile.open(KARMA_FNAME.c_str());
+
+	if(karmaFile.fail())
+	{
+		//TODO write something to std::err
+	}
+	else
+	{
+		std::string fileLine;
+		while(getline(karmaFile, fileLine))
+		{
+			std::string nick;
+			int karma;
+			std::stringstream strstr(fileLine);
+			strstr >> nick;
+			strstr >> karma;
+			_karma[nick] = karma;
+		}
+	}
+	karmaFile.close();
+
 }
 
 void karmabot::saveKarma()
 {
+	std::ofstream karmaFile;
+	karmaFile.open(KARMA_FNAME.c_str());
+
+	std::map<std::string, int>::iterator iter;
+
+	for(iter = _karma.begin(); iter != _karma.end(); ++iter)
+	{
+		karmaFile << iter->first << " " << iter->second << std::endl;
+	}
+	karmaFile.close();
 
 }
 
@@ -67,7 +176,7 @@ bool karmabot::init(PluginUtils* utils_)
 
 }
 
-void karmabot::wrapup()
+void karmabot::wrapUp()
 {
 	saveKarma();
 }
