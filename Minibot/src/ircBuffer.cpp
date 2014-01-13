@@ -59,7 +59,7 @@ void ircBuffer::addBytes(char* bytes, size_t max_size)
 		temp = temp.substr(0, split);
 
 		ircLog::instance()->logf(FILENAME, "Leftovers: %s", _buffer.c_str());
-		ircLog::instance()->logf(FILENAME, "temp: %s", temp.c_str());
+		ircLog::instance()->logf(FILENAME, "temp: %s", temp.substr(0, split - 2).c_str());
 	}
 
 	//parse the complete messages into individual messages
