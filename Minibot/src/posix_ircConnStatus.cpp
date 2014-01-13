@@ -197,8 +197,8 @@ void posix_ircConnStatus::monitorTick(sigval val)
 
 void posix_ircConnStatus::monitor()
 {
-	 ircLog::instance()->logf(FILENAME, "Evaluating connection state...");
-	 ircLog::instance()->logf(FILENAME, "Current State is %d", (int)_state);
+	 //ircLog::instance()->logf(FILENAME, "Evaluating connection state...");
+	 //ircLog::instance()->logf(FILENAME, "Current State is %d", (int)_state);
 
 	switch(_state)
 	{
@@ -247,7 +247,7 @@ bool posix_ircConnStatus::validatePings()
 	double dif = difftime(t, lastPing);
 
 	//std::cout << "ircConnStatus: ping diff = " << dif << std::endl;
-	ircLog::instance()->logf(FILENAME, "ping difference = %f", dif);
+	//ircLog::instance()->logf(FILENAME, "ping difference = %f", dif);
 
 	rc = true;
 	if(dif > PING_TIME_OUT)
