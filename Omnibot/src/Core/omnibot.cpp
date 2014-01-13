@@ -85,13 +85,18 @@ void omnibot::alertEvent(ircEvent& e)
     {
 	    case ircEvent::ET_CONN_LOST:
 		{
+			ircLog::instance()->logf(FILENAME, "Connection Lost... attempting reconnect");
 			OmniConfigParser* parser = OmniConfigParser::instance();
 			if(parser->autoReconnect())
 			{
+				ircLog::instance()->logf(FILENAME, "Attempts to reconnect availible: %d", parser->maxReconnRetries());
 				int i;
 				int error;
 				for(i = 0, error = 0; i < parser->maxReconnRetries(); ++i)
 				{
+
+					ircLog::instance()->logf(FILENAME, "Reconnect attempt %d, %d attempts remaining", 
+							i+1, parser->maxReconnRetries() - i + 1);
 					error = connect();
 					if(!error)
 					{
@@ -108,6 +113,10 @@ void omnibot::alertEvent(ircEvent& e)
 					exit (1);
 				}
 
+			}
+			else
+			{
+				ircLog::instance()->logf(FILENAME, "Auto Reconnections not enabled (probably should exit here)");
 			}
 		}
     }
