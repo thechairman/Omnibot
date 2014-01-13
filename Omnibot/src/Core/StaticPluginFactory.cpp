@@ -1,10 +1,11 @@
 #include <StaticPluginFactory.h>
 
-#include"hurlbot.h"
-#include"bashbot.h"
-#include"qdbbot.h"
-#include"tomebot.h"
-#include"8ballbot.h"
+#include "hurlbot.h"
+#include "bashbot.h"
+#include "qdbbot.h"
+#include "tomebot.h"
+#include "8ballbot.h"
+#include "karmabot.h"
 
 OmniPlugin* StaticPluginFactory::load(std::string pluginName){
 	
@@ -23,6 +24,9 @@ OmniPlugin* StaticPluginFactory::load(std::string pluginName){
 	}
 	else if(!pluginName.compare("8ballbot")){
 		plugin = dynamic_cast<OmniPlugin*>  (new eightBallBot());
+	}
+	else if(!pluginName.compare("karmabot")){
+		plugin = dynamic_cast<OmniPlugin*>  (new karmabot());
 	}
 
 	return plugin;
