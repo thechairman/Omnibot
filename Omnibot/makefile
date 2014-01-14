@@ -185,7 +185,7 @@ ${OMNICOMM_LIB}: ${OMNICOMM_OBJS}
 .PHONY: ${PLUGINS}
 
 ${PLUGINS}:
-	${MAKE} -C ${PLUGIN_DIR} -f somakefile all DYNAMIC_LOADING=${DYNAMIC_LOADING}
+	${MAKE} -C ${PLUGIN_DIR} all DYNAMIC_LOADING=${DYNAMIC_LOADING}
 
 #invoke make for the Minibot directory
 .PHONY: ${MINIBOT}
