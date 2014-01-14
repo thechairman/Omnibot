@@ -25,6 +25,7 @@ void karmabot::onMessage(ircMessage& msg)
 
 	size_t increment_loc = msg.message().find(INCREMENTOR);
 	size_t decrement_loc = msg.message().find(DECREMENTOR);
+	bool updated = false;
 	//if we are trying to get somebody's karma total
 	if(!msg.message().substr(0, COMMAND_LEN).compare(COMMAND_STR))
 	{
@@ -55,8 +56,11 @@ void karmabot::onMessage(ircMessage& msg)
 			karma = 0;
 			std::pair<std::string, int> thing(target, karma);
 			_karma.insert(thing);
+			updated = true;
 		}
-
+		std::stringstream strstr;
+		strstr << target << " karma: " << karma;
+		utils->sendMessage(msg.channel(), strstr.str());
 		
 	}
 	else if (increment_loc != std::string::npos)
@@ -64,12 +68,14 @@ void karmabot::onMessage(ircMessage& msg)
 		std::string nick;
 	       	nick = msg.message().substr( 0, increment_loc);
 		incrementKarma(nick);
+		updated = true;
 	}
 	else if (decrement_loc != std::string::npos)
 	{
 		std::string nick;
 	       	nick = msg.message().substr( 0, decrement_loc);
 		decrementKarma(nick);
+		updated = true;
 	}
 
 //	if(msg.message().find(" ") == std::string::npos)
@@ -93,6 +99,10 @@ void karmabot::onMessage(ircMessage& msg)
 //		}
 //	}
 
+	if(updated)
+	{
+		saveKarma();
+	}
 }
 
 void karmabot::onOmniCommConnect(OmniCommChannel* o){}
@@ -154,7 +164,7 @@ void karmabot::loadKarma()
 void karmabot::saveKarma()
 {
 	std::ofstream karmaFile;
-	karmaFile.open(KARMA_FNAME.c_str());
+	karmaFile.open(KARMA_FNAME.c_str(), std::ios_base::out | std::ios_base::trunc);
 
 	std::map<std::string, int>::iterator iter;
 
