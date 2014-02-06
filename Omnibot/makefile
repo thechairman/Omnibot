@@ -123,7 +123,8 @@ PLUGIN_LIBS = -lhurlbot\
 	      -lqdbbot\
 	      -ltomebot\
 	      -l8ballbot\
-	      -lkarmabot
+	      -lkarmabot\
+	      -lwordsbot
 
 	      
 #ifeq(${DYNAMIC_LOADING}, YES)

@@ -18,14 +18,16 @@ PLUGIN_OBJS = hurlbot.o\
 	      qdbbot.o\
 	      tomebot.o\
 	      8ballbot.o\
-	      karmabot.o
+	      karmabot.o\
+	      wordsbot.o
 
 PLUGINS = libhurlbot.so\
 	  libbashbot.so\
 	  libqdbbot.so\
 	  libtomebot.so\
 	  lib8ballbot.so\
-	  libkarmabot.so
+	  libkarmabot.so\
+	  libwordsbot.so
 
 ifeq (${DYNAMIC_LOADING}, YES)
 	LOAD_MODE=-DDYNAMIC_LOADING
