@@ -6,6 +6,7 @@
 #include "tomebot.h"
 #include "8ballbot.h"
 #include "karmabot.h"
+#include "wordsbot.h"
 
 OmniPlugin* StaticPluginFactory::load(std::string pluginName){
 	
@@ -27,6 +28,9 @@ OmniPlugin* StaticPluginFactory::load(std::string pluginName){
 	}
 	else if(!pluginName.compare("karmabot")){
 		plugin = dynamic_cast<OmniPlugin*>  (new karmabot());
+	}
+	else if(!pluginName.compare("wordsbot")){
+		plugin = dynamic_cast<OmniPlugin*>  (new wordsbot());
 	}
 
 	return plugin;
