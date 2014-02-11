@@ -1,4 +1,3 @@
-
 #include "wordsbot.h"
 #include <deque>
 #include <string>
@@ -276,6 +275,25 @@ std::pair<std::string, std::string>* wordsbot::searchString(const std::string& s
 			found = str.find((iter->first));
 			ircLog::instance()->logf(MYFILE, " - searchString() co: %s", iter->first.c_str()); 
 		}
+
+		//compensate for finding a word inside another word
+		//ircLog::instance()->logf(MYFILE, " - searcString(): finished searching
+		if(found != std::string::npos && found > 0 && str[found -1] != ' ')
+		{
+			found = std::string::npos;
+		}
+	
+
+
+		if( found != std::string::npos &&
+				found + (iter->first).size() < str.size() && 
+				str[found + (iter->first).size()] != ' ' &&
+				str[found + (iter->first).size()] != '?' &&
+				str[found + (iter->first).size()] != '!')
+		{
+			found = std::string::npos;
+		}
+
 
 		if(found != std::string::npos)
 		{
