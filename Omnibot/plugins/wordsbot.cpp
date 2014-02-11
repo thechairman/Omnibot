@@ -200,12 +200,27 @@ bool wordsbot::addString(const std::string& str)
 		size_t is = str.find("is");
 		//start from the end of "no, "
 		size_t after_no = str.find(" ") + 1;
-		x = str.substr(after_no, is - after_no );
+		if(is - after_no > 0)
+		{
+			//the minus one is to not get the space before is
+			x = str.substr(after_no, is - after_no - 1 );
+		}
+		else
+		{
+			found_is = false;
+		}
 	}
 	else if(found_is)
 	{
 		ircLog::instance()->logf(MYFILE, " - addString() find only is");
-		x = (*before.rbegin());
+		if(before.size() > 0)
+		{	
+			x = (*before.rbegin());
+		}
+		else
+		{
+			found_is = false;
+		}
 	}
 	
 	ircLog::instance()->logf(MYFILE, " - addString() x is %s", x.c_str());
@@ -259,6 +274,7 @@ std::pair<std::string, std::string>* wordsbot::searchString(const std::string& s
 		else
 		{
 			found = str.find((iter->first));
+			ircLog::instance()->logf(MYFILE, " - searchString() co: %s", iter->first.c_str()); 
 		}
 
 		if(found != std::string::npos)
