@@ -1,4 +1,5 @@
 #include <sstream>
+#include <cstdlib>
 #include "OmniQuitCmd.h"
 
 const std::string OmniQuitCmd::NAME = "quit";

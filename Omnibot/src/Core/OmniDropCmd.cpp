@@ -1,5 +1,5 @@
 #include <sstream>
-#include "OmniDropCmd.h":
+#include "OmniDropCmd.h"
 
 const std::string OmniDropCmd::NAME = "drop";
 const std::string OmniDropCmd::USE = "drop [ plugin ... ]";
