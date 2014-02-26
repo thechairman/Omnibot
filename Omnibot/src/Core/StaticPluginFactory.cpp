@@ -7,6 +7,7 @@
 #include "8ballbot.h"
 #include "karmabot.h"
 #include "wordsbot.h"
+#include "numberwangbot.h"
 
 OmniPlugin* StaticPluginFactory::load(std::string pluginName){
 	
@@ -31,6 +32,9 @@ OmniPlugin* StaticPluginFactory::load(std::string pluginName){
 	}
 	else if(!pluginName.compare("wordsbot")){
 		plugin = dynamic_cast<OmniPlugin*>  (new wordsbot());
+	}
+	else if(!pluginName.compare("numberwangbot")){
+		plugin = dynamic_cast<OmniPlugin*>  (new numberwangBot());
 	}
 
 	return plugin;
