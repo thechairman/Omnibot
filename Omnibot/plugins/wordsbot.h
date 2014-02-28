@@ -18,9 +18,11 @@ class wordsbot:public OmniPlugin {
 		const static int MAX_LINE_LEN = 25;
 		
 		const static std::string WORDS_FNAME;
+		const static std::string UNSPEAKABLE_WORDS_FNAME;
 		const static std::string LINES[NUM_LINES][MAX_LINE_LEN];
 
 		std::map<std::string, std::string> _words;
+		std::vector<std::string>* _unspeakable_words;
 		PluginUtils* utils;
 
 		std::string getString(const std::string&, const std::string&);
@@ -29,7 +31,9 @@ class wordsbot:public OmniPlugin {
 		bool proc();
 		void saveWords();
 		void loadWords();
-
+		void loadUnspeakables();
+		void saveUnspeakables();
+		bool isUnspeakable(std::string);
 
 
 };

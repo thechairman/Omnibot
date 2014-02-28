@@ -19,6 +19,7 @@
 #endif
 
 const std::string wordsbot::WORDS_FNAME = "word_map.txt";
+const std::string wordsbot::UNSPEAKABLE_WORDS_FNAME = "unspeakable_words.txt";
 const std::string wordsbot::LINES[NUM_LINES][MAX_LINE_LEN] =
 {
 	{ "Someone said ", " is "},
@@ -105,12 +106,16 @@ void wordsbot::onOmniCommConnect(OmniCommChannel* channel){}
 
 bool wordsbot::init(PluginUtils* utils_){
 	utils = utils_;
+	_unspeakable_words = new std::vector<std::string>();
 	loadWords();
+	loadUnspeakables();
 	return true;
 }
 
 void wordsbot::wrapUp(){
 	saveWords();
+	//saveUnspeakables();
+	delete _unspeakable_words;
 }
 
 std::string wordsbot::name(){
@@ -142,9 +147,12 @@ bool wordsbot::addString(const std::string& str)
 	std::stringstream tokenizer(str);
 	std::string token;
 	std::deque<std::string> before, after;
-	std::string x, y;
+	std::string x = "", y = "";
 	bool found_is = false;
 	bool found_no = false;
+
+
+
 
 	std::string normalized_str = str;
 	std::transform(normalized_str.begin(), normalized_str.end(), normalized_str.begin(), ::tolower);
@@ -193,6 +201,7 @@ bool wordsbot::addString(const std::string& str)
 		ircLog::instance()->logf(MYFILE, " - addString() found_no is false");
 	}
 
+
 	if(found_is && found_no)
 	{
 		ircLog::instance()->logf(MYFILE, " - addString() found both");
@@ -212,7 +221,7 @@ bool wordsbot::addString(const std::string& str)
 	else if(found_is)
 	{
 		ircLog::instance()->logf(MYFILE, " - addString() find only is");
-		if(before.size() > 0)
+		if(before.size() > 0 )
 		{	
 			x = (*before.rbegin());
 		}
@@ -223,6 +232,25 @@ bool wordsbot::addString(const std::string& str)
 	}
 	
 	ircLog::instance()->logf(MYFILE, " - addString() x is %s", x.c_str());
+	
+	bool unspeakable = false;
+	if(x.empty())
+	{
+		unspeakable = isUnspeakable(x);
+	}
+
+	if(unspeakable)
+	{
+		ircLog::instance()->logf(MYFILE, " - addString() x is unspeakable");
+		x = "";
+		found_is = false;
+	}
+	else
+	{
+		ircLog::instance()->logf(MYFILE, " - addString() x is cool");
+	}
+
+
 	//handle the y which is the same for either case
 	if(found_is)
 	{
@@ -399,4 +427,63 @@ void wordsbot::loadWords()
 
 	file.close();
 
+}
+void wordsbot::loadUnspeakables()
+{
+	std::ifstream file;
+	std::string file_line;
+	file.open(UNSPEAKABLE_WORDS_FNAME.c_str());
+
+	while(std::getline(file, file_line, '\n'))
+	{
+		_unspeakable_words->push_back(file_line);
+		ircLog::instance()->logf(MYFILE, " - loadUnspeakables() read %s", file_line.c_str() );
+	}
+
+	//_unspeakable_words.push_back("is");
+
+/*	if(_unspeakable_words[0] == NULL)
+	{
+		std::cout << "something is wrong..." << std::endl;
+	}
+*/
+	file.close();
+}
+void wordsbot::saveUnspeakables()
+{
+	std::ofstream file;
+	file.open(UNSPEAKABLE_WORDS_FNAME.c_str());
+
+	for(unsigned int i = 0; i < _unspeakable_words->size(); ++i)
+	{
+		file << (*_unspeakable_words)[i] << std::endl;
+	}
+
+	file.close();
+
+}
+bool wordsbot::isUnspeakable(std::string word)
+{
+	bool retval = false;
+
+	std::cout << "size of unspeakable words: " << _unspeakable_words->size() << std::endl;
+
+	for(unsigned int i = 0; i < _unspeakable_words->size(); ++i)
+	{
+		/*if(_unspeakable_words[i] == NULL)
+		{
+			ircLog::instance()->logf(MYFILE, " - isUnspeakable(): _unspeakable_words %d is NULL", i);
+			continue;
+		}*/
+		//const char* a = word.c_str();
+		//const char* b = _unspeakable_words[i].c_str();
+		//ircLog::instance()->logf(MYFILE, " - isUnspeakable() compareing %s", _unspeakable_words[i].c_str());
+		//ircLog::instance()->logf(MYFILE, " - isUnspeakable() compareing %s", word.c_str());
+		//ircLog::instance()->logf(MYFILE, " - isUnspeakable() compareing %s and %s", word.c_str(), _unspeakable_words[i].c_str());
+		if(!word.compare((*_unspeakable_words)[i]))
+		{
+			retval = true;
+		}
+	}
+	return retval;
 }
