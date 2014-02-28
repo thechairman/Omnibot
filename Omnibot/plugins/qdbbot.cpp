@@ -5,6 +5,8 @@
 #include<cstdlib>
 #include<cstring>
 
+#include<unistd.h>
+
 #include "qdbbot.h"
 #include "Threads/pthread_Thread.h"
 

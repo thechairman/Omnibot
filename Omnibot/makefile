@@ -23,7 +23,8 @@ LIBS = -lOmniThread \
        -lpthread \
        -lMinibot \
        -lcurl	\
-       -lrt 
+       -lrt	\
+       -ldl 
 
 INCLUDES = -I ./include \
 	   -I ./include/Core \

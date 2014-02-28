@@ -1,3 +1,5 @@
+
+#include <cstdlib>
 #include <iostream>
 
 #include "OmniConfigParser.h"

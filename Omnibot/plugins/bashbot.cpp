@@ -1,9 +1,12 @@
+
 #include<curl/curl.h>
 #include<curl/types.h>
 #include<curl/easy.h>
 
 #include<cstdlib>
 #include<cstring>
+
+#include<unistd.h>
 
 #include "bashbot.h"
 #include "Threads/pthread_Thread.h"

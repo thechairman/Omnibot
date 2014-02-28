@@ -361,7 +361,7 @@ void ircInterface::onConnectionDeath()
 	//notify the client through the event handler.
 	std::cerr << "ircInterface: connection lost..." << std::endl;
 	//ircEvent e = ircEvent::connectionLost();
-	ircEvent e = (ircEvent) ircEvent_connLost::ircEvent_connLost();
+	ircEvent e = (ircEvent) ircEvent_connLost();
 	notifyEvent(e);
 
 

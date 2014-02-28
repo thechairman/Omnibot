@@ -2,7 +2,7 @@ VPATH = ./src
 
 CC = g++
 AR = ar
-LIBS = -lpthread -lstdc++ -lrt
+LIBS = -pthread -lstdc++ -lrt
 INCLUDES = -I ./include
 
 BUILD_DIR = ./build/
@@ -43,7 +43,7 @@ ${LIBRARY}: ${LIB_OBJS}
 ${EXECUTABLE}: ${EXE_OBJS}
 	@mkdir -p ${BUILD_DIR}
 	@echo "Building: $@"
-	${CC} -o"$@" ${LIBS} ${EXE_OBJS}
+	${CC} -o"$@" ${LIBS} ${EXE_OBJS} ${LIBS}
 	@echo "Done building: $@"
 	@echo ' '
 
