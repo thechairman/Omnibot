@@ -1,4 +1,3 @@
-
 #include <cstdlib>
 #include <iostream>
 
@@ -10,7 +9,7 @@
 
 const std::string FILENAME = "Core/omnibot.cpp";
 
-omnibot::omnibot():_irc(new ircInterface()), _nicks(), _manager(_irc, _nicks),_blocker(OmniBlocker::create()),_passedIrc(false){
+omnibot::omnibot():_irc(new ircInterface()), _nicks(), _manager(_irc, _nicks),/*_blocker(OmniBlocker::create()),*/_passedIrc(false){
 /*	should create an irc instance here and connec
 	but i don't think this is possible... you would 
 	need a default server... maybe I should just take
@@ -23,7 +22,7 @@ omnibot::omnibot():_irc(new ircInterface()), _nicks(), _manager(_irc, _nicks),_b
 	ircLog::instance()->logf(FILENAME, "size of _commands after createCommands %u", _commands->size());
 
 }
-omnibot::omnibot(ircInterface* irc_):_irc(irc_),_nicks(),_manager(_irc, _nicks),_blocker(OmniBlocker::create()),_passedIrc(true){
+omnibot::omnibot(ircInterface* irc_):_irc(irc_),_nicks(),_manager(_irc, _nicks),/*_blocker(OmniBlocker::create()),*/_passedIrc(true){
 	//std::cout << std::hex << &irc_ << std::dec << std::endl;
 	ircLog::instance()->logf(FILENAME, "ircInteface instance: %x", &irc_);
 	_irc->registerForNotify(this);
@@ -186,7 +185,7 @@ int omnibot::connect()
 }
 void omnibot::exec()
 {
-	_blocker->block();
+	/*_blocker->block();*/
 }
 void omnibot::join(std::string channel){
 	_irc->join(channel);

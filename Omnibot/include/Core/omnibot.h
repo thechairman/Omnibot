@@ -5,7 +5,7 @@
 
 #include "NickManager.h"
 #include "PluginManager.h"
-#include "OmniBlocker.h"
+//#include "OmniBlocker.h"
 #include "ircInterface.h"
 #include "ircInterfaceClient.h"
 
@@ -26,7 +26,7 @@ class omnibot: public ircInterfaceClient{
 		ircInterface* _irc;
 		NickManager _nicks;
 		PluginManager _manager;
-		OmniBlocker* _blocker;
+		//OmniBlocker* _blocker;
 		bool _passedIrc;
 
 		std::vector<OmniCommand*>* _commands;

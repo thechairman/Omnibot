@@ -114,7 +114,8 @@ PLUGIN_OBJS = ${PLUGIN_DIR}/hurlbot.o\
 	      ${PLUGIN_DIR}/qdbbot.o\
 	      ${PLUGIN_DIR}/tomebot.o\
 	      ${PLUGIN_DIR}/8ballbot.o\
-	      ${PLUGIN_DIR}/karmabot.o
+	      ${PLUGIN_DIR}/karmabot.o\
+	      ${PLUGIN_DIR}/numberwangbot.o
 
 
 #################################################################################
@@ -125,7 +126,8 @@ PLUGIN_LIBS = -lhurlbot\
 	      -ltomebot\
 	      -l8ballbot\
 	      -lkarmabot\
-	      -lwordsbot
+	      -lwordsbot\
+	      -lnumberwangbot
 
 	      
 #ifeq(${DYNAMIC_LOADING}, YES)

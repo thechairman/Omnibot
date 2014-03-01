@@ -19,7 +19,8 @@ PLUGIN_OBJS = hurlbot.o\
 	      tomebot.o\
 	      8ballbot.o\
 	      karmabot.o\
-	      wordsbot.o
+	      wordsbot.o\
+	      numberwangbot.o
 
 PLUGINS = libhurlbot.so\
 	  libbashbot.so\
@@ -27,7 +28,8 @@ PLUGINS = libhurlbot.so\
 	  libtomebot.so\
 	  lib8ballbot.so\
 	  libkarmabot.so\
-	  libwordsbot.so
+	  libwordsbot.so\
+	  libnumberwangbot.so
 
 ifeq (${DYNAMIC_LOADING}, YES)
 	LOAD_MODE=-DDYNAMIC_LOADING
@@ -52,7 +54,7 @@ all: ${PLUGINS}
 lib%.o: ./%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++  ${LIBS} ${INCLUDES} -fPIC ${LOAD_MODE} -g -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	g++ ${LIBS} ${INCLUDES} -fPIC ${LOAD_MODE} -g -O0 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
