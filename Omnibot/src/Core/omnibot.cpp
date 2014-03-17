@@ -51,7 +51,7 @@ void omnibot::alertMessage(ircMessage& msg)
 	ircLog::instance()->logf(FILENAME, "Omnibot received string: %s", toParse.c_str());
 
 	size_t i;
-	
+
 	ircLog::instance()->logf(FILENAME, "using commands at %x", _commands);
 	ircLog::instance()->logf(FILENAME, "number of commands %u", _commands->size());
 
@@ -166,7 +166,7 @@ int omnibot::connect()
 	for(size_t i = 0; i < channels.size(); ++i)
 	{
 		_irc->join(channels[i]);
-	
+
 	}
 
 	std::vector<std::string> plugins = parser->plugins();
@@ -178,7 +178,7 @@ int omnibot::connect()
 			ircLog::instance()->logf(FILENAME, "succefully loaded plugin %s on connect", plugins[i].c_str());
 		else
 			ircLog::instance()->logf(FILENAME, "failed to load plugin %s on connect", plugins[i].c_str());
-	
+
 	}
 
 	return rc;
