@@ -78,8 +78,6 @@ CORE_OBJS = ${BUILD_CORE}/omnibot.o\
 	    ${BUILD_CORE}/PluginUtils.o\
 	    ${BUILD_CORE}/OmniPluginInterface.o\
 	    ${BUILD_CORE}/OmniConfigParser.o\
-	    ${BUILD_CORE}/OmniBlocker.o\
-	    ${BUILD_CORE}/posix_OmniBlocker.o\
 	    ${BUILD_CORE}/main.o\
 	    ${BUILD_CORE}/OmniJoinCmd.o\
 	    ${BUILD_CORE}/OmniLeaveCmd.o\
