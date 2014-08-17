@@ -48,6 +48,7 @@ void numberwangBot::onOmniCommConnect(OmniCommChannel* occ){}
 bool numberwangBot::init(PluginUtils* pus)
 {
 	_utils = pus;
+	return true;;
 }
 void numberwangBot::wrapUp(){}
 std::string numberwangBot::name()

@@ -153,7 +153,7 @@ int OmniCfgReader::processFile()
 			}
 		}
 	}
-	for(int i = 0; i < _sectionsInOrder.size(); ++i )
+	for(unsigned int i = 0; i < _sectionsInOrder.size(); ++i )
 	{
 		std::cout << "Section: " << _sectionsInOrder[i] << std::endl;
 		sectionData data = _sections[_sectionsInOrder[i]];

@@ -533,6 +533,7 @@ bool OmniConfigParser::AuthSection::isSection(std::string section)
 }
 OmniConfigParser::parseCodes OmniConfigParser::AuthSection::loadEntry(std::string entry)
 {
+	return P_SUCCESS;;
 }
 
 void OmniConfigParser::AuthSection::clear()
