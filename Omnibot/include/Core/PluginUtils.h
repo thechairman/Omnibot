@@ -33,6 +33,9 @@ class PluginUtils {
 		std::vector<ircUser> getAuthenticatedUsers();
 
 		OmniCommChannel* openOmniCommChannel(std::string);
+
+		void kick(std::string nick);
+		void ban(std::string nick);
 	
 	private:
 		ircInterface *_irc;

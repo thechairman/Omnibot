@@ -1,5 +1,6 @@
 #include "PluginUtils.h"
 
+#include <iostream>
 PluginUtils::PluginUtils(PluginUtils* utils, PluginAttrs* attrs)
 {
 	_irc = utils->_irc;
@@ -11,12 +12,19 @@ PluginUtils::PluginUtils(ircInterface* irc_, PluginManager& manager_, NickManage
 
 
 void PluginUtils::sendPM(std::string nick, std::string message){
-	_irc->sendPM(nick, message);
+	if(_attrs->canPrivateMessage())
+	{
+		_irc->sendPM(nick, message);
+	}
 }
 
 
-void PluginUtils::sendMessage(std::string channel, std::string message){
-	_irc->sendMessage(channel, message);
+void PluginUtils::sendMessage(std::string channel, std::string message)
+{
+	if(_attrs->canChannelMessage())
+	{
+		_irc->sendMessage(channel, message);
+	}
 }
 ircUser PluginUtils::getUser(std::string nick)
 {
@@ -49,5 +57,28 @@ std::vector<ircUser> PluginUtils::getAuthenticatedUsers()
 
 OmniCommChannel* PluginUtils::openOmniCommChannel(std::string name)
 {
-	return _manager->setupChannel(name);
+	OmniCommChannel* retval = NULL; 
+	if(_attrs->canTalkToPlugins())
+	{
+		retval = _manager->setupChannel(name);
+	}
+
+	 return retval;
+}
+
+void PluginUtils::kick(std::string nick)
+{
+	if(_attrs->canKick())
+	{
+		std::cout << " I'd kick if I could" << std::endl;
+	}
+
+}
+void PluginUtils::ban(std::string nick)
+{
+	if(_attrs->canBan())
+	{
+		std::cout << " I'd ban if I could" << std::endl;
+	}
+
 }

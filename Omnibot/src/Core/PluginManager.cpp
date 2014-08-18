@@ -45,9 +45,12 @@ bool PluginManager::load(std::string pluginName){
 		return false;
 	}
 
+	//for now
+	static PluginAttrs attrs;
+
 	//TODO look up permissions for this plugin and set them 
 	//in the this plugin utils struct
-	PluginUtils* utils= new PluginUtils(_utils, (PluginAttrs*) NULL );
+	PluginUtils* utils= new PluginUtils(_utils, &attrs );
 
 	newPlugin->init(utils);
 

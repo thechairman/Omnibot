@@ -1,4 +1,4 @@
-#include<PluginAttrs.h>
+#include"PluginAttrs.h"
 
 PluginAttrs::PluginAttrs():
 	_name("default"),
@@ -21,13 +21,13 @@ PluginAttrs::PluginAttrs(std::string name, bool pm, bool msg, bool ipc,
 	_ban(ban)
 {}
 
-inline std::string PluginAttrs::name(){return _name;}
-inline bool PluginAttrs::canPrivateMessage(){return _pm;}
-inline bool PluginAttrs::canChannelMessage(){return _message;}
-inline bool PluginAttrs::canTalkToPlugins(){return _ipc;}
-inline bool PluginAttrs::canGetUserInfo(){return _user_info;}
-inline bool PluginAttrs::canKick(){return _kick;}
-inline bool PluginAttrs::canBan(){return _ban;}
+//inline std::string PluginAttrs::name(){return _name;}
+//inline bool PluginAttrs::canPrivateMessage(){return _pm;}
+//inline bool PluginAttrs::canChannelMessage(){return _message;}
+//inline bool PluginAttrs::canTalkToPlugins(){return _ipc;}
+//inline bool PluginAttrs::canGetUserInfo(){return _user_info;}
+//inline bool PluginAttrs::canKick(){return _kick;}
+//inline bool PluginAttrs::canBan(){return _ban;}
 
 
 std::ostream& operator<<(std::ostream& os, const PluginAttrs& attrs)
