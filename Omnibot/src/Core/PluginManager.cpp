@@ -62,6 +62,7 @@ bool PluginManager::load(std::string pluginName){
 
 bool PluginManager::unload(std::string pluginName){
 	std::vector<OmniPlugin*>::iterator iter;
+	bool retval = false;
 	for(iter = _plugins.begin(); iter != _plugins.end(); iter++)
 	{
 		if(!((*iter)->name().compare(pluginName)))
@@ -69,6 +70,7 @@ bool PluginManager::unload(std::string pluginName){
 			(*iter)->wrapUp();
 			delete (*iter);
 			_plugins.erase(iter);
+			retval = true;
 			break;
 		}
 	}
@@ -77,7 +79,7 @@ bool PluginManager::unload(std::string pluginName){
 	//dynamic library" we should tell the factory to do that here
 	
 
-	return true;
+	return retval;
 }
 
 void PluginManager::pushMessage(ircMessage& msg){

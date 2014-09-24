@@ -38,16 +38,24 @@ bool OmniDropCmd::exec(ircMessage& msg)
 {
 	std::istringstream tokenizer(msg.message());
 	std::string token;
+	bool foundCommand = false;
 
 	while(getline(tokenizer, token, ' '))
 	{
 		if(token.compare(name()) == 0)
 		{
+			foundCommand = true;
 			continue;
 		}
 
-		_plugins->unload(token);
-		_irc->sendMessage(msg.channel(), "dropping " + token);
+		if(_plugins->unload(token))
+		{
+			_irc->sendMessage(msg.channel(), "dropping " + token);
+		}
+		else
+		{
+			_irc->sendMessage(msg.channel(), "sorry " +  msg.user().nick() +", I can't find that plugin");
+		}
 	}
 
 	return false;
