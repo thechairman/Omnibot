@@ -19,6 +19,13 @@
 //Frakking circular dependencies
 //class ircUserAuth;
 
+/**
+ *    This is the top level class for the minibot library and provides a for fairly lowlevel
+ *    access to the irc protocol with public functions for each possible command to send to the 
+ *    server.  It abstracts the details about string construction.  It also contains functions 
+ *    called by the low level io classes for processing strings received on a socket and distributing
+ *    them to intrested parties.
+ */
 class ircInterface : public ircioCallBack, public ircConnStatusCB{
 
 	public:
@@ -71,8 +78,9 @@ class ircInterface : public ircioCallBack, public ircConnStatusCB{
 	void removeChannel(std::string);
 
 	//TODO find a way to get this to just ircio
-	ircio* _serverConnection;
-	std::vector<ircInterfaceClient*> clients;
+	ircio* _serverConnection;                        /**<Pointer to the class that handles socket io*/
+	std::vector<ircInterfaceClient*> clients;        /**<Vector of clients to invoke callbacks on when 
+							   messsages are recieved*/
 
 	//map to hold nicks -> user structs
 	std::map<std::string, ircUser*> users;
@@ -80,7 +88,8 @@ class ircInterface : public ircioCallBack, public ircConnStatusCB{
 //	ircUserAuth* _userAuth;
 //	ircUsersInterface* _usersInterface;
 	ircNickListParser _nickListParser;
-	ircConnStatus* _connStatus;
+	ircConnStatus* _connStatus;                     /**<Pointer to the object monitoring the health of
+							  the server connection*/
 
 	bool _autoReconnect;
 	std::string _server;

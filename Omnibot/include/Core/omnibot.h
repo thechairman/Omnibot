@@ -12,7 +12,23 @@
 #include "OmniCommand.h"
 #include "OmniCommandBuilder.h"
 
+
+/**
+ * This is class is the top level class in Omnibot
+ */
 class omnibot: public ircInterfaceClient{
+	
+	private:
+		ircInterface* _irc;                   /**< A pointer to the minibot irc interface*/
+		NickManager _nicks;                   /**< A pointer to the nick manger */
+		PluginManager _manager;
+		bool _passedIrc;		      /**< A flag indicating whether or not _irc 
+							needs to be deleted in the destructor*/
+
+		std::vector<OmniCommand*>* _commands; /**< This vector contains the omnibot command 
+							objects responsible for processing commands
+							directed at the bot proper*/
+		
 	public:
 		omnibot();
 		omnibot(ircInterface*);
@@ -23,14 +39,6 @@ class omnibot: public ircInterfaceClient{
 		void exec();
 
 	private:
-		ircInterface* _irc;
-		NickManager _nicks;
-		PluginManager _manager;
-		//OmniBlocker* _blocker;
-		bool _passedIrc;
-
-		std::vector<OmniCommand*>* _commands;
-		
 		//probably a ton of methods here about what to do
 		//with various things to do when certain messages 
 		//are recieved

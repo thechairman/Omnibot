@@ -52,24 +52,46 @@ void printUser(ircUser* user)
 
 }
 
+/**
+ * Constructor for the ircInterface
+ * Auto reconnect is false by default
+ */
 ircInterface::ircInterface():_autoReconnect(false){
+
+	//get the os specific low level io device
 	_serverConnection = ircio::create();
 
+	//get the os specific connection monitor
 	_connStatus = ircConnStatus::instance();
 
 }
 
+/**
+ *  ircInterface destructor
+ *  cleans up the low level io connection
+ */
 ircInterface::~ircInterface(){
 	delete _serverConnection;
 	
 	//TODO clean up _connStatus
 }
+/**
+ *  Sets the interface's auto reconnect property;
+ *  @param reconnect the flag that indicates whether or not to set reconnect
+ *  @return void
+ */
 void ircInterface::setAutoReconnect(bool reconnect)
 {
 	_autoReconnect = reconnect;
 }
 
-int ircInterface::connect(std::string server, int port){
+/**
+ *  This function establishes a connections to the specified server on the specified port
+ *  @param server a string with the name of the server to connect (it is unknown if IPs will work or not)
+ *  @param port the tcp port to connect ot the server on
+ *  @returns CONNECT_SUCCESS on success non zero from connSetup_t on failure.
+ */
+int ircInterface::connect(const std::string server, const int port){
 
 	int rc = CONNECT_SUCCESS;
 	//std::cout << "ircInterface: initing connection monitoring" <<std::endl;
@@ -105,6 +127,17 @@ int ircInterface::connect(std::string server, int port){
 	return rc;
 }
 
+/**
+ *  This function registers the user with there server.  It sends the nick and tue user name.
+ *  When an irc client connects to the server within a certain period of time the client must
+ *  register the user with the server.  This involves sending the NICK message to submit the nick
+ *
+ *  @param nick the nickname to use on the irc server
+ *  @param uname the user name
+ *  @param rname the users real name
+ *
+ *  @returns CONNECT_SUCCESS on success or NICK_COLLISION
+ */
 int ircInterface::registerUser(std::string nick, std::string uname, std::string rname){
 
 	_nick = nick;
