@@ -92,6 +92,30 @@ double OmniCfgReader::getDouble(std::string section, std::string entry, double d
 	}
 	return retval;
 }
+void OmniCfgReader::setBool(std::string section, std::string entry, bool value)
+{
+	std::stringstream converter;
+	converter <<  value;
+	addEntry(section, entry, converter.str());
+}
+void OmniCfgReader::setString(std::string section, std::string entry, std::string value)
+{
+	std::stringstream converter;
+	converter <<  value;
+	addEntry(section, entry, converter.str());
+}
+void OmniCfgReader::setInt(std::string section, std::string entry, int value)
+{
+	std::stringstream converter;
+	converter <<  value;
+	addEntry(section, entry, converter.str());
+}
+void OmniCfgReader::setDouble(std::string section, std::string entry, int value)
+{
+	std::stringstream converter;
+	converter <<  value;
+	addEntry(section, entry, converter.str());
+}
 int OmniCfgReader::processFile()
 {
 	std::string line;
@@ -213,6 +237,22 @@ void OmniCfgReader::addEntry(std::string section, std::string entry, std::string
    		}
 	}
 }
+bool OmniCfgReader::setSection(std::string section)
+{
+	bool retval = false;
+	for(unsigned int i = 0; i < _sectionsInOrder.size(); ++i)
+	{
+		if(_sectionsInOrder[i].compare(section) == 0)
+		{
+			//next section is always the one
+			//after what we are acessing
+			_nextSection = i + 1;
+			retval = true;
+		}
+	}
+
+	return retval;
+}
 
 bool OmniCfgReader::getNextSection(std::string& section)
 {
@@ -225,7 +265,7 @@ bool OmniCfgReader::getNextSection(std::string& section)
 	}
 	else
 	{
-		_nextSection = 0;;
+		_nextSection = 0;
 		_nextEntry = 0;
 	}
 

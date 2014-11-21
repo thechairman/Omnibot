@@ -19,8 +19,15 @@ class OmniCfgReader
 		int getInt(std::string section, std::string entry, int dflt);
 		double getDouble(std::string section, std::string entry, double dflt);
 
+
 		bool getNextSection(std::string& section);
 		bool getNextEntry(std::string& entry);
+
+		bool setSection(std::string section);
+		void setBool(std::string section, std::string entry, bool value);
+		void setString(std::string section, std::string entry, std::string value);
+		void setInt(std::string section, std::string entry, int value);
+		void setDouble(std::string section, std::string entry, int value);
 
 	private:
 		
