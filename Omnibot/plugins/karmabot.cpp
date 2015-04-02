@@ -67,15 +67,45 @@ void karmabot::onMessage(ircMessage& msg)
 	{
 		std::string nick;
 	       	nick = msg.message().substr( 0, increment_loc);
-		incrementKarma(nick);
-		updated = true;
+		
+		stripString(nick, ": ");
+	        stripString(nick, ":");	
+
+		if(nick.find(" ") == std::string::npos)
+		{
+			if(nick.compare(msg.user().nick()))
+			{
+				incrementKarma(nick);
+				updated = true;
+			}
+			else
+			{
+				utils->sendMessage(msg.channel(), msg.user().nick() + ": You can't karma yourself!");
+			}
+		}
+
 	}
 	else if (decrement_loc != std::string::npos)
 	{
 		std::string nick;
 	       	nick = msg.message().substr( 0, decrement_loc);
-		decrementKarma(nick);
-		updated = true;
+
+		stripString(nick, ": ");
+	        stripString(nick, ":");	
+
+		if(nick.find(" ") == std::string::npos)
+		{
+			if(nick.compare(msg.user().nick()))
+			{	
+				decrementKarma(nick);
+				updated = true;
+			}
+			else
+			{
+				utils->sendMessage(msg.channel(), msg.user().nick() + ": I just stopped you from doing something dumb");
+			
+			}
+		}
 	}
 
 //	if(msg.message().find(" ") == std::string::npos)
@@ -174,6 +204,16 @@ void karmabot::saveKarma()
 	}
 	karmaFile.close();
 
+}
+
+void karmabot::stripString(std::string& theString,  const std::string& substr)
+{
+	int i = theString.find(substr);
+	while(i != std::string::npos)
+	{
+		theString.erase(i, substr.length());
+		i = theString.find(substr);
+	}
 }
 
 bool karmabot::init(PluginUtils* utils_)

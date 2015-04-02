@@ -35,5 +35,6 @@ class karmabot: public OmniPlugin{
 
 		void loadKarma();
 		void saveKarma();
+		void stripString(std::string&,  const std::string&);
 };
 
